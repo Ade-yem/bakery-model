@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types.js';
+import { configureApp } from './../src/app.config.js';
 import { AppModule } from './../src/app.module.js';
 
 describe('AppController (e2e)', () => {
@@ -13,14 +14,24 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configureApp(app);
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('/api/v1 (GET)', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .get('/api/v1')
       .expect(200)
       .expect('Hello World!');
+  });
+
+  it('/docs/openapi.json (GET)', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/docs/openapi.json')
+      .expect(200);
+
+    expect(response.body.info.title).toBe('TallyBakery API');
+    expect(response.body.paths['/api/v1']).toBeDefined();
   });
 
   afterEach(async () => {
