@@ -17,6 +17,7 @@ Read the relevant sections of these documents before changing product behavior:
 
 - `docs/Product Requirements Document_ Shift-Based Invento....md` — personas, access boundaries, workflows, goals, and product requirements.
 - `docs/tallybakery_software_design_document.md` — proposed architecture, domain model, ledger rules, API conventions, offline synchronization, security, and acceptance criteria.
+- `docs/shared_package.md` — specification of the shared contracts package (`@repo/shared`), including types, enums, error taxonomy, pagination, and boundary rules.
 
 ## Workspace and commands
 
