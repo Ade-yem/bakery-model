@@ -1,0 +1,1741 @@
+{
+  "type": "base",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "7ee28980-5006-4be9-90df-5822b5bf4f25",
+  "prevIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "department_type"
+      ],
+      "writes": [
+        "s|enum|public.department_type",
+        "n|enum|public.department_type",
+        "e|enum|public.department_type",
+        "n|type|public.department_type"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "membership_status"
+      ],
+      "writes": [
+        "s|enum|public.membership_status",
+        "n|enum|public.membership_status",
+        "e|enum|public.membership_status",
+        "n|type|public.membership_status"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "record_status"
+      ],
+      "writes": [
+        "s|enum|public.record_status",
+        "n|enum|public.record_status",
+        "e|enum|public.record_status",
+        "n|type|public.record_status"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "tenant_status"
+      ],
+      "writes": [
+        "s|enum|public.tenant_status",
+        "n|enum|public.tenant_status",
+        "e|enum|public.tenant_status",
+        "n|type|public.tenant_status"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "branches"
+      ],
+      "writes": [
+        "s|tbl|public.branches",
+        "n|tbl|public.branches",
+        "e|tbl|public.branches",
+        "n|rel|public.branches",
+        "n|type|public.branches",
+        "n|rel|public.branches_pkey",
+        "n|rel|public.branches_tenant_code_unique",
+        "n|rel|public.branches_tenant_id_id_unique"
+      ],
+      "reads": [
+        "n|sch|public",
+        "n|enum|public.record_status"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "departments"
+      ],
+      "writes": [
+        "s|tbl|public.departments",
+        "n|tbl|public.departments",
+        "e|tbl|public.departments",
+        "n|rel|public.departments",
+        "n|type|public.departments",
+        "n|rel|public.departments_pkey",
+        "n|rel|public.departments_tenant_id_id_unique",
+        "n|rel|public.departments_branch_name_unique"
+      ],
+      "reads": [
+        "n|sch|public",
+        "n|enum|public.department_type",
+        "n|enum|public.record_status"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "membership_branches"
+      ],
+      "writes": [
+        "s|tbl|public.membership_branches",
+        "n|tbl|public.membership_branches",
+        "e|tbl|public.membership_branches",
+        "n|rel|public.membership_branches",
+        "n|type|public.membership_branches",
+        "n|rel|public.membership_branches_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "membership_departments"
+      ],
+      "writes": [
+        "s|tbl|public.membership_departments",
+        "n|tbl|public.membership_departments",
+        "e|tbl|public.membership_departments",
+        "n|rel|public.membership_departments",
+        "n|type|public.membership_departments",
+        "n|rel|public.membership_departments_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "role_permissions"
+      ],
+      "writes": [
+        "s|tbl|public.role_permissions",
+        "n|tbl|public.role_permissions",
+        "e|tbl|public.role_permissions",
+        "n|rel|public.role_permissions",
+        "n|type|public.role_permissions",
+        "n|rel|public.role_permissions_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "tenant_memberships"
+      ],
+      "writes": [
+        "s|tbl|public.tenant_memberships",
+        "n|tbl|public.tenant_memberships",
+        "e|tbl|public.tenant_memberships",
+        "n|rel|public.tenant_memberships",
+        "n|type|public.tenant_memberships",
+        "n|rel|public.tenant_memberships_pkey",
+        "n|rel|public.tenant_memberships_tenant_user_unique",
+        "n|rel|public.tenant_memberships_tenant_id_id_unique"
+      ],
+      "reads": [
+        "n|sch|public",
+        "n|enum|public.membership_status"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "tenants"
+      ],
+      "writes": [
+        "s|tbl|public.tenants",
+        "n|tbl|public.tenants",
+        "e|tbl|public.tenants",
+        "n|rel|public.tenants",
+        "n|type|public.tenants",
+        "n|rel|public.tenants_pkey"
+      ],
+      "reads": [
+        "n|sch|public",
+        "n|enum|public.tenant_status"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "branches",
+        "branches_tenant_status_created_at_idx"
+      ],
+      "writes": [
+        "s|idx|public.branches_tenant_status_created_at_idx",
+        "n|idx|public.branches_tenant_status_created_at_idx",
+        "e|idx|public.branches_tenant_status_created_at_idx",
+        "n|rel|public.branches_tenant_status_created_at_idx"
+      ],
+      "reads": [
+        "n|tbl|public.branches",
+        "n|sch|public",
+        "n|col|public.branches.tenant_id",
+        "n|col|public.branches.status",
+        "n|col|public.branches.created_at"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "departments",
+        "departments_tenant_branch_status_idx"
+      ],
+      "writes": [
+        "s|idx|public.departments_tenant_branch_status_idx",
+        "n|idx|public.departments_tenant_branch_status_idx",
+        "e|idx|public.departments_tenant_branch_status_idx",
+        "n|rel|public.departments_tenant_branch_status_idx"
+      ],
+      "reads": [
+        "n|tbl|public.departments",
+        "n|sch|public",
+        "n|col|public.departments.tenant_id",
+        "n|col|public.departments.branch_id",
+        "n|col|public.departments.status"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "membership_branches",
+        "membership_branches_branch_idx"
+      ],
+      "writes": [
+        "s|idx|public.membership_branches_branch_idx",
+        "n|idx|public.membership_branches_branch_idx",
+        "e|idx|public.membership_branches_branch_idx",
+        "n|rel|public.membership_branches_branch_idx"
+      ],
+      "reads": [
+        "n|tbl|public.membership_branches",
+        "n|sch|public",
+        "n|col|public.membership_branches.tenant_id",
+        "n|col|public.membership_branches.branch_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "membership_departments",
+        "membership_departments_department_idx"
+      ],
+      "writes": [
+        "s|idx|public.membership_departments_department_idx",
+        "n|idx|public.membership_departments_department_idx",
+        "e|idx|public.membership_departments_department_idx",
+        "n|rel|public.membership_departments_department_idx"
+      ],
+      "reads": [
+        "n|tbl|public.membership_departments",
+        "n|sch|public",
+        "n|col|public.membership_departments.tenant_id",
+        "n|col|public.membership_departments.department_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "role_permissions",
+        "role_permissions_tenant_role_idx"
+      ],
+      "writes": [
+        "s|idx|public.role_permissions_tenant_role_idx",
+        "n|idx|public.role_permissions_tenant_role_idx",
+        "e|idx|public.role_permissions_tenant_role_idx",
+        "n|rel|public.role_permissions_tenant_role_idx"
+      ],
+      "reads": [
+        "n|tbl|public.role_permissions",
+        "n|sch|public",
+        "n|col|public.role_permissions.tenant_id",
+        "n|col|public.role_permissions.role_key"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "tenant_memberships",
+        "tenant_memberships_tenant_status_idx"
+      ],
+      "writes": [
+        "s|idx|public.tenant_memberships_tenant_status_idx",
+        "n|idx|public.tenant_memberships_tenant_status_idx",
+        "e|idx|public.tenant_memberships_tenant_status_idx",
+        "n|rel|public.tenant_memberships_tenant_status_idx"
+      ],
+      "reads": [
+        "n|tbl|public.tenant_memberships",
+        "n|sch|public",
+        "n|col|public.tenant_memberships.tenant_id",
+        "n|col|public.tenant_memberships.status"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "tenants",
+        "tenants_status_created_at_idx"
+      ],
+      "writes": [
+        "s|idx|public.tenants_status_created_at_idx",
+        "n|idx|public.tenants_status_created_at_idx",
+        "e|idx|public.tenants_status_created_at_idx",
+        "n|rel|public.tenants_status_created_at_idx"
+      ],
+      "reads": [
+        "n|tbl|public.tenants",
+        "n|sch|public",
+        "n|col|public.tenants.status",
+        "n|col|public.tenants.created_at"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "branches"
+      ],
+      "writes": [
+        "s|fk|public.branches.branches_tenant_id_tenants_id_fkey",
+        "n|fk|public.branches.branches_tenant_id_tenants_id_fkey",
+        "e|fk|public.branches.branches_tenant_id_tenants_id_fkey",
+        "n|con|public.branches.branches_tenant_id_tenants_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.branches",
+        "n|sch|public",
+        "n|tbl|public.tenants",
+        "n|sch|public",
+        "n|col|public.branches.tenant_id",
+        "n|col|public.tenants.id",
+        "e|uniqueness|public.tenants.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "departments"
+      ],
+      "writes": [
+        "s|fk|public.departments.departments_tenant_branch_fk",
+        "n|fk|public.departments.departments_tenant_branch_fk",
+        "e|fk|public.departments.departments_tenant_branch_fk",
+        "n|con|public.departments.departments_tenant_branch_fk"
+      ],
+      "reads": [
+        "n|tbl|public.departments",
+        "n|sch|public",
+        "n|tbl|public.branches",
+        "n|sch|public",
+        "n|col|public.departments.tenant_id",
+        "n|col|public.departments.branch_id",
+        "n|col|public.branches.tenant_id",
+        "n|col|public.branches.id",
+        "e|uniqueness|public.branches.id.tenant_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "membership_branches"
+      ],
+      "writes": [
+        "s|fk|public.membership_branches.membership_branches_membership_fk",
+        "n|fk|public.membership_branches.membership_branches_membership_fk",
+        "e|fk|public.membership_branches.membership_branches_membership_fk",
+        "n|con|public.membership_branches.membership_branches_membership_fk"
+      ],
+      "reads": [
+        "n|tbl|public.membership_branches",
+        "n|sch|public",
+        "n|tbl|public.tenant_memberships",
+        "n|sch|public",
+        "n|col|public.membership_branches.tenant_id",
+        "n|col|public.membership_branches.membership_id",
+        "n|col|public.tenant_memberships.tenant_id",
+        "n|col|public.tenant_memberships.id",
+        "e|uniqueness|public.tenant_memberships.id.tenant_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "membership_branches"
+      ],
+      "writes": [
+        "s|fk|public.membership_branches.membership_branches_branch_fk",
+        "n|fk|public.membership_branches.membership_branches_branch_fk",
+        "e|fk|public.membership_branches.membership_branches_branch_fk",
+        "n|con|public.membership_branches.membership_branches_branch_fk"
+      ],
+      "reads": [
+        "n|tbl|public.membership_branches",
+        "n|sch|public",
+        "n|tbl|public.branches",
+        "n|sch|public",
+        "n|col|public.membership_branches.tenant_id",
+        "n|col|public.membership_branches.branch_id",
+        "n|col|public.branches.tenant_id",
+        "n|col|public.branches.id",
+        "e|uniqueness|public.branches.id.tenant_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "membership_departments"
+      ],
+      "writes": [
+        "s|fk|public.membership_departments.membership_departments_membership_fk",
+        "n|fk|public.membership_departments.membership_departments_membership_fk",
+        "e|fk|public.membership_departments.membership_departments_membership_fk",
+        "n|con|public.membership_departments.membership_departments_membership_fk"
+      ],
+      "reads": [
+        "n|tbl|public.membership_departments",
+        "n|sch|public",
+        "n|tbl|public.tenant_memberships",
+        "n|sch|public",
+        "n|col|public.membership_departments.tenant_id",
+        "n|col|public.membership_departments.membership_id",
+        "n|col|public.tenant_memberships.tenant_id",
+        "n|col|public.tenant_memberships.id",
+        "e|uniqueness|public.tenant_memberships.id.tenant_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "membership_departments"
+      ],
+      "writes": [
+        "s|fk|public.membership_departments.membership_departments_department_fk",
+        "n|fk|public.membership_departments.membership_departments_department_fk",
+        "e|fk|public.membership_departments.membership_departments_department_fk",
+        "n|con|public.membership_departments.membership_departments_department_fk"
+      ],
+      "reads": [
+        "n|tbl|public.membership_departments",
+        "n|sch|public",
+        "n|tbl|public.departments",
+        "n|sch|public",
+        "n|col|public.membership_departments.tenant_id",
+        "n|col|public.membership_departments.department_id",
+        "n|col|public.departments.tenant_id",
+        "n|col|public.departments.id",
+        "e|uniqueness|public.departments.id.tenant_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "role_permissions"
+      ],
+      "writes": [
+        "s|fk|public.role_permissions.role_permissions_tenant_id_tenants_id_fkey",
+        "n|fk|public.role_permissions.role_permissions_tenant_id_tenants_id_fkey",
+        "e|fk|public.role_permissions.role_permissions_tenant_id_tenants_id_fkey",
+        "n|con|public.role_permissions.role_permissions_tenant_id_tenants_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.role_permissions",
+        "n|sch|public",
+        "n|tbl|public.tenants",
+        "n|sch|public",
+        "n|col|public.role_permissions.tenant_id",
+        "n|col|public.tenants.id",
+        "e|uniqueness|public.tenants.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "tenant_memberships"
+      ],
+      "writes": [
+        "s|fk|public.tenant_memberships.tenant_memberships_tenant_id_tenants_id_fkey",
+        "n|fk|public.tenant_memberships.tenant_memberships_tenant_id_tenants_id_fkey",
+        "e|fk|public.tenant_memberships.tenant_memberships_tenant_id_tenants_id_fkey",
+        "n|con|public.tenant_memberships.tenant_memberships_tenant_id_tenants_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.tenant_memberships",
+        "n|sch|public",
+        "n|tbl|public.tenants",
+        "n|sch|public",
+        "n|col|public.tenant_memberships.tenant_id",
+        "n|col|public.tenants.id",
+        "e|uniqueness|public.tenants.id"
+      ]
+    }
+  ],
+  "ddl": [
+    {
+      "schema": "public",
+      "name": "branches",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "departments",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "membership_branches",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "membership_departments",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "role_permissions",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "tenant_memberships",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "tenants",
+      "isRlsEnabled": false,
+      "entityType": "tables"
+    },
+    {
+      "schema": "public",
+      "name": "department_type",
+      "values": [
+        "RECEPTION",
+        "PRODUCTION",
+        "DISBURSEMENT",
+        "STORE"
+      ],
+      "entityType": "enums"
+    },
+    {
+      "schema": "public",
+      "name": "membership_status",
+      "values": [
+        "INVITED",
+        "ACTIVE",
+        "SUSPENDED",
+        "INACTIVE"
+      ],
+      "entityType": "enums"
+    },
+    {
+      "schema": "public",
+      "name": "record_status",
+      "values": [
+        "ACTIVE",
+        "INACTIVE"
+      ],
+      "entityType": "enums"
+    },
+    {
+      "schema": "public",
+      "name": "tenant_status",
+      "values": [
+        "ACTIVE",
+        "SUSPENDED",
+        "INACTIVE"
+      ],
+      "entityType": "enums"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "tenant_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "name",
+      "type": "varchar(160)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "code",
+      "type": "varchar(50)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "timezone",
+      "type": "varchar(100)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "status",
+      "type": "record_status",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'ACTIVE'",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "tenant_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "branch_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "type",
+      "type": "department_type",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "name",
+      "type": "varchar(160)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "status",
+      "type": "record_status",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'ACTIVE'",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "tenant_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "membership_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "branch_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "tenant_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "membership_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "department_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "role_permissions",
+      "name": "tenant_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "role_permissions",
+      "name": "role_key",
+      "type": "varchar(100)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "role_permissions",
+      "name": "permission_key",
+      "type": "varchar(160)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "role_permissions",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "tenant_id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "auth_user_id",
+      "type": "varchar(255)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "display_name",
+      "type": "varchar(160)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "role_key",
+      "type": "varchar(100)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "status",
+      "type": "membership_status",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'INVITED'",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "id",
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "name",
+      "type": "varchar(160)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "status",
+      "type": "tenant_status",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'ACTIVE'",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "subscription_tier",
+      "type": "varchar(50)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "subscription_status",
+      "type": "varchar(50)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "default_currency",
+      "type": "varchar(3)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "settings",
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'{}'",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "entityType": "columns"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "branches_tenant_status_created_at_idx",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "departments_tenant_branch_status_idx",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "branch_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "membership_branches_branch_idx",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "branch_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "membership_departments_department_idx",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "department_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
+      "table": "role_permissions",
+      "name": "role_permissions_tenant_role_idx",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "role_key",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "tenant_memberships_tenant_status_idx",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tenant_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "tenants_status_created_at_idx",
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "entityType": "indexes"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "branches_tenant_id_tenants_id_fkey",
+      "nameExplicit": false,
+      "columns": [
+        "tenant_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "tenants",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "departments_tenant_branch_fk",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "branch_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "branches",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "membership_branches_membership_fk",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "membership_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "tenant_memberships",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "membership_branches_branch_fk",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "branch_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "branches",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "membership_departments_membership_fk",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "membership_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "tenant_memberships",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "membership_departments_department_fk",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "department_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "departments",
+      "columnsTo": [
+        "tenant_id",
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "role_permissions",
+      "name": "role_permissions_tenant_id_tenants_id_fkey",
+      "nameExplicit": false,
+      "columns": [
+        "tenant_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "tenants",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "tenant_memberships_tenant_id_tenants_id_fkey",
+      "nameExplicit": false,
+      "columns": [
+        "tenant_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "tenants",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "entityType": "fks"
+    },
+    {
+      "schema": "public",
+      "table": "membership_branches",
+      "name": "membership_branches_pkey",
+      "columns": [
+        "tenant_id",
+        "membership_id",
+        "branch_id"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "membership_departments",
+      "name": "membership_departments_pkey",
+      "columns": [
+        "tenant_id",
+        "membership_id",
+        "department_id"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "role_permissions",
+      "name": "role_permissions_pkey",
+      "columns": [
+        "tenant_id",
+        "role_key",
+        "permission_key"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "branches_pkey",
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "departments_pkey",
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "tenant_memberships_pkey",
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "tenants",
+      "name": "tenants_pkey",
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "branches_tenant_code_unique",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "code"
+      ],
+      "nullsNotDistinct": false,
+      "entityType": "uniques"
+    },
+    {
+      "schema": "public",
+      "table": "branches",
+      "name": "branches_tenant_id_id_unique",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "id"
+      ],
+      "nullsNotDistinct": false,
+      "entityType": "uniques"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "departments_tenant_id_id_unique",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "id"
+      ],
+      "nullsNotDistinct": false,
+      "entityType": "uniques"
+    },
+    {
+      "schema": "public",
+      "table": "departments",
+      "name": "departments_branch_name_unique",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "branch_id",
+        "name"
+      ],
+      "nullsNotDistinct": false,
+      "entityType": "uniques"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "tenant_memberships_tenant_user_unique",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "auth_user_id"
+      ],
+      "nullsNotDistinct": false,
+      "entityType": "uniques"
+    },
+    {
+      "schema": "public",
+      "table": "tenant_memberships",
+      "name": "tenant_memberships_tenant_id_id_unique",
+      "nameExplicit": true,
+      "columns": [
+        "tenant_id",
+        "id"
+      ],
+      "nullsNotDistinct": false,
+      "entityType": "uniques"
+    }
+  ]
+}

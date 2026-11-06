@@ -97,7 +97,13 @@ These are product/design requirements, not proof that the corresponding controls
 
 ## Skills
 
-There are no project-local agent skills defined in this repository. If the working environment provides a skill that directly applies to the task, use it and follow its guidance alongside these project instructions. Do not assume an optional integration or skill is installed.
+For every task in this repository, first read and follow the project-local
+[monorepo-development skill](.agents/skills/skills/monorepo-development/SKILL.md).
+It applies to frontend, backend, shared-package, and cross-workspace work.
+
+If the working environment provides another skill that directly applies to the
+task, use it alongside these project instructions. Do not assume an optional
+integration or skill is installed.
 
 ## API-specific guidance
 

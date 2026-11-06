@@ -129,7 +129,7 @@ Use a TypeScript pnpm workspace to keep the frontend, backend, and shared contra
 
 ```text
 /apps
-  /web                 React + Vite PWA
+  /client                 React + Vite PWA
   /api                 NestJS REST API
 /packages
   /contracts           Shared enums, API types, event contracts
