@@ -84,31 +84,31 @@ accepted.
 
 ### 3. Authentication, Context, and Authorization
 
-- [ ] 3.1 Write the remaining auth tests `TEST-W1-AUTH-003`, `004`, `006`, and
+- [x] 3.1 Write the remaining auth tests `TEST-W1-AUTH-003`, `004`, `006`, and
       `009`, then integrate the selected Better Auth route/session verifier under
       `/api/auth/*`. (W1-02)
-- [ ] 3.2 Implement production-safe cookie, secret, trusted-origin, CSRF, and
+- [x] 3.2 Implement production-safe cookie, secret, trusted-origin, CSRF, and
       body-parser behavior proven by the auth integration suite. (W1-02)
-- [ ] 3.3 Write `TEST-W1-ACCESS-009`, `010`, and `014` through `016`; implement
+- [x] 3.3 Write `TEST-W1-ACCESS-009`, `010`, and `014` through `016`; implement
       the versioned permission catalogue, role keys, immutable role ceilings, and
       field-visibility policies. (W1-06)
-- [ ] 3.4 Write `TEST-W1-ACCESS-011` through `013`; implement session guard,
+- [x] 3.4 Write `TEST-W1-ACCESS-011` through `013`; implement session guard,
       active-context resolution, selector verification, permission metadata, and
       permission/scope guards. (W1-06)
-- [ ] 3.5 Define `ActorContext` and controller parameter injection so services
+- [x] 3.5 Define `ActorContext` and controller parameter injection so services
       receive verified authority rather than raw identity fields from DTOs.
       (W1-06)
-- [ ] 3.6 Implement authorization-context refresh/invalidation and prove
+- [x] 3.6 Implement authorization-context refresh/invalidation and prove
       `TEST-W1-ACCESS-019`. (W1-06)
-- [ ] 3.7 Write `/me` tests `TEST-W1-ACCESS-017` and `018`; implement safe
+- [x] 3.7 Write `/me` tests `TEST-W1-ACCESS-017` and `018`; implement safe
       membership/scope/permission discovery and shared response contracts. (W1-07)
-- [ ] 3.8 Run auth, policy, context, `/me`, build, and lint gates.
+- [x] 3.8 Run auth, policy, context, `/me`, build, and lint gates.
 
 #### Phase 3 confirmation gate
 
-- [ ] All protected routes deny by default.
-- [ ] Tenant/branch/department selectors are verified, never trusted.
-- [ ] Persona field-visibility tests pass before master-data endpoints are
+- [x] All protected routes deny by default.
+- [x] Tenant/branch/department selectors are verified, never trusted.
+- [x] Persona field-visibility tests pass before master-data endpoints are
       implemented.
 
 ### 4. Database Models, Migrations, and Repositories
