@@ -37,32 +37,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Run linting
         run: pnpm lint
 
       - name: Run builds
-        run: pnpm build
+        run: pnpm --filter @repo/shared build && pnpm --filter @repo/api build
 
-      - name: Run migrations
+      - name: Run database migrations
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tallybakery
-        run: cd apps/api && pnpm drizzle-kit migrate
+        run: pnpm --filter @repo/api db:migrate
 
       - name: Run unit & integration tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tallybakery
           BETTER_AUTH_SECRET: testing-secret-must-be-at-least-32-characters-long
           PORT: 3000
-        run: pnpm test
+        run: pnpm --filter @repo/api test
 
       - name: Run E2E tests
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tallybakery
           BETTER_AUTH_SECRET: testing-secret-must-be-at-least-32-characters-long
           PORT: 3000
-        run: pnpm test:e2e
+        run: pnpm --filter @repo/api test:e2e
