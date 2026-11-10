@@ -3,13 +3,14 @@ import {
   PERMISSION_KEYS,
   ROLE_CEILINGS,
   VALID_PERMISSIONS,
+  type PermissionKey,
 } from './permissions.js';
 
 describe('Phase 3.3 Permission Catalogue & Role Ceilings', () => {
   // TEST-W1-ACCESS-009 — Unknown permission rejected
   it('TEST-W1-ACCESS-009: rejects unknown permission keys', () => {
     expect(VALID_PERMISSIONS.has(PERMISSION_KEYS.ITEMS_READ)).toBe(true);
-    expect(VALID_PERMISSIONS.has('unknown:fake:perm' as any)).toBe(false);
+    expect(VALID_PERMISSIONS.has('unknown:fake:perm' as PermissionKey)).toBe(false);
   });
 
   // TEST-W1-ACCESS-010 — Role ceiling enforced
