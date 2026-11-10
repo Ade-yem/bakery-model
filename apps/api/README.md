@@ -2,7 +2,7 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
@@ -29,6 +29,28 @@
 
 ```bash
 $ pnpm install
+$ cp apps/api/.env.example apps/api/.env
+```
+
+Set `DATABASE_URL` to the pooled PostgreSQL connection used by the API. Set
+`MIGRATION_DATABASE_URL` to a direct, migration-privileged connection in
+deployed environments. Drizzle Kit also accepts Neon's standard
+`DATABASE_URL_UNPOOLED` and falls back to `DATABASE_URL` locally.
+
+## Database migrations
+
+Run these commands from `apps/api`, or prefix them with
+`pnpm --filter @repo/api` from the repository root:
+
+```bash
+# generate and review a migration after changing src/database/schema
+$ pnpm db:generate
+
+# validate migration history
+$ pnpm db:check
+
+# apply pending migrations
+$ pnpm db:migrate
 ```
 
 ## Compile and run the project
@@ -43,6 +65,9 @@ $ pnpm run start:dev
 # production mode
 $ pnpm run start:prod
 ```
+
+The REST API is served under `/api/v1`. Swagger UI is available at `/docs`,
+and the OpenAPI document is available at `/docs/openapi.json`.
 
 ## Run tests
 
