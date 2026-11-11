@@ -20,6 +20,11 @@ import {
 import type { ActorContext } from '../actor-context.js';
 import { RoleKey } from '@repo/shared';
 
+/**
+ * Guard that verifies the caller's active tenant membership and enforces
+ * branch and department access scopes. Rejects inactive departments and
+ * cross-tenant header tampering.
+ */
 @Injectable()
 export class TenantScopeGuard implements CanActivate {
   constructor(
@@ -27,6 +32,14 @@ export class TenantScopeGuard implements CanActivate {
     private readonly db: Database,
   ) {}
 
+  /**
+   * Evaluates whether the request has an active tenant membership and valid selectors.
+   *
+   * @param context - The execution context of the incoming request.
+   * @returns True if the request is authorized within tenant and selector scopes.
+   * @throws {UnauthorizedException} If user is unauthenticated.
+   * @throws {ForbiddenException} If membership is missing, suspended, or selectors are invalid/inactive.
+   */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<
       Request & {
@@ -100,9 +113,38 @@ export class TenantScopeGuard implements CanActivate {
       activeBranchId = branchHeader;
     }
 
-    // If department selector header is provided, verify scope
+    // If department selector header is provided, verify scope and active status
     let activeDepartmentId: string | undefined = undefined;
     if (departmentHeader && typeof departmentHeader === 'string') {
+      // 1. Check department existence and status in caller's tenant
+      const [deptRecord] = await this.db
+        .select({
+          id: schema.departments.id,
+          status: schema.departments.status,
+        })
+        .from(schema.departments)
+        .where(
+          and(
+            eq(schema.departments.id, departmentHeader),
+            eq(schema.departments.tenantId, membership.tenantId),
+          ),
+        );
+
+      if (!deptRecord) {
+        throw new ForbiddenException({
+          code: 'SCOPE_FORBIDDEN',
+          message: 'Department not found in tenant scope',
+        });
+      }
+
+      // Inactive departments cannot be selected for active operations
+      if (deptRecord.status !== 'ACTIVE') {
+        throw new ForbiddenException({
+          code: 'SCOPE_FORBIDDEN',
+          message: 'Inactive departments cannot be selected for active operations',
+        });
+      }
+
       if (membership.roleKey !== 'OWNER' && !departmentIds.includes(departmentHeader)) {
         throw new ForbiddenException({
           code: 'SCOPE_FORBIDDEN',

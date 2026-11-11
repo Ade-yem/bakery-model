@@ -1,16 +1,13 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import pg from 'pg';
+import { eq } from 'drizzle-orm';
 import * as schema from './schema/index.js';
 import { DEFAULT_ROLE_PERMISSIONS } from '../access-control/permissions.js';
 
 const connectionString =
-  process.env.MIGRATION_DATABASE_URL ||
-  process.env.DATABASE_URL_UNPOOLED ||
   process.env.DATABASE_URL ||
   'postgresql://postgres:postgres@localhost:5432/tallybakery';
 
-const pool = new pg.Pool({ connectionString });
-const db = drizzle(pool, { schema });
+const db = drizzle(connectionString);
 
 async function seed() {
   console.log('Starting seed...');
@@ -19,15 +16,24 @@ async function seed() {
   const [user] = await db
     .insert(schema.user)
     .values({
+      id: 'owner-user-seed-id',
       name: 'Bakery Owner',
       email: 'owner@tallybakery.local',
       emailVerified: true,
-      role: 'owner',
     })
     .onConflictDoNothing()
     .returning();
 
-  const userId = user ? user.id : (await db.query.user.findFirst())?.id;
+  let userId = user?.id;
+  if (!userId) {
+    const [existing] = await db
+      .select({ id: schema.user.id })
+      .from(schema.user)
+      .where(eq(schema.user.email, 'owner@tallybakery.local'))
+      .limit(1);
+    userId = existing?.id;
+  }
+
   if (!userId) {
     console.error('Could not find or create user');
     process.exit(1);
@@ -146,7 +152,7 @@ async function seed() {
     status: 'ACTIVE',
   });
 
-  // 7. Create supplier
+  // 8. Create supplier
   await db.insert(schema.suppliers).values({
     tenantId: tenant.id,
     name: 'French Butter Mills',
@@ -155,7 +161,7 @@ async function seed() {
     status: 'ACTIVE',
   });
 
-  // 8. Create customer
+  // 9. Create customer
   await db.insert(schema.customers).values({
     tenantId: tenant.id,
     displayName: 'Grand Cafe',
@@ -167,7 +173,7 @@ async function seed() {
   });
 
   console.log('Seed completed successfully for tenant:', tenant.id);
-  await pool.end();
+  process.exit(0);
 }
 
 seed().catch((err) => {
