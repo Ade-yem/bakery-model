@@ -62,6 +62,19 @@ The system enforces strict boundary isolation. A user logged into one department
 | **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Blocked from sales figures, cash totals, customer data, and disbursement inventories. |
 | **Packaging & Disbursement Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
 
+### Dynamic tenant role and department catalog
+
+TallyBakery does not assume a single static role or department taxonomy. Each tenant starts with a seeded default catalog in the database, and the business owner or delegated administrator can edit that catalog without any application deployment or code change.
+
+The seeded baseline for a new business includes the core operating departments and role definitions needed by a bakery workflow:
+
+- Departments: Reception, Production, Disbursement, and Store
+- Roles: Owner, Manager, Receptionist, Production Supervisor, and Disbursement Officer
+
+These records are tenant-scoped configuration, not hard-coded app classes. The business can rename departments, deactivate unused ones, add custom departments, clone or update a role's permission bundle, and change which branches or departments a staff member can access. The system still validates edits against the approved permission set and tenant boundaries, but the catalog itself is dynamic and editable by the tenant.
+
+The default seed provides a working starter configuration for onboarding, while preserving room for business-specific configurations across bakery locations and future operational models.
+
 ## **4\. Functional Specifications**
 
 ### **4.1 Module 1: Departmental Operational Workflows**

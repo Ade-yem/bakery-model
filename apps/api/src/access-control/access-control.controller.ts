@@ -17,7 +17,7 @@ import {
   PERMISSION_KEYS,
   type PermissionKey,
   type RoleKey,
-} from '../access-control/permissions.js';
+} from './permissions.js';
 
 @Controller()
 @UseGuards(SessionGuard, TenantScopeGuard, PermissionGuard)

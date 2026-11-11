@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 import * as schema from './schema/index.js';
+import { DEFAULT_ROLE_PERMISSIONS } from '../access-control/permissions.js';
 
 const connectionString =
   process.env.MIGRATION_DATABASE_URL ||
@@ -57,17 +58,39 @@ async function seed() {
     })
     .returning();
 
-  // 4. Create department
-  const [dept] = await db
-    .insert(schema.departments)
-    .values({
-      tenantId: tenant.id,
-      branchId: branch.id,
-      name: 'Pastry Kitchen',
-      type: 'PRODUCTION',
-      status: 'ACTIVE',
-    })
-    .returning();
+  // 4. Create tenant baseline departments
+  const defaultDepartments = [
+    { name: 'Reception', type: 'RECEPTION' },
+    { name: 'Production', type: 'PRODUCTION' },
+    { name: 'Disbursement', type: 'DISBURSEMENT' },
+    { name: 'Store', type: 'STORE' },
+  ] as const;
+
+  const insertedDepartments = await Promise.all(
+    defaultDepartments.map(async ({ name, type }) =>
+      db
+        .insert(schema.departments)
+        .values({
+          tenantId: tenant.id,
+          branchId: branch.id,
+          name,
+          type,
+          status: 'ACTIVE',
+        })
+        .returning(),
+    ),
+  );
+
+  const departmentsByName = new Map(
+    insertedDepartments.flat().map((department) => [department.name, department]),
+  );
+
+  const ownerDepartmentIds = [
+    departmentsByName.get('Reception')?.id,
+    departmentsByName.get('Production')?.id,
+    departmentsByName.get('Disbursement')?.id,
+    departmentsByName.get('Store')?.id,
+  ].filter((id): id is string => Boolean(id));
 
   // 5. Create membership
   const [membership] = await db
@@ -87,13 +110,29 @@ async function seed() {
     branchId: branch.id,
   });
 
-  await db.insert(schema.membershipDepartments).values({
-    tenantId: tenant.id,
-    membershipId: membership.id,
-    departmentId: dept.id,
-  });
+  await db.insert(schema.membershipDepartments).values(
+    ownerDepartmentIds.map((departmentId) => ({
+      tenantId: tenant.id,
+      membershipId: membership.id,
+      departmentId,
+    })),
+  );
 
-  // 6. Create catalog item
+  // 6. Seed default role permissions for the tenant
+  const defaultRolePermissions = Object.entries(DEFAULT_ROLE_PERMISSIONS).flatMap(
+    ([roleKey, permissions]) =>
+      permissions.map((permissionKey) => ({
+        tenantId: tenant.id,
+        roleKey,
+        permissionKey,
+      })),
+  );
+
+  if (defaultRolePermissions.length > 0) {
+    await db.insert(schema.rolePermissions).values(defaultRolePermissions);
+  }
+
+  // 7. Create catalog item
   await db.insert(schema.catalogItems).values({
     tenantId: tenant.id,
     itemType: 'FINISHED_GOOD',

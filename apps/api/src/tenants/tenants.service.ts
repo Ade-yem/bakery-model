@@ -3,6 +3,7 @@ import { getDrizzleToken } from '@nestjs/drizzle';
 import type { Database } from '../database/database.types.js';
 import * as schema from '../database/schema/index.js';
 import { AuditService } from '../audit/audit.service.js';
+import { DEFAULT_ROLE_PERMISSIONS } from '../access-control/permissions.js';
 
 @Injectable()
 export class TenantsService {
@@ -46,17 +47,38 @@ export class TenantsService {
         })
         .returning();
 
-      // 3. Create default department
-      const [dept] = await tx
-        .insert(schema.departments)
-        .values({
-          tenantId: tenant.id,
-          branchId: branch.id,
-          type: 'PRODUCTION',
-          name: input.departmentName || 'General',
-          status: 'ACTIVE',
-        })
-        .returning();
+      // 3. Create default department baseline for the tenant
+      const defaultDepartments = [
+        { name: 'Reception', type: 'RECEPTION' },
+        { name: 'Production', type: 'PRODUCTION' },
+        { name: 'Disbursement', type: 'DISBURSEMENT' },
+        { name: 'Store', type: 'STORE' },
+      ] as const;
+
+      const createdDepartments = await Promise.all(
+        defaultDepartments.map(async ({ name, type }) =>
+          tx
+            .insert(schema.departments)
+            .values({
+              tenantId: tenant.id,
+              branchId: branch.id,
+              type,
+              name,
+              status: 'ACTIVE',
+            })
+            .returning(),
+        ),
+      );
+
+      const departmentsByName = new Map(
+        createdDepartments.flat().map((department) => [department.name, department]),
+      );
+      const ownerDepartmentIds = [
+        departmentsByName.get('Reception')?.id,
+        departmentsByName.get('Production')?.id,
+        departmentsByName.get('Disbursement')?.id,
+        departmentsByName.get('Store')?.id,
+      ].filter((id): id is string => Boolean(id));
 
       // 4. Create OWNER membership
       const [membership] = await tx
@@ -77,12 +99,28 @@ export class TenantsService {
         branchId: branch.id,
       });
 
-      // 6. Create department assignment
-      await tx.insert(schema.membershipDepartments).values({
-        tenantId: tenant.id,
-        membershipId: membership.id,
-        departmentId: dept.id,
-      });
+      // 6. Create department assignment for the owner across the baseline departments
+      await tx.insert(schema.membershipDepartments).values(
+        ownerDepartmentIds.map((departmentId) => ({
+          tenantId: tenant.id,
+          membershipId: membership.id,
+          departmentId,
+        })),
+      );
+
+      // 7. Seed default role/permission catalogue for the tenant
+      const rolePermissions = Object.entries(DEFAULT_ROLE_PERMISSIONS).flatMap(
+        ([roleKey, permissions]) =>
+          permissions.map((permissionKey) => ({
+            tenantId: tenant.id,
+            roleKey,
+            permissionKey,
+          })),
+      );
+
+      if (rolePermissions.length > 0) {
+        await tx.insert(schema.rolePermissions).values(rolePermissions);
+      }
 
       await this.auditService.log({
         tenantId: tenant.id,
@@ -98,7 +136,7 @@ export class TenantsService {
       return {
         tenant,
         branch,
-        department: dept,
+        departments: createdDepartments.flat(),
         membership,
       };
     });

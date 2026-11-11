@@ -14,7 +14,7 @@ import { StaffModule } from './staff/staff.module.js';
 import { CatalogModule } from './catalog/catalog.module.js';
 import { SuppliersModule } from './suppliers/suppliers.module.js';
 import { CustomersModule } from './customers/customers.module.js';
-import { AccessControlApiModule } from './access-control-api/access-control.module.js';
+import { AccessControlApiModule } from './access-control/access-control.module.js';
 import { HealthModule } from './health/health.module.js';
 
 @Module({

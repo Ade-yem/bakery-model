@@ -95,6 +95,20 @@ Use tenant-scoped membership and role assignments rather than relying solely on 
 
 The backend resolves the active tenant and branch from authorized membership, not from an untrusted client-supplied `tenant_id`. The client may send an organization/branch selector, but the server must verify membership before using it.
 
+### 2.3 Dynamic tenant role and department catalog
+
+The system treats roles and departments as tenant configuration records that are seeded for each new tenant and remain editable after onboarding. The seed is a baseline, not a frozen code-level definition.
+
+Design requirements:
+
+- Every new tenant receives a default department catalog and default role catalog from a seed routine.
+- The default catalog mirrors the bakery operating model: Reception, Production, Disbursement, and Store departments, plus the standard business roles for Owner, Manager, Receptionist, Production Supervisor, and Disbursement Officer.
+- The tenant owner or admin may rename departments, deactivate or archive unused ones, add custom departments, and duplicate or adjust role permissions within the approved permission catalogue.
+- The application validates role edits against the approved permission allowlist and tenant access scope, but the system never requires a code deployment to change a tenant’s business departments or role assignments.
+- Role and department records remain tenant-scoped. No department or role data is shared across tenants, and tenant membership access is derived from the tenant-specific catalog.
+
+This keeps the product extensible without weakening the security model: the system still enforces a fixed, approved permission vocabulary, while allowing the tenant to decide how those permissions are assigned to the business roles and departments it actually operates.
+
 ---
 
 ## 3. Architecture overview
