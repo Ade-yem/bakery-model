@@ -63,5 +63,6 @@
         "service": "marketing"
       }
     }
-  ]
+  ],
+  "installCommand": "pnpm install"
 }
