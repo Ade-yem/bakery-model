@@ -210,8 +210,18 @@ describe('StaffService - Membership Scopes & Role Assignments', () => {
               // branch verification
               return Promise.resolve([activeBranch]);
             }
-            // dept verification
-            return Promise.resolve([activeDept]);
+            if (selectCount === 3) {
+              // dept verification
+              return Promise.resolve([activeDept]);
+            }
+            if (selectCount === 4) {
+              // role lookup
+              return {
+                limit: () => Promise.resolve([{ id: 'role-mgr', code: 'MANAGER' }]),
+              };
+            }
+            // role departments lookup (none -> global)
+            return Promise.resolve([]);
           }),
         }),
       }),
@@ -229,5 +239,60 @@ describe('StaffService - Membership Scopes & Role Assignments', () => {
     expect(updated.roleKey).toBe('MANAGER');
     expect(mockTx.delete).toHaveBeenCalledTimes(2); // deletes old membershipBranches & membershipDepartments
     expect(mockTx.insert).toHaveBeenCalledTimes(2); // inserts new branches & departments
+  });
+
+  it('TEST-DFDR-SCOPE-002: rejects department assignment when department is not permitted by role scoping', async () => {
+    const existingMembership = {
+      id: membershipId,
+      tenantId: tenantA,
+      roleKey: 'OVEN_OPERATOR',
+      status: 'ACTIVE',
+    };
+
+    const requestedDept = {
+      id: 'dept-reception-1',
+      tenantId: tenantA,
+      name: 'Reception',
+      status: 'ACTIVE',
+    };
+
+    let selectCount = 0;
+    mockDb = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockImplementation(() => {
+            selectCount++;
+            if (selectCount === 1) {
+              return {
+                limit: () => Promise.resolve([existingMembership]),
+              };
+            }
+            if (selectCount === 2) {
+              // department validation: found active
+              return Promise.resolve([requestedDept]);
+            }
+            if (selectCount === 3) {
+              // tenant_roles lookup: find role
+              return {
+                limit: () => Promise.resolve([{ id: 'role-oven-op', code: 'OVEN_OPERATOR', isSystem: false }]),
+              };
+            }
+            if (selectCount === 4) {
+              // role_departments lookup: role is bound to dept-baking-1, not dept-reception-1
+              return Promise.resolve([{ roleId: 'role-oven-op', departmentId: 'dept-baking-1' }]);
+            }
+            return Promise.resolve([]);
+          }),
+        }),
+      }),
+    } as unknown as Database;
+
+    staffService = new StaffService(mockDb);
+
+    await expect(
+      staffService.updateAccess(tenantA, membershipId, {
+        departmentIds: ['dept-reception-1'],
+      }),
+    ).rejects.toThrow(ForbiddenException);
   });
 });

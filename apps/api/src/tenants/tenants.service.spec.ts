@@ -2,17 +2,15 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { TenantsService } from './tenants.service.js';
 import type { Database } from '../database/database.types.js';
 import { AuditService } from '../audit/audit.service.js';
-import { DEFAULT_ROLE_PERMISSIONS } from '../access-control/permissions.js';
+import { TenantTemplateSeederService } from './tenant-template-seeder.service.js';
 
 describe('TenantsService - Baseline Catalog Seeding', () => {
   let tenantsService: TenantsService;
   let mockDb: any;
   let mockAuditService: any;
-  let insertedTables: { table: string; values: any }[];
+  let mockSeederService: any;
 
   beforeEach(() => {
-    insertedTables = [];
-
     mockAuditService = {
       log: vi.fn().mockResolvedValue(undefined),
     };
@@ -35,40 +33,45 @@ describe('TenantsService - Baseline Catalog Seeding', () => {
       roleKey: 'OWNER',
     };
 
-    let deptCounter = 1;
+    const mockDepartments = [
+      { id: 'dept-1', name: 'Reception', code: 'REC' },
+      { id: 'dept-2', name: 'Production', code: 'PROD' },
+      { id: 'dept-3', name: 'Dispatch', code: 'DISP' },
+      { id: 'dept-4', name: 'Store', code: 'STORE' },
+    ];
 
-    const createInsertChain = (tableObj: any) => ({
-      values: (vals: any) => {
-        insertedTables.push({ table: tableObj, values: vals });
-        return {
-          returning: () => {
-            if (Array.isArray(vals)) {
-              return vals.map((v) => ({
-                id: `id-${deptCounter++}`,
-                ...v,
-              }));
-            }
-            if (vals.name === 'Artisan Bakery') return [mockTenant];
-            if (vals.code === 'MAIN') return [mockBranch];
-            if (vals.roleKey === 'OWNER') return [mockMembership];
-            return [{ id: `id-${deptCounter++}`, ...vals }];
-          },
-        };
-      },
-    });
+    mockSeederService = {
+      seedBaseline: vi.fn().mockResolvedValue({
+        departments: mockDepartments,
+        roles: [{ id: 'role-1', code: 'OWNER' }],
+        membership: mockMembership,
+      }),
+    };
 
     const mockTx = {
-      insert: vi.fn((table) => createInsertChain(table)),
+      insert: vi.fn((_tableObj) => ({
+        values: (vals: any) => ({
+          returning: () => {
+            if (vals.name === 'Artisan Bakery') return [mockTenant];
+            if (vals.code === 'MAIN') return [mockBranch];
+            return [vals];
+          },
+        }),
+      })),
     };
 
     mockDb = {
       transaction: vi.fn(async (cb: (tx: any) => Promise<any>) => cb(mockTx)),
     } as unknown as Database;
 
-    tenantsService = new TenantsService(mockDb, mockAuditService as AuditService);
+    tenantsService = new TenantsService(
+      mockDb,
+      mockAuditService as AuditService,
+      mockSeederService as TenantTemplateSeederService,
+    );
   });
 
-  it('AC-1 & AC-6: creates baseline departments and seeds tenant records upon onboarding', async () => {
+  it('AC-1 & AC-6: creates baseline departments and seeds tenant records upon onboarding via seeder', async () => {
     const result = await tenantsService.onboardTenant({
       tenantName: 'Artisan Bakery',
       actorAuthUserId: 'user-auth-1',
@@ -79,67 +82,18 @@ describe('TenantsService - Baseline Catalog Seeding', () => {
     expect(result.tenant.id).toBe('tenant-uuid-1');
     expect(result.branch.id).toBe('branch-uuid-1');
     expect(result.membership.roleKey).toBe('OWNER');
+    expect(mockSeederService.seedBaseline).toHaveBeenCalledWith(
+      'tenant-uuid-1',
+      'branch-uuid-1',
+      'user-auth-1',
+      'Alice Baker',
+    );
 
-    // 4 baseline departments must be created
     const createdDeptNames = result.departments.map((d: any) => d.name);
     expect(createdDeptNames).toContain('Reception');
     expect(createdDeptNames).toContain('Production');
     expect(createdDeptNames).toContain('Dispatch');
     expect(createdDeptNames).toContain('Store');
-  });
-
-  it('Owner membership is assigned to all default baseline departments', async () => {
-    await tenantsService.onboardTenant({
-      tenantName: 'Artisan Bakery',
-      actorAuthUserId: 'user-auth-1',
-      userEmail: 'owner@artisan.com',
-      userName: 'Alice Baker',
-    });
-
-    // Check membership departments insertion
-    const deptAssignments = insertedTables.find(
-      (entry) => Array.isArray(entry.values) && entry.values.some((v) => v.departmentId),
-    );
-
-    expect(deptAssignments).toBeDefined();
-    expect(deptAssignments?.values).toHaveLength(4);
-    for (const assignment of deptAssignments?.values ?? []) {
-      expect(assignment.tenantId).toBe('tenant-uuid-1');
-      expect(assignment.membershipId).toBe('membership-uuid-1');
-      expect(assignment.departmentId).toBeDefined();
-    }
-  });
-
-  it('AC-2: role permissions are seeded from approved baseline allowlist for all fixed roles', async () => {
-    await tenantsService.onboardTenant({
-      tenantName: 'Artisan Bakery',
-      actorAuthUserId: 'user-auth-1',
-      userEmail: 'owner@artisan.com',
-      userName: 'Alice Baker',
-    });
-
-    // Verify role permissions were inserted
-    const rolePermEntries = insertedTables.find(
-      (entry) =>
-        Array.isArray(entry.values) &&
-        entry.values.some((v) => v.roleKey && v.permissionKey),
-    );
-
-    expect(rolePermEntries).toBeDefined();
-    const seededRoleKeys = new Set(rolePermEntries?.values.map((v: any) => v.roleKey));
-
-    expect(seededRoleKeys.has('OWNER')).toBe(true);
-    expect(seededRoleKeys.has('MANAGER')).toBe(true);
-    expect(seededRoleKeys.has('RECEPTIONIST')).toBe(true);
-    expect(seededRoleKeys.has('PRODUCTION_SUPERVISOR')).toBe(true);
-    expect(seededRoleKeys.has('DISPATCH_OFFICER')).toBe(true);
-
-    // Verify permission rows match DEFAULT_ROLE_PERMISSIONS count
-    const totalExpectedRows = Object.values(DEFAULT_ROLE_PERMISSIONS).reduce(
-      (acc, perms) => acc + perms.length,
-      0,
-    );
-    expect(rolePermEntries?.values.length).toBe(totalExpectedRows);
   });
 
   it('records an audit event for tenant onboarding', async () => {

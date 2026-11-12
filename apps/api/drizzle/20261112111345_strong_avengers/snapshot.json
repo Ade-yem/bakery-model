@@ -1,0 +1,750 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "89e1ef3c-c514-47db-bcff-f4f603915a84",
+  "prevIds": [
+    "52f9b090-ec02-4589-96b2-c0dd946a443b"
+  ],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "role_departments"
+      ],
+      "writes": [
+        "s|tbl|public.role_departments",
+        "n|tbl|public.role_departments",
+        "e|tbl|public.role_departments",
+        "n|rel|public.role_departments",
+        "n|type|public.role_departments",
+        "n|rel|public.role_departments_pkey"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": [
+        "table",
+        "public",
+        "tenant_roles"
+      ],
+      "writes": [
+        "s|tbl|public.tenant_roles",
+        "n|tbl|public.tenant_roles",
+        "e|tbl|public.tenant_roles",
+        "n|rel|public.tenant_roles",
+        "n|type|public.tenant_roles",
+        "n|rel|public.tenant_roles_pkey",
+        "n|rel|public.tenant_roles_tenant_code_unique",
+        "n|rel|public.tenant_roles_tenant_id_id_unique"
+      ],
+      "reads": [
+        "n|sch|public",
+        "n|enum|public.record_status"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "departments",
+        "code"
+      ],
+      "writes": [
+        "s|col|public.departments.code",
+        "n|col|public.departments.code",
+        "e|col|public.departments.code"
+      ],
+      "reads": [
+        "n|tbl|public.departments",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "add_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "departments",
+        "description"
+      ],
+      "writes": [
+        "s|col|public.departments.description",
+        "n|col|public.departments.description",
+        "e|col|public.departments.description"
+      ],
+      "reads": [
+        "n|tbl|public.departments",
+        "n|sch|public"
+      ]
+    },
+    {
+      "statementType": "alter_column",
+      "statementTarget": [
+        "column",
+        "public",
+        "departments",
+        "type"
+      ],
+      "writes": [
+        "s|colprop|public.departments.type.default",
+        "s|colprop|public.departments.type.type"
+      ],
+      "reads": [
+        "n|tbl|public.departments",
+        "n|sch|public",
+        "n|col|public.departments.type"
+      ],
+      "sqlHash": "f7b2cdd6fbf682e9"
+    },
+    {
+      "statementType": "add_unique",
+      "statementTarget": [
+        "table",
+        "public",
+        "departments"
+      ],
+      "writes": [
+        "s|uq|public.departments.departments_branch_code_unique",
+        "n|uq|public.departments.departments_branch_code_unique",
+        "e|uq|public.departments.departments_branch_code_unique",
+        "n|con|public.departments.departments_branch_code_unique",
+        "n|rel|public.departments_branch_code_unique"
+      ],
+      "reads": [
+        "n|tbl|public.departments",
+        "n|sch|public",
+        "n|col|public.departments.tenant_id",
+        "n|col|public.departments.branch_id",
+        "n|col|public.departments.code"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "role_departments",
+        "role_departments_department_idx"
+      ],
+      "writes": [
+        "s|idx|public.role_departments_department_idx",
+        "n|idx|public.role_departments_department_idx",
+        "e|idx|public.role_departments_department_idx",
+        "n|rel|public.role_departments_department_idx"
+      ],
+      "reads": [
+        "n|tbl|public.role_departments",
+        "n|sch|public",
+        "n|col|public.role_departments.tenant_id",
+        "n|col|public.role_departments.department_id"
+      ]
+    },
+    {
+      "statementType": "create_index",
+      "statementTarget": [
+        "index",
+        "public",
+        "tenant_roles",
+        "tenant_roles_tenant_status_idx"
+      ],
+      "writes": [
+        "s|idx|public.tenant_roles_tenant_status_idx",
+        "n|idx|public.tenant_roles_tenant_status_idx",
+        "e|idx|public.tenant_roles_tenant_status_idx",
+        "n|rel|public.tenant_roles_tenant_status_idx"
+      ],
+      "reads": [
+        "n|tbl|public.tenant_roles",
+        "n|sch|public",
+        "n|col|public.tenant_roles.tenant_id",
+        "n|col|public.tenant_roles.status"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "role_departments"
+      ],
+      "writes": [
+        "s|fk|public.role_departments.role_departments_role_fk",
+        "n|fk|public.role_departments.role_departments_role_fk",
+        "e|fk|public.role_departments.role_departments_role_fk",
+        "n|con|public.role_departments.role_departments_role_fk"
+      ],
+      "reads": [
+        "n|tbl|public.role_departments",
+        "n|sch|public",
+        "n|tbl|public.tenant_roles",
+        "n|sch|public",
+        "n|col|public.role_departments.tenant_id",
+        "n|col|public.role_departments.role_id",
+        "n|col|public.tenant_roles.tenant_id",
+        "n|col|public.tenant_roles.id",
+        "e|uniqueness|public.tenant_roles.id.tenant_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "role_departments"
+      ],
+      "writes": [
+        "s|fk|public.role_departments.role_departments_department_fk",
+        "n|fk|public.role_departments.role_departments_department_fk",
+        "e|fk|public.role_departments.role_departments_department_fk",
+        "n|con|public.role_departments.role_departments_department_fk"
+      ],
+      "reads": [
+        "n|tbl|public.role_departments",
+        "n|sch|public",
+        "n|tbl|public.departments",
+        "n|sch|public",
+        "n|col|public.role_departments.tenant_id",
+        "n|col|public.role_departments.department_id",
+        "n|col|public.departments.tenant_id",
+        "n|col|public.departments.id",
+        "e|uniqueness|public.departments.id.tenant_id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": [
+        "table",
+        "public",
+        "tenant_roles"
+      ],
+      "writes": [
+        "s|fk|public.tenant_roles.tenant_roles_tenant_id_tenants_id_fkey",
+        "n|fk|public.tenant_roles.tenant_roles_tenant_id_tenants_id_fkey",
+        "e|fk|public.tenant_roles.tenant_roles_tenant_id_tenants_id_fkey",
+        "n|con|public.tenant_roles.tenant_roles_tenant_id_tenants_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.tenant_roles",
+        "n|sch|public",
+        "n|tbl|public.tenants",
+        "n|sch|public",
+        "n|col|public.tenant_roles.tenant_id",
+        "n|col|public.tenants.id",
+        "e|uniqueness|public.tenants.id"
+      ]
+    },
+    {
+      "statementType": "drop_enum",
+      "statementTarget": [
+        "enum",
+        "public",
+        "department_type"
+      ],
+      "writes": [
+        "s|enum|public.department_type",
+        "n|enum|public.department_type",
+        "e|enum|public.department_type",
+        "n|type|public.department_type"
+      ],
+      "reads": [
+        "n|sch|public"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "role_departments",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "tenant_roles",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "departments",
+        "name": "code",
+        "type": "varchar(50)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "departments",
+        "name": "description",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "tenant_id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "role_id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "department_id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "is_primary",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "gen_random_uuid()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "tenant_id",
+        "type": "uuid",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "code",
+        "type": "varchar(50)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "name",
+        "type": "varchar(160)",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "description",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "is_system",
+        "type": "boolean",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "false",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "status",
+        "type": "record_status",
+        "typeSchema": "public",
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'ACTIVE'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "now()",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "role_departments_department_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "tenant_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "department_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "tenant_roles_tenant_status_idx",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "tenant_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          },
+          {
+            "value": "status",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": false,
+        "where": null,
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "role_departments_role_fk",
+        "nameExplicit": true,
+        "columns": [
+          "tenant_id",
+          "role_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "tenant_roles",
+        "columnsTo": [
+          "tenant_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "role_departments_department_fk",
+        "nameExplicit": true,
+        "columns": [
+          "tenant_id",
+          "department_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "departments",
+        "columnsTo": [
+          "tenant_id",
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "CASCADE",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "tenant_roles_tenant_id_tenants_id_fkey",
+        "nameExplicit": false,
+        "columns": [
+          "tenant_id"
+        ],
+        "schemaTo": "public",
+        "tableTo": "tenants",
+        "columnsTo": [
+          "id"
+        ],
+        "onUpdate": "NO ACTION",
+        "onDelete": "RESTRICT",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "role_departments",
+        "name": "role_departments_pkey",
+        "columns": [
+          "tenant_id",
+          "role_id",
+          "department_id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "tenant_roles_pkey",
+        "columns": [
+          "id"
+        ],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "departments",
+        "name": "departments_branch_code_unique",
+        "nameExplicit": true,
+        "columns": [
+          "tenant_id",
+          "branch_id",
+          "code"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "tenant_roles_tenant_code_unique",
+        "nameExplicit": true,
+        "columns": [
+          "tenant_id",
+          "code"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "tenant_roles",
+        "name": "tenant_roles_tenant_id_id_unique",
+        "nameExplicit": true,
+        "columns": [
+          "tenant_id",
+          "id"
+        ],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "drop",
+      "key": "enums\u0000[\"public\",\"department_type\"]"
+    },
+    {
+      "op": "alter",
+      "key": "columns\u0000[\"public\",\"departments\",\"type\"]",
+      "set": {
+        "type": "varchar(100)",
+        "typeSchema": null,
+        "default": "'PRODUCTION'"
+      }
+    }
+  ]
+}

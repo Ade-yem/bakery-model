@@ -139,6 +139,40 @@ export class StaffService {
             inactiveDepts.map((d) => d.name).join(', '),
         );
       }
+
+      // Check role-department scoping constraints if role has explicit department mappings
+      const [roleRow] = await this.db
+        .select({ id: schema.tenantRoles.id, code: schema.tenantRoles.code })
+        .from(schema.tenantRoles)
+        .where(
+          and(
+            eq(schema.tenantRoles.tenantId, tenantId),
+            eq(schema.tenantRoles.code, targetRole),
+          ),
+        )
+        .limit(1);
+
+      if (roleRow) {
+        const allowedRoleDepts = await this.db
+          .select({ departmentId: schema.roleDepartments.departmentId })
+          .from(schema.roleDepartments)
+          .where(
+            and(
+              eq(schema.roleDepartments.tenantId, tenantId),
+              eq(schema.roleDepartments.roleId, roleRow.id),
+            ),
+          );
+
+        if (allowedRoleDepts.length > 0) {
+          const allowedDeptSet = new Set(allowedRoleDepts.map((r) => r.departmentId));
+          const unauthorizedDepts = input.departmentIds.filter((id) => !allowedDeptSet.has(id));
+          if (unauthorizedDepts.length > 0) {
+            throw new ForbiddenException(
+              `Role ${targetRole} is not authorized for department(s): ${unauthorizedDepts.join(', ')}`,
+            );
+          }
+        }
+      }
     }
 
     // 5. Execute atomic database update in transaction

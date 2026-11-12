@@ -3,6 +3,8 @@ import {
   Get,
   Put,
   Post,
+  Patch,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -19,10 +21,11 @@ import {
   type PermissionKey,
 } from './permissions.js';
 import { AccessControlService, CloneRoleInput } from './access-control.service.js';
+import type { CreateRoleDto, UpdateRoleDto } from '@repo/shared';
 
 /**
  * Controller exposing endpoints for permission catalog discovery,
- * dynamic tenant role querying, role permission modification, and role cloning.
+ * dynamic tenant role querying, role creation, updates, and department scoping.
  */
 @Controller()
 @UseGuards(SessionGuard, TenantScopeGuard, PermissionGuard)
@@ -44,12 +47,78 @@ export class AccessControlController {
    * Lists the dynamic roles and assigned permissions for the current tenant.
    *
    * @param actor - The authenticated actor context.
-   * @returns The tenant's roles map.
+   * @returns The tenant's roles list.
    */
   @Get('roles')
   @RequirePermission(PERMISSION_KEYS.ROLES_READ)
   async listRoles(@CurrentActor() actor: ActorContext) {
     return this.accessControlService.listRoles(actor.tenantId);
+  }
+
+  /**
+   * Creates a new custom role with optional department assignments and permissions.
+   *
+   * @param actor - The authenticated actor context.
+   * @param body - The create role payload.
+   * @returns The created role.
+   */
+  @Post('roles')
+  @RequirePermission(PERMISSION_KEYS.ROLES_MANAGE)
+  async createRole(
+    @CurrentActor() actor: ActorContext,
+    @Body() body: CreateRoleDto,
+  ) {
+    return this.accessControlService.createRole(
+      actor.tenantId,
+      body,
+      actor.authUserId,
+      actor.membershipId,
+    );
+  }
+
+  /**
+   * Updates an existing role's name, description, permissions, department mappings, or status.
+   *
+   * @param actor - The authenticated actor context.
+   * @param roleId - The UUID of the role to update.
+   * @param body - The update role payload.
+   * @returns The updated role.
+   */
+  @Patch('roles/:roleId')
+  @RequirePermission(PERMISSION_KEYS.ROLES_MANAGE)
+  async updateRole(
+    @CurrentActor() actor: ActorContext,
+    @Param('roleId') roleId: string,
+    @Body() body: UpdateRoleDto,
+  ) {
+    return this.accessControlService.updateRole(
+      actor.tenantId,
+      roleId,
+      body,
+      actor.authUserId,
+      actor.membershipId,
+    );
+  }
+
+  /**
+   * Deactivates a non-system role.
+   *
+   * @param actor - The authenticated actor context.
+   * @param roleId - The UUID of the role to deactivate.
+   * @returns Success response.
+   */
+  @Delete('roles/:roleId')
+  @RequirePermission(PERMISSION_KEYS.ROLES_MANAGE)
+  async deleteRole(
+    @CurrentActor() actor: ActorContext,
+    @Param('roleId') roleId: string,
+  ) {
+    return this.accessControlService.deleteRole(
+      actor.tenantId,
+      roleId,
+      actor.authUserId,
+      actor.membershipId,
+    );
   }
 
   /**

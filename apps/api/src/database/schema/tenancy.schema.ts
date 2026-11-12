@@ -1,10 +1,12 @@
 import {
+  boolean,
   foreignKey,
   index,
   jsonb,
   pgEnum,
   pgTable,
   primaryKey,
+  text,
   timestamp,
   unique,
   uuid,
@@ -18,13 +20,6 @@ export const tenantStatusEnum = pgEnum('tenant_status', [
 ]);
 
 export const recordStatusEnum = pgEnum('record_status', ['ACTIVE', 'INACTIVE']);
-
-export const departmentTypeEnum = pgEnum('department_type', [
-  'RECEPTION',
-  'PRODUCTION',
-  'DISPATCH',
-  'STORE',
-]);
 
 export const membershipStatusEnum = pgEnum('membership_status', [
   'INVITED',
@@ -94,8 +89,10 @@ export const departments = pgTable(
     id: uuid('id').defaultRandom().primaryKey(),
     tenantId: uuid('tenant_id').notNull(),
     branchId: uuid('branch_id').notNull(),
-    type: departmentTypeEnum('type').notNull(),
     name: varchar('name', { length: 160 }).notNull(),
+    code: varchar('code', { length: 50 }).notNull(),
+    type: varchar('type', { length: 100 }).default('PRODUCTION').notNull(),
+    description: text('description'),
     status: recordStatusEnum('status').default('ACTIVE').notNull(),
     ...timestamps,
   },
@@ -106,6 +103,11 @@ export const departments = pgTable(
       foreignColumns: [branches.tenantId, branches.id],
     }).onDelete('restrict'),
     unique('departments_tenant_id_id_unique').on(table.tenantId, table.id),
+    unique('departments_branch_code_unique').on(
+      table.tenantId,
+      table.branchId,
+      table.code,
+    ),
     unique('departments_branch_name_unique').on(
       table.tenantId,
       table.branchId,
@@ -227,6 +229,59 @@ export const rolePermissions = pgTable(
   ],
 );
 
+export const tenantRoles = pgTable(
+  'tenant_roles',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'restrict' }),
+    code: varchar('code', { length: 50 }).notNull(),
+    name: varchar('name', { length: 160 }).notNull(),
+    description: text('description'),
+    isSystem: boolean('is_system').default(false).notNull(),
+    status: recordStatusEnum('status').default('ACTIVE').notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    unique('tenant_roles_tenant_code_unique').on(table.tenantId, table.code),
+    unique('tenant_roles_tenant_id_id_unique').on(table.tenantId, table.id),
+    index('tenant_roles_tenant_status_idx').on(table.tenantId, table.status),
+  ],
+);
+
+export const roleDepartments = pgTable(
+  'role_departments',
+  {
+    tenantId: uuid('tenant_id').notNull(),
+    roleId: uuid('role_id').notNull(),
+    departmentId: uuid('department_id').notNull(),
+    isPrimary: boolean('is_primary').default(false).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.tenantId, table.roleId, table.departmentId],
+    }),
+    foreignKey({
+      name: 'role_departments_role_fk',
+      columns: [table.tenantId, table.roleId],
+      foreignColumns: [tenantRoles.tenantId, tenantRoles.id],
+    }).onDelete('cascade'),
+    foreignKey({
+      name: 'role_departments_department_fk',
+      columns: [table.tenantId, table.departmentId],
+      foreignColumns: [departments.tenantId, departments.id],
+    }).onDelete('cascade'),
+    index('role_departments_department_idx').on(
+      table.tenantId,
+      table.departmentId,
+    ),
+  ],
+);
+
 export type Tenant = typeof tenants.$inferSelect;
 export type NewTenant = typeof tenants.$inferInsert;
 export type Branch = typeof branches.$inferSelect;
@@ -235,3 +290,7 @@ export type Department = typeof departments.$inferSelect;
 export type NewDepartment = typeof departments.$inferInsert;
 export type TenantMembership = typeof tenantMemberships.$inferSelect;
 export type NewTenantMembership = typeof tenantMemberships.$inferInsert;
+export type TenantRole = typeof tenantRoles.$inferSelect;
+export type NewTenantRole = typeof tenantRoles.$inferInsert;
+export type RoleDepartment = typeof roleDepartments.$inferSelect;
+export type NewRoleDepartment = typeof roleDepartments.$inferInsert;

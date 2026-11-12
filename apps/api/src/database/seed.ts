@@ -66,20 +66,21 @@ async function seed() {
 
   // 4. Create tenant baseline departments
   const defaultDepartments = [
-    { name: 'Reception', type: 'RECEPTION' },
-    { name: 'Production', type: 'PRODUCTION' },
-    { name: 'Dispatch', type: 'DISPATCH' },
-    { name: 'Store', type: 'STORE' },
+    { name: 'Reception', code: 'REC', type: 'RECEPTION' },
+    { name: 'Production', code: 'PROD', type: 'PRODUCTION' },
+    { name: 'Dispatch', code: 'DISP', type: 'DISPATCH' },
+    { name: 'Store', code: 'STORE', type: 'STORE' },
   ] as const;
 
   const insertedDepartments = await Promise.all(
-    defaultDepartments.map(async ({ name, type }) =>
+    defaultDepartments.map(async ({ name, code, type }) =>
       db
         .insert(schema.departments)
         .values({
           tenantId: tenant.id,
           branchId: branch.id,
           name,
+          code,
           type,
           status: 'ACTIVE',
         })

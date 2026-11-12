@@ -8,7 +8,7 @@
 
 ### **1.1 Executive Summary**
 
-TallyBakery is a multi-tenant, offline-first Software-as-a-Service (SaaS) platform engineered for shift-based manufacturing and retail operations (using commercial bakeries as the anchor reference). The software enforces zero-trust departmental accountability by cross-reconciling raw materials consumed, finished units produced, customer orders billed, units disbursed, and cash drawer balances across recurring shift handovers.
+TallyBakery is a multi-tenant, offline-first Software-as-a-Service (SaaS) platform engineered for shift-based manufacturing facilities and factory operations (with commercial bakeries serving as the initial anchor reference deployment). The platform provides a dynamic operational structure allowing factory owners to model their physical facility floor into custom departments, configure tailored operational roles, and enforce zero-trust departmental accountability by cross-reconciling raw materials consumed, finished units produced, customer orders billed, units disbursed, and cash drawer balances across recurring shift handovers.
 
 ### **1.2 Problem Statement**
 
@@ -62,20 +62,48 @@ The system enforces strict boundary isolation. A user logged into one department
 | **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Blocked from sales figures, cash totals, customer data, and dispatch inventories. |
 | **Packaging & Dispatch Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
 
-### Dynamic tenant role and department catalog
+### **3.1 Dynamic Factory Role and Department Architecture**
 
-TallyBakery does not assume a single static role or department taxonomy. Each tenant starts with a seeded default catalog in the database, and the business owner or delegated administrator can edit that catalog without any application deployment or code change.
+The platform does not enforce a rigid or hardcoded department and role taxonomy. Instead, each factory tenant operates an entirely configurable organizational model:
 
-The seeded baseline for a new business includes the core operating departments and role definitions needed by a bakery workflow:
+1. **Configurable Departments**: Factory owners can create, configure, rename, reorganize, and deactivate departments per branch without code deployments. Departments represent distinct physical or logical floor areas (e.g., *Mixing, Baking/Oven Bay, Quality Assurance, Packaging, Cold Storage, Maintenance, Raw Materials Warehouse, Reception, Dispatch*).
+2. **First-Class Dynamic Roles**: Roles are tenant-owned, first-class records. Factory owners can define new roles, update existing role titles, descriptions, and active statuses, and customize the granular permission bundles assigned to each role from the verified platform capability catalog. (Only the primary `OWNER` role is system-protected against deletion or self-lockout).
+3. **Role-to-Department Association**: Roles maintain explicit relationships with departments. A role can be defined as:
+   - **Department-Scoped**: Tied to one or more specific departments (e.g., a *Mixing Operator* role is bound to the *Mixing Department*; an *Inventory Clerk* is bound to the *Store/Warehouse*). Staff assigned this role are automatically constrained to those departments.
+   - **Cross-Departmental / Global**: Permitted across all departments within a branch or organization (e.g., *Owner*, *General Manager*, *Facility Maintenance Lead*).
+4. **Default Seed Templates on Tenant Creation**:
+   The baseline bakery workflow described below (Departments: *Reception, Production, Dispatch, Store*; Roles: *Owner, Manager, Receptionist, Production Supervisor, Dispatch Officer*) is provisioned as an out-of-the-box **Starter Seed Template** when an organization registers. Once created, every seeded department and non-Owner role can be edited, renamed, customized, or extended to match any factory's specific workflow.
 
-- Departments: Reception, Production, Dispatch, and Store
-- Roles: Owner, Manager, Receptionist, Production Supervisor, and Dispatch Officer
+### **3.2 Default Starter Roles (Seeded Baseline)**
 
-These records are tenant-scoped configuration, not hard-coded app classes. The business can rename departments, deactivate unused ones, add custom departments, clone or update a role's permission bundle, and change which branches or departments a staff member can access. The system still validates edits against the approved permission set and tenant boundaries, but the catalog itself is dynamic and editable by the tenant.
+The following initial role profiles are seeded by default to support immediate onboarding:
 
-The default seed provides a working starter configuration for onboarding, while preserving room for business-specific configurations across bakery locations and future operational models.
+| Seeded Role | Default Access Permissions | Default Department Association | Key Operational Boundary |
+| :--- | :--- | :--- | :--- |
+| **Super Admin (Owner)** | Organization-wide visibility, multi-branch analytics, audit logs, subscription billing, threshold configs, role & department management. | Global (All Departments) | None (System protected against deletion). |
+| **Shift / Branch Manager** | Procurement logging, expense approval, employee onboarding/scheduling, discrepancy resolution, handover co-sign. | Global / Multi-Department | Cannot alter finalized audit trails or delete historic shifts. |
+| **Receptionist (Cashier)** | Customer order entry, multi-method payment receipt, credit/debt ledger, manual order push to dispatch. | Scoped to Reception | Blocked from production sheets, raw material balances, and dispatch fulfillment screens. |
+| **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Scoped to Production | Blocked from sales figures, cash totals, customer data, and dispatch inventories. |
+| **Packaging & Dispatch Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Scoped to Dispatch / Store | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
 
 ## **4\. Functional Specifications**
+
+### **4.0 Module 0: Factory Structure & Access Management (Departments & Roles)**
+
+#### **A. Department Configuration & Floor Modeling**
+> * **Department Lifecycle:** Factory owners and administrators can create, update, rename, and deactivate departments per branch.
+> * **Attributes:** Each department includes a name, unique branch code, operational category/type (e.g., `PRODUCTION`, `STORE`, `DISPATCH`, `RECEPTION`, `PACKAGING`, `MAINTENANCE`, `CUSTOM`), optional description, and active status.
+> * **Flexible Floor Layouts:** The system does not limit factories to four departments; facilities can model multiple production lines, specialized storage units (e.g., cold room, raw store), or packaging zones.
+> * **Operational Status:** Inactive departments cannot be assigned to new staff or selected as active operation destinations.
+
+#### **B. Dynamic Role Definition & Department Scoping**
+> * **Role Management:** Factory owners can create custom roles, edit role titles and descriptions, and configure their permission sets.
+> * **Department Association:** Roles can be scoped to specific department(s) or configured as cross-departmental. Staff assigned to a department-scoped role inherit that department boundary for operational logging and shift signoffs.
+> * **System Safeguards:** The primary `OWNER` role cannot be deleted, deactivated, or stripped of administrative permissions. Role updates are validated against the approved system capability set.
+
+#### **C. Baseline Template Seeding**
+> * **Automated Starter Baseline:** When an organization/tenant is created, a default baseline (Reception, Production, Dispatch, Store departments, along with default Owner, Manager, Cashier, Supervisor, and Dispatch roles) is seeded into the database.
+> * **Full Post-Onboarding Customization:** All seeded entities (except Owner immutability) are standard editable database records, allowing the business to immediately rename, reconfigure, or expand them.
 
 ### **4.1 Module 1: Departmental Operational Workflows**
 

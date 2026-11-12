@@ -87,3 +87,63 @@ export interface ApiResponse<T> {
   error: string | null;
   success: boolean;
 }
+
+// Dynamic Departments & Roles DTOs
+export interface CreateDepartmentDto {
+  branchId: string;
+  name: string;
+  code: string;
+  type?: string;
+  description?: string;
+}
+
+export interface UpdateDepartmentDto {
+  name?: string;
+  code?: string;
+  type?: string;
+  description?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface DepartmentDto {
+  id: string;
+  tenantId: string;
+  branchId: string;
+  name: string;
+  code: string;
+  type: string;
+  description: string | null;
+  status: 'ACTIVE' | 'INACTIVE';
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+
+export interface CreateRoleDto {
+  code: string;
+  name: string;
+  description?: string;
+  permissions: string[];
+  departmentIds?: string[];
+}
+
+export interface UpdateRoleDto {
+  name?: string;
+  description?: string;
+  permissions?: string[];
+  departmentIds?: string[];
+  status?: 'ACTIVE' | 'INACTIVE';
+}
+
+export interface RoleDto {
+  id: string;
+  tenantId: string;
+  code: string;
+  name: string;
+  description: string | null;
+  isSystem: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
+  permissions: string[];
+  departmentIds: string[];
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}

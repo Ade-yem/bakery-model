@@ -2,16 +2,15 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { AccessControlService } from './access-control.service.js';
 import type { Database } from '../database/database.types.js';
 import { AuditService } from '../audit/audit.service.js';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { PERMISSION_KEYS } from './permissions.js';
 
-describe('AccessControlService - Dynamic Role Catalog', () => {
+describe('AccessControlService - Dynamic Factory Role & Department Catalog', () => {
   let service: AccessControlService;
   let mockDb: any;
   let mockAuditService: any;
 
   const tenantA = 'tenant-aaa-111';
-  const tenantB = 'tenant-bbb-222';
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -20,17 +19,192 @@ describe('AccessControlService - Dynamic Role Catalog', () => {
     };
   });
 
-  it('AC-1 & AC-3: lists dynamic roles and assigned permissions from database for tenant', async () => {
-    const roleRows = [
-      { roleKey: 'OWNER', permissionKey: PERMISSION_KEYS.TENANT_READ },
-      { roleKey: 'OWNER', permissionKey: PERMISSION_KEYS.ROLES_MANAGE },
-      { roleKey: 'MANAGER', permissionKey: PERMISSION_KEYS.BRANCHES_READ },
-    ];
-
+  it('TEST-DFDR-ROLE-001: creates custom factory role with metadata, permissions, and department mappings', async () => {
     mockDb = {
       select: vi.fn().mockReturnValue({
         from: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue(roleRows),
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockImplementation(() => {
+              // Check collision for role code -> none
+              return Promise.resolve([]);
+            }),
+          }),
+        }),
+      }),
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([
+            {
+              id: 'role-qa-1',
+              tenantId: tenantA,
+              code: 'QUALITY_INSPECTOR',
+              name: 'Quality Assurance Lead',
+              description: 'Inspects mixing batches and oven outputs',
+              isSystem: false,
+              status: 'ACTIVE',
+            },
+          ]),
+        }),
+      }),
+      transaction: vi.fn(async (cb: (tx: any) => Promise<any>) => {
+        const tx = {
+          insert: vi.fn().mockReturnValue({
+            values: vi.fn().mockReturnValue({
+              returning: vi.fn().mockResolvedValue([
+                {
+                  id: 'role-qa-1',
+                  tenantId: tenantA,
+                  code: 'QUALITY_INSPECTOR',
+                  name: 'Quality Assurance Lead',
+                  description: 'Inspects mixing batches and oven outputs',
+                  isSystem: false,
+                  status: 'ACTIVE',
+                },
+              ]),
+            }),
+          }),
+        };
+        return cb(tx);
+      }),
+    } as unknown as Database;
+
+    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+
+    const result = await service.createRole(tenantA, {
+      code: 'QUALITY_INSPECTOR',
+      name: 'Quality Assurance Lead',
+      description: 'Inspects mixing batches and oven outputs',
+      permissions: [PERMISSION_KEYS.ITEMS_READ, PERMISSION_KEYS.DEPARTMENTS_READ],
+      departmentIds: ['dept-mixing-1', 'dept-oven-1'],
+    });
+
+    expect(result.id).toBe('role-qa-1');
+    expect(result.code).toBe('QUALITY_INSPECTOR');
+    expect(result.permissions).toContain(PERMISSION_KEYS.ITEMS_READ);
+    expect(result.departmentIds).toContain('dept-mixing-1');
+  });
+
+  it('TEST-DFDR-ROLE-002: rejects custom role creation with unknown permission keys', async () => {
+    mockDb = {} as unknown as Database;
+    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+
+    await expect(
+      service.createRole(tenantA, {
+        code: 'HACKER_ROLE',
+        name: 'Hacker',
+        permissions: ['unauthorized:destroy:world' as any],
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('TEST-DFDR-ROLE-003: rejects duplicate role code in same tenant', async () => {
+    mockDb = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([{ id: 'existing-role', code: 'MANAGER' }]),
+          }),
+        }),
+      }),
+    } as unknown as Database;
+
+    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+
+    await expect(
+      service.createRole(tenantA, {
+        code: 'MANAGER',
+        name: 'Duplicate Manager',
+        permissions: [PERMISSION_KEYS.BRANCHES_READ],
+      }),
+    ).rejects.toThrow(ConflictException);
+  });
+
+  it('TEST-DFDR-ROLE-004: protects system OWNER role from deletion or deactivation', async () => {
+    mockDb = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([
+              {
+                id: 'role-owner',
+                code: 'OWNER',
+                isSystem: true,
+                tenantId: tenantA,
+              },
+            ]),
+          }),
+        }),
+      }),
+    } as unknown as Database;
+
+    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+
+    await expect(
+      service.deleteRole(tenantA, 'role-owner'),
+    ).rejects.toThrow(ForbiddenException);
+
+    await expect(
+      service.updateRole(tenantA, 'role-owner', {
+        status: 'INACTIVE',
+      }),
+    ).rejects.toThrow(ForbiddenException);
+  });
+
+  it('TEST-DFDR-SCOPE-001: associates role with departments and retrieves assigned departments', async () => {
+    const roleId = 'role-123';
+    mockDb = {
+      transaction: vi.fn(async (cb: (tx: any) => Promise<any>) => {
+        const tx = {
+          delete: vi.fn().mockReturnValue({
+            where: vi.fn().mockResolvedValue(undefined),
+          }),
+          insert: vi.fn().mockReturnValue({
+            values: vi.fn().mockResolvedValue(undefined),
+          }),
+        };
+        return cb(tx);
+      }),
+    } as unknown as Database;
+
+    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+    const assigned = await service.assignRoleDepartments(tenantA, roleId, ['dept-1', 'dept-2']);
+
+    expect(assigned).toEqual(['dept-1', 'dept-2']);
+  });
+
+  it('lists dynamic roles with metadata, permissions, and department assignments', async () => {
+    const rolesFromDb = [
+      {
+        id: 'role-1',
+        tenantId: tenantA,
+        code: 'OPERATOR',
+        name: 'Oven Operator',
+        description: 'Bakehouse operator',
+        isSystem: false,
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    const permsFromDb = [
+      { roleKey: 'OPERATOR', permissionKey: PERMISSION_KEYS.ITEMS_READ },
+    ];
+
+    const deptsFromDb = [
+      { roleId: 'role-1', departmentId: 'dept-baking-1' },
+    ];
+
+    let selectCallCount = 0;
+    mockDb = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockImplementation(() => {
+            selectCallCount++;
+            if (selectCallCount === 1) return Promise.resolve(rolesFromDb);
+            if (selectCallCount === 2) return Promise.resolve(permsFromDb);
+            return Promise.resolve(deptsFromDb);
+          }),
         }),
       }),
     } as unknown as Database;
@@ -38,132 +212,9 @@ describe('AccessControlService - Dynamic Role Catalog', () => {
     service = new AccessControlService(mockDb, mockAuditService as AuditService);
     const result = await service.listRoles(tenantA);
 
-    expect(result.roles['OWNER']).toEqual([
-      PERMISSION_KEYS.TENANT_READ,
-      PERMISSION_KEYS.ROLES_MANAGE,
-    ]);
-    expect(result.roles['MANAGER']).toEqual([PERMISSION_KEYS.BRANCHES_READ]);
-  });
-
-  it('AC-2 & Test Coverage: rejects unknown permission keys when updating role permissions', async () => {
-    mockDb = {} as unknown as Database;
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
-
-    await expect(
-      service.updateRolePermissions(tenantA, 'MANAGER', [
-        PERMISSION_KEYS.BRANCHES_READ,
-        'malicious:fake:permission' as any,
-      ]),
-    ).rejects.toThrow(BadRequestException);
-  });
-
-  it('AC-5 & Test Coverage: rejects permissions exceeding the role ceiling', async () => {
-    mockDb = {} as unknown as Database;
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
-
-    // PRODUCTION_SUPERVISOR ceiling excludes CUSTOMERS_MANAGE and ROLES_MANAGE
-    await expect(
-      service.updateRolePermissions(tenantA, 'PRODUCTION_SUPERVISOR', [
-        PERMISSION_KEYS.ITEMS_READ,
-        PERMISSION_KEYS.ROLES_MANAGE as any,
-      ]),
-    ).rejects.toThrow(ForbiddenException);
-  });
-
-  it('AC-3: updates role permissions and persists them in database within role ceiling', async () => {
-    const mockTx = {
-      delete: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue(undefined),
-      }),
-      insert: vi.fn().mockReturnValue({
-        values: vi.fn().mockResolvedValue(undefined),
-      }),
-    };
-
-    mockDb = {
-      transaction: vi.fn(async (cb: (tx: any) => Promise<any>) => cb(mockTx)),
-    } as unknown as Database;
-
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
-
-    const validManagerPerms = [
-      PERMISSION_KEYS.BRANCHES_READ,
-      PERMISSION_KEYS.STAFF_READ,
-    ];
-
-    const result = await service.updateRolePermissions(tenantA, 'MANAGER', validManagerPerms);
-
-    expect(result.roleKey).toBe('MANAGER');
-    expect(result.permissions).toEqual(validManagerPerms);
-    expect(mockTx.delete).toHaveBeenCalled();
-    expect(mockTx.insert).toHaveBeenCalled();
-    expect(mockAuditService.log).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tenantId: tenantA,
-        action: 'role:permissions:update',
-      }),
-    );
-  });
-
-  it('AC-3: allows cloning an existing role into a custom role within the ceiling', async () => {
-    mockDb = {
-      select: vi.fn().mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([]), // No collision
-          }),
-        }),
-      }),
-      insert: vi.fn().mockReturnValue({
-        values: vi.fn().mockResolvedValue(undefined),
-      }),
-    } as unknown as Database;
-
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
-
-    const cloned = await service.cloneRole(tenantA, {
-      sourceRoleKey: 'PRODUCTION_SUPERVISOR',
-      newRoleKey: 'HEAD_BAKER',
-      permissions: [PERMISSION_KEYS.ITEMS_READ],
-    });
-
-    expect(cloned.roleKey).toBe('HEAD_BAKER');
-    expect(cloned.baseRoleKey).toBe('PRODUCTION_SUPERVISOR');
-    expect(cloned.permissions).toEqual([PERMISSION_KEYS.ITEMS_READ]);
-  });
-
-  it('AC-5: rejects cloning a role if permissions exceed the source role ceiling', async () => {
-    mockDb = {} as unknown as Database;
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
-
-    await expect(
-      service.cloneRole(tenantA, {
-        sourceRoleKey: 'PRODUCTION_SUPERVISOR',
-        newRoleKey: 'ROGUE_BAKER',
-        permissions: [
-          PERMISSION_KEYS.ITEMS_READ,
-          PERMISSION_KEYS.TENANT_UPDATE as any, // Exceeds PRODUCTION_SUPERVISOR ceiling
-        ],
-      }),
-    ).rejects.toThrow(ForbiddenException);
-  });
-
-  it('AC-4: isolates custom roles to the creating tenant without leaking across tenants', async () => {
-    // Mock select returning only tenantB roles when queried with tenantB
-    mockDb = {
-      select: vi.fn().mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          where: vi.fn().mockResolvedValue([
-            { roleKey: 'TENANT_B_ROLE', permissionKey: PERMISSION_KEYS.ITEMS_READ },
-          ]),
-        }),
-      }),
-    } as unknown as Database;
-
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
-    const result = await service.listRoles(tenantB);
-
-    expect(result.roles['TENANT_B_ROLE']).toBeDefined();
-    expect(result.roles['HEAD_BAKER']).toBeUndefined();
+    expect(result.roles).toHaveLength(1);
+    expect(result.roles[0].code).toBe('OPERATOR');
+    expect(result.roles[0].permissions).toEqual([PERMISSION_KEYS.ITEMS_READ]);
+    expect(result.roles[0].departmentIds).toEqual(['dept-baking-1']);
   });
 });

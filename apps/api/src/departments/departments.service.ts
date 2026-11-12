@@ -2,18 +2,11 @@ import { Injectable, Inject, ConflictException, NotFoundException } from '@nestj
 import { getDrizzleToken } from '@nestjs/drizzle';
 import type { Database } from '../database/database.types.js';
 import * as schema from '../database/schema/index.js';
-import { eq, and, ne } from 'drizzle-orm';
+import { eq, and, ne, or } from 'drizzle-orm';
+import type { CreateDepartmentDto, UpdateDepartmentDto } from '@repo/shared';
 
-export interface CreateDepartmentInput {
-  branchId: string;
-  name: string;
-  type?: 'RECEPTION' | 'PRODUCTION' | 'DISPATCH' | 'STORE';
-}
-
-export interface UpdateDepartmentInput {
-  name?: string;
-  status?: 'ACTIVE' | 'INACTIVE';
-}
+export type CreateDepartmentInput = CreateDepartmentDto;
+export type UpdateDepartmentInput = UpdateDepartmentDto;
 
 /**
  * Service managing tenant department catalog operations including creation,
@@ -46,7 +39,7 @@ export class DepartmentsService {
    * @param input - The department creation parameters.
    * @returns The created department database record.
    * @throws {NotFoundException} If the specified branchId does not belong to the tenant.
-   * @throws {ConflictException} If a department with the same name already exists in the branch.
+   * @throws {ConflictException} If a department with the same name or code already exists in the branch.
    */
   async create(tenantId: string, input: CreateDepartmentInput) {
     // 1. Verify branch belongs to this tenant (cross-tenant protection)
@@ -65,20 +58,27 @@ export class DepartmentsService {
       throw new NotFoundException('Branch not found in tenant');
     }
 
-    // 2. Verify department name uniqueness in the branch
+    // 2. Verify department name and code uniqueness in the branch
     const existing = await this.db
-      .select({ id: schema.departments.id })
+      .select({ id: schema.departments.id, code: schema.departments.code, name: schema.departments.name })
       .from(schema.departments)
       .where(
         and(
           eq(schema.departments.tenantId, tenantId),
           eq(schema.departments.branchId, input.branchId),
-          eq(schema.departments.name, input.name),
+          or(
+            eq(schema.departments.name, input.name),
+            eq(schema.departments.code, input.code),
+          ),
         ),
       )
       .limit(1);
 
     if (existing.length > 0) {
+      const match = existing[0]!;
+      if (match.code === input.code) {
+        throw new ConflictException('Department code already exists in this branch');
+      }
       throw new ConflictException('Department name already exists in this branch');
     }
 
@@ -88,7 +88,9 @@ export class DepartmentsService {
         tenantId,
         branchId: input.branchId,
         name: input.name,
+        code: input.code,
         type: input.type || 'PRODUCTION',
+        description: input.description || null,
         status: 'ACTIVE',
       })
       .returning();
@@ -97,14 +99,14 @@ export class DepartmentsService {
   }
 
   /**
-   * Updates an existing department's name or active/inactive lifecycle status.
+   * Updates an existing department's name, code, type, description, or status.
    *
    * @param tenantId - The UUID of the tenant owning the department.
    * @param departmentId - The UUID of the department to update.
-   * @param input - The update fields (name, status).
+   * @param input - The update fields.
    * @returns The updated department database record.
    * @throws {NotFoundException} If the department is not found in the tenant.
-   * @throws {ConflictException} If renaming conflicts with another department in the branch.
+   * @throws {ConflictException} If name or code conflicts with another department in the branch.
    */
   async update(tenantId: string, departmentId: string, input: UpdateDepartmentInput) {
     // 1. Locate department within tenant scope
@@ -123,22 +125,33 @@ export class DepartmentsService {
       throw new NotFoundException('Department not found');
     }
 
-    // 2. If renaming, check for collision in the same branch excluding this department
-    if (input.name && input.name !== department.name) {
+    // 2. If renaming or changing code, check for collision in the same branch excluding this department
+    const nameChanged = input.name && input.name !== department.name;
+    const codeChanged = input.code && input.code !== department.code;
+
+    if (nameChanged || codeChanged) {
+      const collisionConditions = [];
+      if (nameChanged) collisionConditions.push(eq(schema.departments.name, input.name!));
+      if (codeChanged) collisionConditions.push(eq(schema.departments.code, input.code!));
+
       const conflict = await this.db
-        .select({ id: schema.departments.id })
+        .select({ id: schema.departments.id, code: schema.departments.code, name: schema.departments.name })
         .from(schema.departments)
         .where(
           and(
             eq(schema.departments.tenantId, tenantId),
             eq(schema.departments.branchId, department.branchId),
-            eq(schema.departments.name, input.name),
             ne(schema.departments.id, departmentId),
+            or(...collisionConditions),
           ),
         )
         .limit(1);
 
       if (conflict.length > 0) {
+        const match = conflict[0]!;
+        if (codeChanged && match.code === input.code) {
+          throw new ConflictException('Department code already exists in this branch');
+        }
         throw new ConflictException('Department name already exists in this branch');
       }
     }
@@ -147,8 +160,11 @@ export class DepartmentsService {
     const [updated] = await this.db
       .update(schema.departments)
       .set({
-        ...(input.name ? { name: input.name } : {}),
-        ...(input.status ? { status: input.status } : {}),
+        ...(input.name !== undefined ? { name: input.name } : {}),
+        ...(input.code !== undefined ? { code: input.code } : {}),
+        ...(input.type !== undefined ? { type: input.type } : {}),
+        ...(input.description !== undefined ? { description: input.description } : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
         updatedAt: new Date(),
       })
       .where(
