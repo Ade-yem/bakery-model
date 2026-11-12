@@ -15,7 +15,7 @@ TallyBakery is a multi-tenant, offline-first Software-as-a-Service (SaaS) platfo
 Small-to-medium manufacturing and retail businesses (SMEs) face high rates of revenue leakage, internal theft, and unrecorded inventory shrinkage. Key operational pain points include:
 
 > * **The "Shift Blame" Loop:** When closing inventory is short, outgoing and incoming shift workers dispute when the shortage occurred.  
-> * **Disbursement Mismatches:** Bread or packaged products leave the stock room before or without payment verification.  
+> * **Dispatch Mismatches:** Bread or packaged products leave the stock room before or without payment verification.  
 > * **Owner Blindness:** Business owners cannot monitor operational integrity without physically sitting at the facility.  
 > * **Network Vulnerability:** Typical cloud point-of-sale (POS) systems break down during frequent local internet blackouts.
 
@@ -23,7 +23,7 @@ Small-to-medium manufacturing and retail businesses (SMEs) face high rates of re
 
 ### **2.1 Core Goals**
 
-> * **Enforce Departmental Parity:** Formally interlock Production, Disbursement, Reception, and Procurement logs at each shift change.  
+> * **Enforce Departmental Parity:** Formally interlock Production, Dispatch, Reception, and Procurement logs at each shift change.  
 > * **Offline Floor Continuity:** Guarantee 100% operational uptime for order logging, baking entrieshi, and handovers on local devices regardless of internet availability.  
 > * **Noise-Free Executive Monitoring:** Restrict active push alerts strictly to discrepancies and critical exceptions while aggregating holistic analytics for executive review on demand.
 
@@ -51,16 +51,16 @@ The system enforces strict boundary isolation. A user logged into one department
         `▼                           ▼                            ▼`  
 `┌──────────────┐            ┌──────────────┐             ┌───────────────┐`  
 `│  Reception   │            │  Production  │             │ Packaging &   │`  
-`│   (Cashier)  │            │ (Bakehouse)  │             │ Disbursement  │`  
+`│   (Cashier)  │            │ (Bakehouse)  │             │ Dispatch  │`  
 `└──────────────┘            └──────────────┘             └───────────────┘`
 
 | Role | Default Access Permissions | Restrictions |
 | :---- | :---- | :---- |
 | **Super Admin (Owner)** | Organization-wide visibility, multi-branch analytics, audit logs, subscription billing, threshold configs. | None. |
 | **Shift / Branch Manager** | Procurement logging, expense approval, employee onboarding/scheduling, discrepancy resolution, handover co-sign. | Cannot alter finalized audit trails or delete historic shifts. |
-| **Receptionist (Cashier)** | Customer order entry, multi-method payment receipt, credit/debt ledger, manual order push to disbursement. | Blocked from production sheets, raw material balances, and disbursement fulfillment screens. |
-| **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Blocked from sales figures, cash totals, customer data, and disbursement inventories. |
-| **Packaging & Disbursement Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
+| **Receptionist (Cashier)** | Customer order entry, multi-method payment receipt, credit/debt ledger, manual order push to dispatch. | Blocked from production sheets, raw material balances, and dispatch fulfillment screens. |
+| **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Blocked from sales figures, cash totals, customer data, and dispatch inventories. |
+| **Packaging & Dispatch Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
 
 ### Dynamic tenant role and department catalog
 
@@ -68,8 +68,8 @@ TallyBakery does not assume a single static role or department taxonomy. Each te
 
 The seeded baseline for a new business includes the core operating departments and role definitions needed by a bakery workflow:
 
-- Departments: Reception, Production, Disbursement, and Store
-- Roles: Owner, Manager, Receptionist, Production Supervisor, and Disbursement Officer
+- Departments: Reception, Production, Dispatch, and Store
+- Roles: Owner, Manager, Receptionist, Production Supervisor, and Dispatch Officer
 
 These records are tenant-scoped configuration, not hard-coded app classes. The business can rename departments, deactivate unused ones, add custom departments, clone or update a role's permission bundle, and change which branches or departments a staff member can access. The system still validates edits against the approved permission set and tenant boundaries, but the catalog itself is dynamic and editable by the tenant.
 
@@ -82,7 +82,7 @@ The default seed provides a working starter configuration for onboarding, while 
 #### **A. Procurement & Management**
 
 > * **Material Acquisition:** The Manager records raw material arrivals (Vendor, Item, Quantity, Unit Cost, Invoice/Receipt Reference). This automatically increments the central raw material balance.  
-> * **Ad-Hoc Cash Outflow:** Petty cash disbursements (e.g., fuel for generator, minor repairs) must be logged with an attached reason and category.
+> * **Ad-Hoc Cash Outflow:** Petty cash dispatchs (e.g., fuel for generator, minor repairs) must be logged with an attached reason and category.
 
 #### **B. Production (Bakehouse)**
 
@@ -90,11 +90,11 @@ The default seed provides a working starter configuration for onboarding, while 
   * Materials consumed: e.g., N bags of flour, M kg of sugar, X units of yeast.  
   * Finished goods output: Quantity and SKU/size (e.g., 250 units of 500g family loaf, 100 units of 1kg sandwich bread).  
 > * **Yield Decoupling:** Yield variations (e.g., flour producing 48 loaves instead of 50\) are logged transparently for analytics but do not halt the operational flow.  
-> * **Batch Transfer:** Submitting a batch creates a pending **Incoming Stock Transfer** queued for Disbursement acceptance.
+> * **Batch Transfer:** Submitting a batch creates a pending **Incoming Stock Transfer** queued for Dispatch acceptance.
 
-#### **C. Packaging & Disbursement**
+#### **C. Packaging & Dispatch**
 
-> * **Batch Acceptance:** The Disbursement Officer inspects the transfer from Production, confirms the actual physical count received, and accepts it into available stock. Any count difference at this step is recorded as an intake discrepancy.  
+> * **Batch Acceptance:** The Dispatch Officer inspects the transfer from Production, confirms the actual physical count received, and accepts it into available stock. Any count difference at this step is recorded as an intake discrepancy.  
 > * **Live Fulfillment Board:** Displays orders manually dispatched by Reception.  
 > * **Order Handover:** Staff packages the requested units and taps **\[Mark Fulfilled\]**, immediately decrementing physical inventory.
 
@@ -105,7 +105,7 @@ The default seed provides a working starter configuration for onboarding, while 
   * **Cash** (increments calculated cash drawer balance).  
   * **Direct Bank Transfer** (requires bank reference / transaction note).  
   * **Customer Debt / Credit** (requires customer identity and contact; tracks receivables).  
-> * **Manual Dispatch Protocol:** Orders remain in a PAID\_PENDING\_DISPATCH state until Reception explicitly clicks **\[Push to Disbursement\]**. Orders are not visible on the disbursement fulfillment screen until this action is taken.
+> * **Manual Dispatch Protocol:** Orders remain in a PAID\_PENDING\_DISPATCH state until Reception explicitly clicks **\[Push to Dispatch\]**. Orders are not visible on the dispatch fulfillment screen until this action is taken.
 
 ### **4.2 Module 2: The Shift Handover & Reconciliation Engine**
 
@@ -129,7 +129,7 @@ The system enforces an interlocking, dual-signoff shift rollover. Morning shift 
 
 #### **Mathematical Reconciliation Formulas**
 
-> 1. **Disbursement Stock Reconciliation:** \\text{Expected Stock} \= \\text{Opening Stock} \+ \\sum \\text{Accepted Production} \- \\sum \\text{Fulfilled Orders} \\Delta\_{\\text{Stock}} \= \\text{Physical Count} \- \\text{Expected Stock}  
+> 1. **Dispatch Stock Reconciliation:** \\text{Expected Stock} \= \\text{Opening Stock} \+ \\sum \\text{Accepted Production} \- \\sum \\text{Fulfilled Orders} \\Delta\_{\\text{Stock}} \= \\text{Physical Count} \- \\text{Expected Stock}  
 > 2. **Reception Cash Drawer Reconciliation:** \\text{Expected Cash} \= \\text{Opening Drawer Float} \+ \\sum \\text{Cash Tendered} \- \\sum \\text{Approved Petty Cash} \\Delta\_{\\text{Cash}} \= \\text{Counted Cash} \- \\text{Expected Cash}
 
 #### **Handover Resolution Rules**
@@ -163,7 +163,7 @@ To eliminate notification fatigue, the platform maintains complete silence for a
 | **Stock Shrinkage** | \\Delta\_{\\text{Stock}} \< 0 at Shift Seal | Critical | Web Push \+ SMS/WhatsApp |
 | **Unaccounted Stock Surplus** | \\Delta\_{\\text{Stock}} \> 0 at Shift Seal | High | Web Push |
 | **Cash Drawer Deficit** | \\Delta\_{\\text{Cash}} \< 0 at Shift Seal | Critical | Web Push \+ SMS/WhatsApp |
-| **Production Transfer Dispute** | Disbursement accepts count \< Production submitted count | High | In-App Alert to Manager |
+| **Production Transfer Dispute** | Dispatch accepts count \< Production submitted count | High | In-App Alert to Manager |
 | **Debt Ceiling Breach** | Single customer unpaid balance exceeds preset limit | Medium | Web Push to Manager **WhatsApp Executive Summary** Automated daily AI shift summary generated and dispatched to Director Low WhatsApp  |
 
 ### **4.4 Module 4: Owner Analytics & AI Insights Engine**
@@ -233,7 +233,7 @@ An automated analysis engine evaluates shift data, production logs, and sales re
 ### **Core Entity Definitions**
 
 > * **tenants**: Enterprise account records (id, name, subscription\_tier, created\_at).  
-> * **departments**: Functional units (id, tenant\_id, name, type \[RECEPTION, PRODUCTION, DISBURSEMENT, STORE\]).  
+> * **departments**: Functional units (id, tenant\_id, name, type \[RECEPTION, PRODUCTION, DISPATCH, STORE\]).  
 > * **users**: Staff accounts (id, tenant\_id, department\_id, role, pin\_hash, is\_active).  
 > * **shifts**: Shift ledger instances (id, tenant\_id, department\_id, shift\_type, outgoing\_lead\_id, incoming\_lead\_id, status \[OPEN, BALANCED, UNBALANCED\], variance\_data, opened\_at, closed\_at).  
 > * **production\_batches**: Output batches (id, tenant\_id, shift\_id, product\_id, units\_produced, raw\_materials\_summary).  
@@ -253,12 +253,12 @@ An automated analysis engine evaluates shift data, production logs, and sales re
 > * Multi-tenant data isolation and RBAC setup.  
 > * Production batch recording and Raw Material logs.  
 > * Reception order screen with Cash, Transfer, and Debt support.  
-> * Manual "Push to Disbursement" queue and one-tap fulfillment.
+> * Manual "Push to Dispatch" queue and one-tap fulfillment.
 
 ### **Phase 2: Reconciliation & PWA Engine (Weeks 7–12)**
 
 > * Local IndexedDB client storage with background sync outbox.  
-> * Dual-signoff Shift Handover state machine for Disbursement and Reception.  
+> * Dual-signoff Shift Handover state machine for Dispatch and Reception.  
 > * Discrepancy math engine and asynchronous owner alert pipeline (Web Push / SMS).
 
 ### **Phase 3: Analytics & Advanced Features (Weeks 13–16)**

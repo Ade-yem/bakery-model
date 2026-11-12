@@ -22,7 +22,7 @@ export const recordStatusEnum = pgEnum('record_status', ['ACTIVE', 'INACTIVE']);
 export const departmentTypeEnum = pgEnum('department_type', [
   'RECEPTION',
   'PRODUCTION',
-  'DISBURSEMENT',
+  'DISPATCH',
   'STORE',
 ]);
 

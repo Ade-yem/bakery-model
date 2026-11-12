@@ -17,7 +17,7 @@ conventions, database migrations, health checks, and operational diagnostics.
 There is a naming conflict between the source documents. In this specification,
 **Module 1** means the SDD module named **Identity, tenant, branch, and access
 control**. The PRD section named **Module 1: Departmental Operational
-Workflows**—procurement, production, disbursement, and sales—is not part of this
+Workflows**—procurement, production, dispatch, and sales—is not part of this
 Week 1 backend scope and begins in the Week 2 operating-ledger work.
 
 The intended outcome is a deployable API skeleton in which every persona can
@@ -202,7 +202,7 @@ so that I can administer branches and staff within an isolated tenant.
    branch, the four default departments, the Owner's initial scopes, all
    approved fixed-role permission assignments, and an audit event.
 2. THE System SHALL create default department types for Reception, Production,
-   Disbursement, and Store within the initial branch.
+   Dispatch, and Store within the initial branch.
 3. THE System SHALL require tenant name, initial branch name/code, valid IANA
    timezone, ISO 4217 currency code, and approved subscription metadata.
 4. THE System SHALL use non-guessable UUIDs for public application-owned
@@ -229,7 +229,7 @@ and department metadata so that staff can operate in correctly bounded scopes.
 2. WHEN an authorized actor creates or updates a department, THE System SHALL
    verify that the department’s branch belongs to the active tenant.
 3. THE System SHALL support only the approved Week 1 department types:
-   `RECEPTION`, `PRODUCTION`, `DISBURSEMENT`, and `STORE`.
+   `RECEPTION`, `PRODUCTION`, `DISPATCH`, and `STORE`.
 4. THE System SHALL prevent branch or department hard deletion through the
    public API and SHALL use status transitions for deactivation.
 5. WHEN a branch is inactive, THE System SHALL reject new active assignments
@@ -285,7 +285,7 @@ fields.
    reject unknown keys even if a client supplies them.
 2. THE System SHALL support the fixed Week 1 role keys `OWNER`, `MANAGER`,
    `RECEPTIONIST`, `PRODUCTION_SUPERVISOR`, and
-   `DISBURSEMENT_OFFICER`.
+   `DISPATCH_OFFICER`.
 3. THE System SHALL deny protected operations unless the authenticated active
    membership has the required permission and all required resource scopes.
 4. THE System SHALL derive actor identity from the verified session and tenant,
@@ -300,7 +300,7 @@ fields.
    price, or cash data.
 8. THE System SHALL prevent Reception users from receiving raw-material,
    production, or fulfillment-control data.
-9. THE System SHALL prevent Disbursement users from receiving selling prices,
+9. THE System SHALL prevent Dispatch users from receiving selling prices,
    payment amounts, cash totals, customer contact details, or procurement data.
 10. THE System SHALL prevent Managers from altering finalized history and
     SHALL reserve tenant-wide role/permission administration for Owners.
@@ -353,7 +353,7 @@ stable products and units.
    form and serialize them as decimal strings.
 6. WHEN a Production user lists items, THE System SHALL omit selling prices and
    customer-facing monetary fields.
-7. WHEN a Disbursement user lists items, THE System SHALL return only permitted
+7. WHEN a Dispatch user lists items, THE System SHALL return only permitted
    finished-goods fields and SHALL omit selling prices.
 8. WHEN a Reception user lists items, THE System SHALL exclude raw-material
    records and MAY receive permitted finished-good selling prices.
@@ -385,7 +385,7 @@ parties without exposing unnecessary personal or commercial data.
 6. THE System SHALL allow only Owner/Manager procurement access to supplier
    records.
 7. THE System SHALL allow Reception and authorized Owner/Manager access to
-   customer records and SHALL deny Production and Disbursement access to
+   customer records and SHALL deny Production and Dispatch access to
    customer contacts.
 8. THE System SHALL deactivate suppliers and customers rather than hard-delete
    them.

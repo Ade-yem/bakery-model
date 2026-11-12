@@ -1,4 +1,4 @@
-CREATE TYPE "department_type" AS ENUM('RECEPTION', 'PRODUCTION', 'DISBURSEMENT', 'STORE');--> statement-breakpoint
+CREATE TYPE "department_type" AS ENUM('RECEPTION', 'PRODUCTION', 'DISPATCH', 'STORE');--> statement-breakpoint
 CREATE TYPE "membership_status" AS ENUM('INVITED', 'ACTIVE', 'SUSPENDED', 'INACTIVE');--> statement-breakpoint
 CREATE TYPE "record_status" AS ENUM('ACTIVE', 'INACTIVE');--> statement-breakpoint
 CREATE TYPE "tenant_status" AS ENUM('ACTIVE', 'SUSPENDED', 'INACTIVE');--> statement-breakpoint

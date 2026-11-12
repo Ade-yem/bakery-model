@@ -2,7 +2,7 @@
 
 ## Project overview
 
-TallyBakery is intended to be a multi-tenant, offline-first operations and reconciliation platform for shift-based businesses, with commercial bakeries as the initial use case. It connects procurement, raw-material usage, production, finished-stock transfers, customer orders and payments, disbursement, and shift handovers so that stock and cash movements can be reconciled to their actors.
+TallyBakery is intended to be a multi-tenant, offline-first operations and reconciliation platform for shift-based businesses, with commercial bakeries as the initial use case. It connects procurement, raw-material usage, production, finished-stock transfers, customer orders and payments, dispatch, and shift handovers so that stock and cash movements can be reconciled to their actors.
 
 The repository is a pnpm TypeScript monorepo:
 
@@ -76,7 +76,7 @@ Root scripts are declared in `package.json`; package-specific scripts are declar
 When implementing product functionality, preserve these requirements from the PRD and SDD:
 
 - Enforce tenant, branch, department, and role access on the server. Never authorize a request based only on tenant/user identifiers supplied by the client.
-- Keep each role's information boundaries intact. In particular, production users must not see sales or cash data, cashiers must not see production/raw-material or fulfillment controls, and disbursement users must not see monetary or procurement data unless explicitly authorized.
+- Keep each role's information boundaries intact. In particular, production users must not see sales or cash data, cashiers must not see production/raw-material or fulfillment controls, and dispatch users must not see monetary or procurement data unless explicitly authorized.
 - Treat stock and financial movements as append-only ledgers. Correct finalized records with linked compensating entries rather than silently editing or deleting history.
 - Make critical multi-record operations atomic and idempotent. Orders, payments, stock movements, transfer acceptance, shift seals, and sync outcomes must not be partially applied or duplicated.
 - Derive balances and reconciliation results from recorded movements; do not make a manually maintained summary the authoritative source.

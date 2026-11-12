@@ -33,7 +33,7 @@ Each new tenant receives the following default records:
 Departments:
 - Reception
 - Production
-- Disbursement
+- Dispatch
 - Store
 
 Roles:
@@ -41,7 +41,7 @@ Roles:
 - Manager
 - Receptionist
 - Production Supervisor
-- Disbursement Officer
+- Dispatch Officer
 
 The baseline is created in the tenant’s database records, with role permission rows assigned from the approved permission allowlist.
 

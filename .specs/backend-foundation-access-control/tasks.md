@@ -4,7 +4,7 @@
 
 This checklist implements SDD Module 1 plus the backend/data portion of Week 1
 using test-first delivery. It intentionally excludes the PRD’s procurement,
-production, disbursement, and sales workflows until the secure foundation is
+production, dispatch, and sales workflows until the secure foundation is
 accepted.
 
 - Requirements: [requirements.md](./requirements.md)
@@ -186,7 +186,7 @@ accepted.
 
 #### Phase 6 confirmation gate
 
-- [ ] Production, Reception, and Disbursement boundaries match the PRD.
+- [ ] Production, Reception, and Dispatch boundaries match the PRD.
 - [ ] Money remains exact decimal strings at the HTTP boundary.
 - [ ] Master records deactivate without deletion and remain tenant-isolated.
 
@@ -259,7 +259,7 @@ accepted.
       seeded test database. (W1-14)
 - [ ] 9.2 Run the complete direct-ID attack matrix across path, query, body, and
       selector headers for every resource type. (W1-06, W1-14)
-- [ ] 9.3 Authenticate Owner, Manager, Reception, Production, and Disbursement
+- [ ] 9.3 Authenticate Owner, Manager, Reception, Production, and Dispatch
       personas and compare `/me`, endpoint access, and field projections with the
       approved permission matrix. (W1-07, W1-14)
 - [ ] 9.4 Generate the final OpenAPI document, run semantic validation, and

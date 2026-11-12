@@ -87,7 +87,7 @@ The `@repo/shared` package contains client-safe TypeScript types, DTO contracts,
   - `CASHIER`: Sales, customer orders, and cash register flows.
   - `PRODUCTION`: Bakery production operations; restricted from seeing financial and sales data.
   - `RECEPTION`: Finished-goods reception and transfer acceptance.
-  - `DISBURSEMENT`: Raw materials and stock distribution; restricted from financial figures.
+  - `DISPATCH`: Raw materials and stock distribution; restricted from financial figures.
 - **Where to use**:
   - **API**: Route guards (`RolesGuard`), authorization metadata decorators, and membership services.
   - **Client**: Role-based rendering, route guards, and navigation menu filtering.

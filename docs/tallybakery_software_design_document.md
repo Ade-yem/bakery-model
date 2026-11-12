@@ -45,7 +45,7 @@ lang: en
 
 This document translates the TallyBakery PRD into an implementation design. It defines the application architecture, feature modules, principal data structures, authorization model, operating workflows, offline synchronization approach, API boundaries, testing strategy, and a four-week implementation sequence.
 
-TallyBakery is a multi-tenant, offline-first operating ledger for shift-based businesses, anchored on commercial bakeries. It must connect the events that happen across Procurement/Store, Production, Reception, and Packaging & Disbursement so that inventory, orders, payments, and shift closure can be reconciled to named people and devices.
+TallyBakery is a multi-tenant, offline-first operating ledger for shift-based businesses, anchored on commercial bakeries. It must connect the events that happen across Procurement/Store, Production, Reception, and Packaging & Dispatch so that inventory, orders, payments, and shift closure can be reconciled to named people and devices.
 
 ### 1.1 Design goals
 
@@ -77,9 +77,9 @@ The feature scope below is derived from the supplied PRD. Choices such as a shar
 |---|---|---|
 | Business Owner / Super Admin | Tenant-wide visibility, branches, analytics, audit records, thresholds, subscriptions, incident review | No restriction within the tenant; must not gain access to another tenant |
 | Shift / Branch Manager | Procurement, expenses, staff onboarding/scheduling, approvals, incident resolution, handover co-sign | Cannot edit/delete finalized operational history |
-| Receptionist / Cashier | Customer orders, tender splits, customer credit/debt, push orders to disbursement | Cannot access production sheets, raw-material balances, or fulfillment controls |
+| Receptionist / Cashier | Customer orders, tender splits, customer credit/debt, push orders to dispatch | Cannot access production sheets, raw-material balances, or fulfillment controls |
 | Production Supervisor | Raw-material consumption, batch outputs, waste/scrap, production transfers | Cannot access sales amounts, cash totals, or customer data |
-| Packaging & Disbursement Officer | Accept production transfers, view pushed order queue, fulfill orders, count finished goods | Cannot access payment values, cash drawer totals, or procurement logs |
+| Packaging & Dispatch Officer | Accept production transfers, view pushed order queue, fulfill orders, count finished goods | Cannot access payment values, cash drawer totals, or procurement logs |
 
 ### 2.2 Role model
 
@@ -102,7 +102,7 @@ The system treats roles and departments as tenant configuration records that are
 Design requirements:
 
 - Every new tenant receives a default department catalog and default role catalog from a seed routine.
-- The default catalog mirrors the bakery operating model: Reception, Production, Disbursement, and Store departments, plus the standard business roles for Owner, Manager, Receptionist, Production Supervisor, and Disbursement Officer.
+- The default catalog mirrors the bakery operating model: Reception, Production, Dispatch, and Store departments, plus the standard business roles for Owner, Manager, Receptionist, Production Supervisor, and Dispatch Officer.
 - The tenant owner or admin may rename departments, deactivate or archive unused ones, add custom departments, and duplicate or adjust role permissions within the approved permission catalogue.
 - The application validates role edits against the approved permission allowlist and tenant access scope, but the system never requires a code deployment to change a tenant’s business departments or role assignments.
 - Role and department records remain tenant-scoped. No department or role data is shared across tenants, and tenant membership access is derived from the tenant-specific catalog.
@@ -216,7 +216,7 @@ Features:
 - Sign up/sign in, sign out, session lookup, password reset and email verification according to the configured Better Auth methods. (P0)
 - Create tenant/business and initial owner membership. (P0)
 - Branch creation and basic branch settings; the PRD's multi-branch analytics imply branches even though the core entity list does not explicitly define a `branches` table. (P0)
-- Department setup with default Reception, Production, Disbursement, and Store types. (P0)
+- Department setup with default Reception, Production, Dispatch, and Store types. (P0)
 - Invite/create staff, activate/deactivate staff, assign tenant role, branch access, and department access. (P0)
 - Server-side permission guards and tenant-scoped repository filters. (P0)
 - Permission matrix test coverage, including cross-tenant and cross-department denial. (P0)
@@ -256,7 +256,7 @@ Features:
 - Record output product, quantity, and SKU/size. (P0)
 - Record scrap/waste and reason. (P0)
 - Compute observed yield and compare it with configured/previous yield; log variation without blocking normal production. (P1)
-- Submit a completed batch as a pending stock transfer to Disbursement. (P0)
+- Submit a completed batch as a pending stock transfer to Dispatch. (P0)
 - Preserve batch and material-use history in immutable posted records. (P0)
 
 ### Module 5. Inventory ledger and production transfer acceptance
@@ -266,8 +266,8 @@ Features:
 Features:
 - Append-only `inventory_movements` for receipt, production consumption, production output, transfer accepted, fulfillment, waste, adjustment, reversal, and correction events. (P0)
 - Stock balance views by tenant, branch, location/department, item, and unit. (P0)
-- Pending transfers queue for Disbursement. (P0)
-- Disbursement records the physical received count and accepts/rejects or flags differences against the production-submitted count. (P0)
+- Pending transfers queue for Dispatch. (P0)
+- Dispatch records the physical received count and accepts/rejects or flags differences against the production-submitted count. (P0)
 - Record intake discrepancy and create a manager incident when the accepted count differs. (P0)
 - Closing physical count entry and expected-versus-counted stock calculation. (P0)
 - Concurrency control when two devices attempt to accept a transfer or fulfill the same order. (P0)
@@ -281,13 +281,13 @@ Features:
 - Support split tender across cash, bank transfer, and customer credit/debt. (P0)
 - Require a bank transaction reference/note for transfer payments. (P0)
 - Require customer identity/contact for debt allocation; compute outstanding amount and aging. (P0)
-- Keep an order in `PAID_PENDING_DISPATCH` (or approved-credit equivalent) until Reception explicitly pushes it to Disbursement. (P0)
+- Keep an order in `PAID_PENDING_DISPATCH` (or approved-credit equivalent) until Reception explicitly pushes it to Dispatch. (P0)
 - Prevent unpushed orders from appearing in the fulfillment queue. (P0)
 - Cash tender adds to calculated drawer cash; bank transfer is tracked separately and must not inflate the physical cash drawer. (P0)
 - Record voids, refunds, and corrections as compensating events. Detailed refund/payment-provider integration is not defined by the PRD and must be decided if needed. (P1/P2)
 - Trigger debt-ceiling incident when customer receivable exceeds the configured ceiling. (P1)
 
-### Module 7. Packaging and Disbursement fulfilment
+### Module 7. Packaging and Dispatch fulfilment
 
 **Purpose:** ensure goods physically leaving the business map to authorized orders.
 
@@ -312,7 +312,7 @@ Features:
 - Stock reconciliation formula: `expected stock = opening stock + accepted production transfers - fulfilled orders` (include all applicable stock movements such as approved adjustments/waste if they are in that department's ledger). `stock variance = physical count - expected stock`. (P0)
 - Cash reconciliation formula: `expected cash = opening float + cash tenders - approved petty-cash outflow`; `cash variance = counted cash - expected cash`. (P0)
 - Balanced closure if variance is zero; unbalanced closure allowed with reason, incoming co-sign, recorded deficiency, and incident creation. (P0)
-- Department-level shift seals for Reception and Disbursement; manager/owner can view branch roll-up. (P0)
+- Department-level shift seals for Reception and Dispatch; manager/owner can view branch roll-up. (P0)
 - Offline draft/signature captured locally and reconciled on sync. A local offline seal is marked `SEALED_PENDING_SYNC` until the server has validated event order, permissions, and conflicts. (P0)
 
 ### Module 9. Incident and notification management
@@ -404,7 +404,7 @@ Features:
 |---|---|
 | `tenants` | Business account, name, status, subscription tier/status, default currency, settings, created time |
 | `branches` | Tenant branch/location, name/code, timezone, status |
-| `departments` | Tenant/branch scope, type (`RECEPTION`, `PRODUCTION`, `DISBURSEMENT`, `STORE`), name, status |
+| `departments` | Tenant/branch scope, type (`RECEPTION`, `PRODUCTION`, `DISPATCH`, `STORE`), name, status |
 | `staff_profiles` / `tenant_memberships` | Better Auth user ID, tenant ID, role/status, display name, permitted branches/departments |
 | `role_permissions` | Role-to-permission assignments; only approved permission keys may be assigned |
 | `catalog_items` | Tenant item/SKU, item type (`RAW_MATERIAL`, `FINISHED_GOOD`, `OTHER`), name, UOM, active flag, price and category where applicable |
@@ -413,7 +413,7 @@ Features:
 | `procurement_receipts`, `procurement_lines` | Supplier receipt header and item quantities, unit cost, receipt reference, actor/shift |
 | `cash_expenses` | Category, amount/currency, reason, payee/reference, approval state, actor/shift |
 | `production_batches`, `batch_materials`, `batch_outputs` | Batch header, raw material use, finished output, waste, observed yield, status |
-| `stock_transfers`, `stock_transfer_lines` | Production-submitted output, Disbursement physical accepted quantity, discrepancy and acceptance metadata |
+| `stock_transfers`, `stock_transfer_lines` | Production-submitted output, Dispatch physical accepted quantity, discrepancy and acceptance metadata |
 | `inventory_movements` | Append-only signed quantity movement by item, branch/location, source event, actor, client/server time |
 | `inventory_balances` | Derived/cached quantity per item and stock location; rebuildable from `inventory_movements` |
 | `shifts` | Branch/department/type, assigned leads, opening/closing timestamps, state, version, variance summary |
@@ -454,7 +454,7 @@ At minimum:
 ### 5.5 Ledger rules
 
 1. A posted procurement receipt inserts its receipt lines and inbound stock movement in one transaction.
-2. A production batch posts raw-material consumption and creates a pending transfer. Finished stock becomes available to Disbursement only after its transfer is accepted.
+2. A production batch posts raw-material consumption and creates a pending transfer. Finished stock becomes available to Dispatch only after its transfer is accepted.
 3. Transfer acceptance records the physical accepted quantity, discrepancy, and resulting movement atomically.
 4. An order's fulfillment and finished-stock deduction commit together. The endpoint must be idempotent.
 5. Cash drawer expected balance is derived from opening float + cash tenders - approved cash expenses - other explicit cash movements. Bank transfers must not enter the physical cash drawer formula.
@@ -465,12 +465,12 @@ At minimum:
 
 ## 6. Key workflows and state machines
 
-### 6.1 Production to disbursement
+### 6.1 Production to dispatch
 
 1. Production supervisor records material usage, output by SKU/size, scrap/waste and notes.
 2. Backend validates that the user's role and active shift allow the entry.
-3. Within one transaction, the system records the batch, raw-material consumption movements, outputs, and pending stock transfer. Output is not yet treated as available Disbursement stock.
-4. Disbursement sees the pending transfer and independently counts received units.
+3. Within one transaction, the system records the batch, raw-material consumption movements, outputs, and pending stock transfer. Output is not yet treated as available Dispatch stock.
+4. Dispatch sees the pending transfer and independently counts received units.
 5. Acceptance creates the available finished-stock movement. A mismatch records the difference and creates an incident; the intake flow continues unless a separately configured safety rule blocks it.
 
 ### 6.2 Order, payment, dispatch, fulfillment
@@ -478,8 +478,8 @@ At minimum:
 1. Reception creates an order and line items.
 2. Payment rows record each split tender. Transfer requires a transaction reference; debt requires a customer record.
 3. The order is eligible for dispatch when the payment/credit policy is satisfied. The default PRD-aligned flow is `PAID_PENDING_DISPATCH` or `CREDIT_APPROVED_PENDING_DISPATCH`.
-4. Reception manually presses **Push to Disbursement**. Only then does the order appear in the fulfillment queue.
-5. Disbursement marks the order fulfilled. The server verifies it was pushed, is not already fulfilled, and stock remains available. Order state and inventory movement commit atomically.
+4. Reception manually presses **Push to Dispatch**. Only then does the order appear in the fulfillment queue.
+5. Dispatch marks the order fulfilled. The server verifies it was pushed, is not already fulfilled, and stock remains available. Order state and inventory movement commit atomically.
 6. If an action was created offline, the UI labels it pending sync until the server acknowledges the canonical result.
 
 Recommended order status and payment status are separate:
@@ -602,7 +602,7 @@ The PRD's goal of zero data loss should be measured as **no accepted local event
 | Master data | `GET/POST /items`, `GET/POST /suppliers`, `GET/POST /customers` | Catalogue, vendors, customers |
 | Procurement | `POST /procurement/receipts`, `GET /procurement/receipts`, `POST /expenses`, `POST /expenses/:id/approve` | Receipt and expense capture/approval |
 | Production | `POST /production/batches`, `GET /production/batches`, `POST /production/batches/:id/submit` | Batch and yield recording; create pending transfer |
-| Transfers | `GET /transfers/pending`, `POST /transfers/:id/accept`, `POST /transfers/:id/flag` | Disbursement acceptance/discrepancy |
+| Transfers | `GET /transfers/pending`, `POST /transfers/:id/accept`, `POST /transfers/:id/flag` | Dispatch acceptance/discrepancy |
 | Orders | `POST /orders`, `GET /orders`, `GET /orders/:id`, `POST /orders/:id/push`, `POST /orders/:id/fulfill`, `POST /orders/:id/cancel` | Order lifecycle and handoff to fulfillment |
 | Payments/debt | `POST /orders/:id/payments`, `GET /customers/:id/ledger`, `POST /customers/:id/repayments` | Split tenders and receivable ledger |
 | Shifts | `POST /shifts/open`, `POST /shifts/:id/draft-handover`, `POST /shifts/:id/co-sign`, `POST /shifts/:id/seal`, `GET /shifts/:id/reconciliation` | Shift lifecycle and reconciliation |
@@ -645,7 +645,7 @@ External provider calls (SMS, WhatsApp, Web Push, email, LLM) must not happen in
 
 - Deny by default. Every controller/service entry point must define required permissions.
 - Enforce tenant, branch, and department scope in NestJS guards and repositories.
-- Do not expose payment amount fields to Disbursement or production data to Reception through either API response or cached client state.
+- Do not expose payment amount fields to Dispatch or production data to Reception through either API response or cached client state.
 - Use database Row-Level Security as defense in depth where the Neon connection model supports the chosen session context safely. With pooled connections, set tenant context transaction-locally and test for cross-request context leakage. The app-layer scope checks remain mandatory.
 - Test tenant isolation by attempting to read/write another tenant's IDs directly in URLs and payloads.
 
@@ -766,7 +766,7 @@ The PRD's KPI targets (85% shrinkage reduction within 30 days, handover under fo
 **Goal:** real procurement-to-production-to-order-to-fulfillment movement using transactional inventory and payment ledgers.
 
 **Frontend/PWA**
-- Build item/customer/supplier screens, procurement and expense forms, production batch form, pending transfer board, Reception order/cart/payment form, manual push-to-disbursement action, and fulfillment queue.
+- Build item/customer/supplier screens, procurement and expense forms, production batch form, pending transfer board, Reception order/cart/payment form, manual push-to-dispatch action, and fulfillment queue.
 - Implement cash/transfer/debt split tender interface with field validation.
 - Build local draft persistence for long forms and low-connectivity recovery where feasible.
 
@@ -781,12 +781,12 @@ The PRD's KPI targets (85% shrinkage reduction within 30 days, handover under fo
 **Shared QA**
 - Write integration fixtures for stock in, stock consumed, output transferred, transfer accepted, order paid/pushed/fulfilled, split tenders, and customer credit.
 - Verify that transfer and fulfillment retries do not double-adjust inventory.
-- Run department-field-level permission checks, especially monetary values in Disbursement.
+- Run department-field-level permission checks, especially monetary values in Dispatch.
 
 **Exit criteria**
 - A seeded scenario can run from procurement receipt through production and order fulfillment with correctly reconciled ledger movements.
-- Reception must push an order before it appears in Disbursement.
-- Production/Disbursement cannot see customer payment amounts or cash totals.
+- Reception must push an order before it appears in Dispatch.
+- Production/Dispatch cannot see customer payment amounts or cash totals.
 
 ### Week 3 — Shift seals, reconciliation, offline outbox, and incidents
 

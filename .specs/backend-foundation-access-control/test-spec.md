@@ -113,10 +113,10 @@ Tenant A
 ├── Branch A1
 │   ├── Reception A1
 │   ├── Production A1
-│   ├── Disbursement A1
+│   ├── Dispatch A1
 │   └── Store A1
 ├── Branch A2
-└── Owner A, Manager A1, Reception A1, Production A1, Disbursement A1
+└── Owner A, Manager A1, Reception A1, Production A1, Dispatch A1
 
 Tenant B
 ├── Branch B1 and four departments
@@ -237,7 +237,7 @@ both tenants. IDs must be deliberately used in cross-tenant tampering tests.
 - **TEST-W1-ACCESS-009 — Unknown permission rejected**: Insert or submit an
   unknown key; expect configuration/input failure and no effective grant.
 - **TEST-W1-ACCESS-010 — Role ceiling enforced**: Attempt to grant price/customer
-  permissions to Production or Disbursement roles; expect rejection even from
+  permissions to Production or Dispatch roles; expect rejection even from
   an Owner.
 - **TEST-W1-ACCESS-011 — Cross-tenant path tampering**: Persona A uses Tenant B
   membership, staff, branch, department, item, supplier, customer, and audit
@@ -254,7 +254,7 @@ both tenants. IDs must be deliberately used in cross-tenant tampering tests.
 - **TEST-W1-ACCESS-015 — Reception boundary**: Reception persona receives
   finished-good prices and permitted customer fields but cannot access raw
   materials, suppliers, production data, or staff administration.
-- **TEST-W1-ACCESS-016 — Disbursement boundary**: Disbursement persona receives
+- **TEST-W1-ACCESS-016 — Dispatch boundary**: Dispatch persona receives
   permitted finished-good identity/UOM fields but no prices, customer contacts,
   payment values, raw materials, suppliers, or staff administration.
 - **TEST-W1-ACCESS-017 — `/me` safe summary**: Each persona receives only its own
@@ -275,19 +275,19 @@ both tenants. IDs must be deliberately used in cross-tenant tampering tests.
 - **TEST-W1-MASTER-002 — Tenant-isolated item SKU**: Reuse an SKU in a second
   tenant; expect success and isolated reads.
 - **TEST-W1-MASTER-003 — Item role projection**: Query the same finished good as
-  Owner, Reception, Production, and Disbursement; assert exact allowed fields
+  Owner, Reception, Production, and Dispatch; assert exact allowed fields
   for each role.
 - **TEST-W1-MASTER-004 — Item type filtering**: Reception cannot force raw
   materials into its result using filter manipulation; Production and
-  Disbursement receive their permitted types only.
+  Dispatch receive their permitted types only.
 - **TEST-W1-MASTER-005 — Item deactivation**: Deactivate an item; default lists
   exclude it, authorized explicit status filters can find it, and no delete
   occurs.
 - **TEST-W1-MASTER-006 — Supplier access**: Owner/Manager can create/read scoped
-  suppliers; Reception, Production, and Disbursement receive denial.
+  suppliers; Reception, Production, and Dispatch receive denial.
 - **TEST-W1-MASTER-007 — Customer access and redaction**: Owner/Manager and
   Reception receive their permitted customer fields; Production and
-  Disbursement receive no customer/contact records.
+  Dispatch receive no customer/contact records.
 - **TEST-W1-MASTER-008 — Customer credit precision**: Persist boundary and
   fractional credit ceilings; expect exact numeric storage and canonical
   decimal-string responses.
@@ -392,7 +392,7 @@ both tenants. IDs must be deliberately used in cross-tenant tampering tests.
 - **TEST-W1-E2E-002 — Manager journey**: Authenticate Manager A1, read `/me`,
   manage allowed staff/master data in A1, and fail every A2/B1 escalation.
 - **TEST-W1-E2E-003 — Department persona journeys**: Authenticate Reception,
-  Production, and Disbursement users and verify their exact allowed endpoints,
+  Production, and Dispatch users and verify their exact allowed endpoints,
   item projections, and forbidden resources.
 - **TEST-W1-E2E-004 — Migration-seed-health loop**: Start from empty PostgreSQL,
   migrate, seed, boot API, verify readiness, authenticate every persona, and

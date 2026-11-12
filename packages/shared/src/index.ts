@@ -48,7 +48,7 @@ export const ROLE_KEYS = {
   CASHIER: 'CASHIER',
   PRODUCTION: 'PRODUCTION',
   RECEPTION: 'RECEPTION',
-  DISBURSEMENT: 'DISBURSEMENT',
+  DISPATCH: 'DISPATCH',
 } as const;
 
 export type RoleKey = (typeof ROLE_KEYS)[keyof typeof ROLE_KEYS];

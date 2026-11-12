@@ -84,7 +84,7 @@ describe('TenantsService - Baseline Catalog Seeding', () => {
     const createdDeptNames = result.departments.map((d: any) => d.name);
     expect(createdDeptNames).toContain('Reception');
     expect(createdDeptNames).toContain('Production');
-    expect(createdDeptNames).toContain('Disbursement');
+    expect(createdDeptNames).toContain('Dispatch');
     expect(createdDeptNames).toContain('Store');
   });
 
@@ -132,7 +132,7 @@ describe('TenantsService - Baseline Catalog Seeding', () => {
     expect(seededRoleKeys.has('MANAGER')).toBe(true);
     expect(seededRoleKeys.has('RECEPTIONIST')).toBe(true);
     expect(seededRoleKeys.has('PRODUCTION_SUPERVISOR')).toBe(true);
-    expect(seededRoleKeys.has('DISBURSEMENT_OFFICER')).toBe(true);
+    expect(seededRoleKeys.has('DISPATCH_OFFICER')).toBe(true);
 
     // Verify permission rows match DEFAULT_ROLE_PERMISSIONS count
     const totalExpectedRows = Object.values(DEFAULT_ROLE_PERMISSIONS).reduce(

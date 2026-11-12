@@ -612,7 +612,7 @@
       "values": [
         "RECEPTION",
         "PRODUCTION",
-        "DISBURSEMENT",
+        "DISPATCH",
         "STORE"
       ],
       "entityType": "enums"

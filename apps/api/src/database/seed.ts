@@ -68,7 +68,7 @@ async function seed() {
   const defaultDepartments = [
     { name: 'Reception', type: 'RECEPTION' },
     { name: 'Production', type: 'PRODUCTION' },
-    { name: 'Disbursement', type: 'DISBURSEMENT' },
+    { name: 'Dispatch', type: 'DISPATCH' },
     { name: 'Store', type: 'STORE' },
   ] as const;
 
@@ -94,7 +94,7 @@ async function seed() {
   const ownerDepartmentIds = [
     departmentsByName.get('Reception')?.id,
     departmentsByName.get('Production')?.id,
-    departmentsByName.get('Disbursement')?.id,
+    departmentsByName.get('Dispatch')?.id,
     departmentsByName.get('Store')?.id,
   ].filter((id): id is string => Boolean(id));
 

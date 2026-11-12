@@ -211,7 +211,7 @@ OWNER
 MANAGER
 RECEPTIONIST
 PRODUCTION_SUPERVISOR
-DISBURSEMENT_OFFICER
+DISPATCH_OFFICER
 ```
 
 ### Week 1 permission catalogue
@@ -235,7 +235,7 @@ ignored and surfaced as a configuration error; it never widens access.
 
 ### Baseline matrix
 
-| Capability                       |               Owner |                          Manager |                    Reception |                   Production |                   Disbursement |
+| Capability                       |               Owner |                          Manager |                    Reception |                   Production |                   Dispatch |
 | -------------------------------- | ------------------: | -------------------------------: | ---------------------------: | ---------------------------: | -----------------------------: |
 | Tenant metadata read             |              Tenant |                   Assigned scope |                  Own summary |                  Own summary |                    Own summary |
 | Tenant settings update           |                 Yes |                               No |                           No |                           No |                             No |

@@ -14,14 +14,14 @@ describe('Phase 3.3 Permission Catalogue & Role Ceilings', () => {
   });
 
   // TEST-W1-ACCESS-010 — Role ceiling enforced
-  it('TEST-W1-ACCESS-010: Production and Disbursement ceilings strictly exclude financial and customer contact permissions', () => {
+  it('TEST-W1-ACCESS-010: Production and Dispatch ceilings strictly exclude financial and customer contact permissions', () => {
     const prodCeiling = ROLE_CEILINGS['PRODUCTION_SUPERVISOR'];
     expect(prodCeiling).toBeDefined();
     expect(prodCeiling.has(PERMISSION_KEYS.ITEMS_PRICE_READ)).toBe(false);
     expect(prodCeiling.has(PERMISSION_KEYS.CUSTOMERS_READ)).toBe(false);
     expect(prodCeiling.has(PERMISSION_KEYS.CUSTOMERS_CONTACT_READ)).toBe(false);
 
-    const disbCeiling = ROLE_CEILINGS['DISBURSEMENT_OFFICER'];
+    const disbCeiling = ROLE_CEILINGS['DISPATCH_OFFICER'];
     expect(disbCeiling).toBeDefined();
     expect(disbCeiling.has(PERMISSION_KEYS.ITEMS_PRICE_READ)).toBe(false);
     expect(disbCeiling.has(PERMISSION_KEYS.CUSTOMERS_READ)).toBe(false);

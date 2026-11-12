@@ -7,7 +7,7 @@ import { eq, and, ne } from 'drizzle-orm';
 export interface CreateDepartmentInput {
   branchId: string;
   name: string;
-  type?: 'RECEPTION' | 'PRODUCTION' | 'DISBURSEMENT' | 'STORE';
+  type?: 'RECEPTION' | 'PRODUCTION' | 'DISPATCH' | 'STORE';
 }
 
 export interface UpdateDepartmentInput {
@@ -24,7 +24,7 @@ export class DepartmentsService {
   constructor(
     @Inject(getDrizzleToken())
     private readonly db: Database,
-  ) {}
+  ) { }
 
   /**
    * Retrieves all departments belonging strictly to the specified tenant.

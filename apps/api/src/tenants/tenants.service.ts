@@ -11,7 +11,7 @@ export class TenantsService {
     @Inject(getDrizzleToken())
     private readonly db: Database,
     private readonly auditService: AuditService,
-  ) {}
+  ) { }
 
   async onboardTenant(input: {
     tenantName: string;
@@ -51,7 +51,7 @@ export class TenantsService {
       const defaultDepartments = [
         { name: 'Reception', type: 'RECEPTION' },
         { name: 'Production', type: 'PRODUCTION' },
-        { name: 'Disbursement', type: 'DISBURSEMENT' },
+        { name: 'Dispatch', type: 'DISPATCH' },
         { name: 'Store', type: 'STORE' },
       ] as const;
 
@@ -76,7 +76,7 @@ export class TenantsService {
       const ownerDepartmentIds = [
         departmentsByName.get('Reception')?.id,
         departmentsByName.get('Production')?.id,
-        departmentsByName.get('Disbursement')?.id,
+        departmentsByName.get('Dispatch')?.id,
         departmentsByName.get('Store')?.id,
       ].filter((id): id is string => Boolean(id));
 
