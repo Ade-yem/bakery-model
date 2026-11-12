@@ -1,16 +1,22 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
+    "drizzle": {
+      "source": "./apps/api/node_modules/.pnpm/drizzle-kit@1.0.0-rc.5_drizzle-orm@1.0.0-rc.5_@types+pg@8.23.1_pg@8.23.1_/node_modules/drizzle-kit/skills",
+      "sourceType": "local",
+      "computedHash": "c91331769b0cf9a9f5592d9ea5cf0998fdfcd81c4ed1fb0d8784ada819a797e9"
+    },
+    "flutterwave": {
+      "source": "DevMubarak1/Flutterwave",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "2fd18a98236f1bba1faf19cd079440168a853d7ba83efc6daba65854d04d03a0"
+    },
     "nestjs-best-practices": {
       "source": "giuseppe-trisciuoglio/developer-kit",
       "sourceType": "github",
       "skillPath": "plugins/developer-kit-typescript/skills/nestjs-best-practices/SKILL.md",
-      "computedHash": "9ae7ebfb5494452a9496462c4886fd8763e6f8dfa6e506efca7502c0529add2c"
-    },
-    "drizzle": {
-      "source": "./apps/api/node_modules/.pnpm/drizzle-kit@1.0.0-rc.5_drizzle-orm@1.0.0-rc.5_@types+pg@8.23.1_pg@8.23.1_/node_modules/drizzle-kit/skills",
-      "sourceType": "local",
-      "computedHash": "27540b3acc549af69f3882a32f4daa68b2efea9c8724d4506631770cd4b13c88"
+      "computedHash": "a84d13a8264c0737bf605470dc5a1b27d4d87a08689ee3ef4aabe9accf409acd"
     }
   }
 }
