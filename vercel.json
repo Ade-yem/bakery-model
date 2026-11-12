@@ -3,15 +3,18 @@
   "services": {
     "api": {
       "root": "apps/api",
-      "framework": "nestjs"
+      "framework": "nestjs",
+      "installCommand": "pnpm install"
     },
     "app": {
       "root": "apps/app",
-      "framework": "vite"
+      "framework": "vite",
+      "installCommand": "pnpm install"
     },
     "marketing": {
       "root": "apps/marketing",
-      "framework": "vite"
+      "framework": "vite",
+      "installCommand": "pnpm install"
     }
   },
   "rewrites": [
@@ -63,6 +66,5 @@
         "service": "marketing"
       }
     }
-  ],
-  "installCommand": "pnpm install"
+  ]
 }
