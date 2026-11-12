@@ -1,35 +1,71 @@
-# React + TypeScript + Vite
+# @repo/marketing (TallyBakery Marketing Website)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The public marketing website and landing pages for TallyBakery.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This application serves as the public web presence and marketing portal for TallyBakery:
 
-## React Compiler
+- **Landing & Feature Showcases**: Highlighting offline-first shift reconciliation, inventory control, and bakery production tracking.
+- **Pricing & Subscription Plans**: Presenting tier comparisons and billing options powered by the subscription engine.
+- **Customer Acquisition & Onboarding**: Directing bakery owners and managers to signup and business onboarding flows.
+- **Brand & Product Documentation**: Public knowledge resources, customer stories, and feature previews.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Tech Stack
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vite.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Optimization**: [React Compiler](https://react.dev/learn/react-compiler) via Babel plugin
+- **Linter**: [Oxlint](https://oxc.rs/)
+- **Shared Contracts**: `@repo/shared` workspace dependency
 
-## Expanding the Oxlint configuration
+## Getting Started
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Development
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+Run from the monorepo root:
+
+```bash
+pnpm dev:marketing
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Or from this directory:
+
+```bash
+pnpm dev
+```
+
+### Production Build
+
+Run from the monorepo root:
+
+```bash
+pnpm build:marketing
+```
+
+Or from this directory:
+
+```bash
+pnpm build
+```
+
+### Preview
+
+To preview the production build locally:
+
+```bash
+pnpm preview
+```
+
+### Linting
+
+```bash
+pnpm lint
+```
+
+## Architectural Guidelines & Boundaries
+
+- **Separation of Concerns**: Kept distinct from the internal operational application (`apps/app`) to allow independent release lifecycles, SEO optimization, and lightweight public assets.
+- **Shared Types**: Leverages `@repo/shared` for public contracts, subscription plan structures, and error codes where applicable.

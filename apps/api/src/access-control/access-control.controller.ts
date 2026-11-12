@@ -14,7 +14,6 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
-  ApiUnauthorizedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiConflictResponse,
@@ -122,7 +121,10 @@ export class AccessControlController {
   ) {
     return this.accessControlService.createRole(
       actor.tenantId,
-      body,
+      {
+        ...body,
+        permissions: body.permissions ?? [],
+      },
       actor.authUserId,
       actor.membershipId,
     );

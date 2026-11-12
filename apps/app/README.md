@@ -1,35 +1,73 @@
-# React + TypeScript + Vite
+# @repo/app (TallyBakery Main Application)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The main operational web application for TallyBakery — a multi-tenant, offline-first operations and reconciliation platform for commercial bakeries and shift-based food manufacturing facilities.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This application serves as the primary user interface for bakery staff and managers across all operational roles:
 
-## React Compiler
+- **Shift & Handover Management**: Shift start, cash float declaration, mid-shift transfers, and shift seals.
+- **Inventory & Stock Tracking**: Raw-material receiving, storage location movements, finished-stock transfers.
+- **Production & Recipe Execution**: Production batch tracking, recipe scaling, and material consumption logging.
+- **Sales & Cashiering**: Order intake, payment processing, customer credit accounts, and receipt issuance.
+- **Dispatch & Fulfillment**: Order staging, packing, dispatch verification, and route tracking.
+- **Auditing & Reconciliation**: Real-time discrepancy detection across inventory and cash drawers.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Tech Stack
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vite.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Optimization**: [React Compiler](https://react.dev/learn/react-compiler) via Babel plugin
+- **Linter**: [Oxlint](https://oxc.rs/)
+- **Shared Contracts**: `@repo/shared` workspace dependency
 
-## Expanding the Oxlint configuration
+## Getting Started
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Development
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+Run from the monorepo root:
+
+```bash
+pnpm dev:app
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Or from this directory:
+
+```bash
+pnpm dev
+```
+
+### Production Build
+
+Run from the monorepo root:
+
+```bash
+pnpm build:app
+```
+
+Or from this directory:
+
+```bash
+pnpm build
+```
+
+### Preview
+
+To preview the production build locally:
+
+```bash
+pnpm preview
+```
+
+### Linting
+
+```bash
+pnpm lint
+```
+
+## Architectural Guidelines & Boundaries
+
+- **API Integration**: Connects to the backend REST API (`apps/api`) under `/api/v1` and auth routes under `/api/auth`.
+- **State & Access Boundaries**: Respects tenant, branch, department, and role access boundaries enforced by the API.
+- **Shared Types**: Always import shared models, DTOs, enums, and error contracts from `@repo/shared`. Never define duplicate contracts or import server-only code.

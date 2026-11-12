@@ -1,0 +1,67 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "api": {
+      "root": "apps/api",
+      "framework": "nestjs"
+    },
+    "app": {
+      "root": "apps/app",
+      "framework": "vite"
+    },
+    "marketing": {
+      "root": "apps/marketing",
+      "framework": "vite"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/docs(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/health(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "^app\\..*"
+        }
+      ],
+      "destination": {
+        "service": "app"
+      }
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": {
+        "service": "app"
+      }
+    },
+    {
+      "source": "/app",
+      "destination": {
+        "service": "app"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "marketing"
+      }
+    }
+  ]
+}

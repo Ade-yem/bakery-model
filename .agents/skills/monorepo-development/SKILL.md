@@ -31,13 +31,14 @@ boundaries, not as one application directory.
 ## Package boundaries and dependency direction
 
 - Keep frontend, backend, and shared code separate:
-  - `apps/client` owns browser UI and client-side interaction.
+  - `apps/app` owns the main operational browser UI and client-side interaction.
+  - `apps/marketing` owns the public marketing website and landing pages.
   - `apps/api` owns server-side validation, authorization, and authoritative
     business rules.
   - `packages/shared` owns intentionally public, runtime-neutral contracts and
-    utilities safe for both client and server.
+    utilities safe for both clients and server.
 - Keep dependencies flowing from apps to shared packages. Shared packages must
-  not depend on either app; the client must not import API implementation,
+  not depend on any app; the client applications must not import API implementation,
   persistence, or server-only code.
 - Do not expose ORM entities, secrets, environment access, Node-only APIs, or
   other server internals through a client-facing shared package.
@@ -55,7 +56,7 @@ boundaries, not as one application directory.
 
 ## Frontend: React and Vite
 
-- Keep UI and browser interaction in `apps/client`; call the API through its
+- Keep UI and browser interaction in client apps (`apps/app`, `apps/marketing`); call the API through its
   public HTTP contract rather than coupling the UI to NestJS internals.
 - Keep components typed, focused, and accessible. Keep API calls, reusable
   presentation, and state handling in the established client-side locations

@@ -6,7 +6,8 @@ TallyBakery is intended to be a multi-tenant, offline-first operations and recon
 
 The repository is a pnpm TypeScript monorepo:
 
-- `apps/client` — React 19 and Vite frontend.
+- `apps/app` — React 19 and Vite frontend for the main operational application (shifts, inventory, sales, production, reconciliation).
+- `apps/marketing` — React 19 and Vite frontend for marketing and public landing pages.
 - `apps/api` — NestJS REST API.
 - `packages/shared` — shared TypeScript contracts and types.
 - `docs` — product requirements and software design documents.
@@ -34,21 +35,24 @@ The README specifies Node.js 18+ and pnpm 9+.
 Run each app in its own terminal:
 
 ```bash
-pnpm dev:client
+pnpm dev:app
+pnpm dev:marketing
 pnpm --filter @repo/api start:dev
 ```
 
-The client also supports `pnpm --filter @repo/client dev`. The root `dev:api` script currently calls the API package's `dev` script, which is not defined; use `start:dev` directly for API watch mode.
+The frontend apps also support `pnpm --filter @repo/app dev` and `pnpm --filter @repo/marketing dev`. The root `dev:api` script currently calls the API package's `dev` script, which is not defined; use `start:dev` directly for API watch mode.
 
 ### Build and preview
 
 ```bash
-pnpm build                 # API, then client
+pnpm build                 # API, then main app and marketing site
 pnpm build:api
-pnpm build:client
+pnpm build:app
+pnpm build:marketing
 pnpm --filter @repo/shared build
 pnpm start:api
-pnpm start:client          # previews the client production build
+pnpm start:app             # previews the main app production build
+pnpm start:marketing       # previews the marketing site production build
 ```
 
 The root `build` script does not invoke the shared package build. Build `@repo/shared` separately when a change or local build requires its generated `dist` output.
@@ -61,13 +65,14 @@ pnpm --filter @repo/api test:watch
 pnpm --filter @repo/api test:cov
 pnpm --filter @repo/api test:e2e
 pnpm --filter @repo/api lint
-pnpm --filter @repo/client lint
+pnpm --filter @repo/app lint
+pnpm --filter @repo/marketing lint
 pnpm --filter @repo/shared lint
 pnpm lint
 pnpm format:check
 ```
 
-API tests use Vitest. The client and shared package currently have no test scripts. Root formatting writes across the repository (`pnpm format`); prefer the check command or a narrowly scoped formatter for validation.
+API tests use Vitest. The client apps (`apps/app`, `apps/marketing`) and shared package currently have no test scripts (the client apps use oxlint for linting). Root formatting writes across the repository (`pnpm format`); prefer the check command or a narrowly scoped formatter for validation.
 
 Root scripts are declared in `package.json`; package-specific scripts are declared in each workspace package's `package.json`. Use the script that exists in the relevant manifest rather than relying on stale README examples.
 
@@ -90,9 +95,9 @@ These are product/design requirements, not proof that the corresponding controls
 
 - Follow the existing TypeScript, module, and formatting patterns in the package being changed. The API uses ESM imports with `.js` extensions in TypeScript source; preserve that convention.
 - Keep client-safe shared contracts in `packages/shared`. Do not expose ORM entities, persistence internals, secrets, or server-only types to the browser.
-- Keep deployable boundaries between client and API. Put validation and authoritative business rules on the API, not only in UI code.
+- Keep deployable boundaries between client applications and API. Put validation and authoritative business rules on the API, not only in UI code.
 - Prefer small domain-focused NestJS modules/services and typed React components over adding unrelated abstractions.
-- Add or update tests alongside behavior changes. For shared contracts, check the affected client and API builds as well as the package build.
+- Add or update tests alongside behavior changes. For shared contracts, check the affected client apps and API builds as well as the package build.
 - Do not add a database, authentication provider, external service, or new framework based solely on the proposed SDD; confirm the integration choices in the relevant task context and document changes where appropriate.
 
 ## Skills

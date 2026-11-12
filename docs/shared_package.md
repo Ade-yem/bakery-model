@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `@repo/shared` package contains client-safe TypeScript types, DTO contracts, enum definitions, error codes, and pagination models shared across the TallyBakery workspace (`apps/client`, `apps/api`, etc.).
+The `@repo/shared` package contains client-safe TypeScript types, DTO contracts, enum definitions, error codes, and pagination models shared across the TallyBakery workspace (`apps/app`, `apps/marketing`, `apps/api`, etc.).
 
 ### Invariant & Boundary Rules
 

@@ -9,7 +9,7 @@
     "build:api": "pnpm --filter @repo/api build",
     "build:app": "pnpm --filter @repo/app build",
     "build:marketing": "pnpm --filter @repo/marketing build",
-    "build": "pnpm run build:api && pnpm run build:client",
+    "build": "pnpm run build:api && pnpm run build:app && pnpm run build:marketing",
     "start:api": "pnpm --filter @repo/api start",
     "start:app": "pnpm --filter @repo/app preview",
     "start:marketing": "pnpm --filter @repo/marketing preview",
