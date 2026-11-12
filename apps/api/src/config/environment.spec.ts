@@ -15,9 +15,29 @@ describe('validateEnvironment', () => {
       PORT: 4000,
       DATABASE_URL: 'postgresql://user:password@localhost:5432/tallybakery',
       DATABASE_POOL_MAX: 5,
-      BETTER_AUTH_SECRET: 'development-default-secret-min-32-characters-needed-now',
+      BETTER_AUTH_SECRET:
+        'development-default-secret-min-32-characters-needed-now',
       BETTER_AUTH_URL: 'http://localhost:3000',
       TRUSTED_ORIGINS: ['http://localhost:3000', 'http://localhost:5173'],
+      FLW_SECRET_KEY: undefined,
+      FLW_WEBHOOK_HASH: undefined,
+      FLW_V3_BASE_URL: 'https://api.flutterwave.com/v3',
+    });
+  });
+
+  it('parses Flutterwave configuration when provided', () => {
+    expect(
+      validateEnvironment({
+        NODE_ENV: 'test',
+        DATABASE_URL: 'postgresql://user:password@localhost:5432/tallybakery',
+        FLW_SECRET_KEY: 'FLWSECK_TEST-123',
+        FLW_WEBHOOK_HASH: 'flw-secret-hash',
+        FLW_V3_BASE_URL: 'https://custom-flw.example.com/v3',
+      }),
+    ).toMatchObject({
+      FLW_SECRET_KEY: 'FLWSECK_TEST-123',
+      FLW_WEBHOOK_HASH: 'flw-secret-hash',
+      FLW_V3_BASE_URL: 'https://custom-flw.example.com/v3',
     });
   });
 

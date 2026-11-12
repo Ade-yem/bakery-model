@@ -18,9 +18,12 @@ export const PERMISSION_KEYS = {
   CUSTOMERS_MANAGE: 'customers:manage',
   CUSTOMERS_CONTACT_READ: 'customers:contact:read',
   AUDIT_READ: 'audit:read',
+  SUBSCRIPTION_READ: 'subscription:read',
+  SUBSCRIPTION_MANAGE: 'subscription:manage',
 } as const;
 
-export type PermissionKey = (typeof PERMISSION_KEYS)[keyof typeof PERMISSION_KEYS];
+export type PermissionKey =
+  (typeof PERMISSION_KEYS)[keyof typeof PERMISSION_KEYS];
 
 export const VALID_PERMISSIONS: ReadonlySet<PermissionKey> = new Set(
   Object.values(PERMISSION_KEYS),

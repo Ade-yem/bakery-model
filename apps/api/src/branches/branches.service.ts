@@ -4,6 +4,9 @@ import type { Database } from '../database/database.types.js';
 import * as schema from '../database/schema/index.js';
 import { eq, and } from 'drizzle-orm';
 
+/**
+ * Service managing branch facility records and uniqueness constraints within tenant scopes.
+ */
 @Injectable()
 export class BranchesService {
   constructor(
@@ -11,6 +14,12 @@ export class BranchesService {
     private readonly db: Database,
   ) {}
 
+  /**
+   * Retrieves all branches belonging to a specific tenant.
+   *
+   * @param tenantId - The UUID of the authenticated tenant.
+   * @returns Array of branch database records.
+   */
   async list(tenantId: string) {
     return this.db
       .select()
@@ -18,11 +27,27 @@ export class BranchesService {
       .where(eq(schema.branches.tenantId, tenantId));
   }
 
-  async create(tenantId: string, input: { name: string; code: string; timezone?: string }) {
+  /**
+   * Registers a new branch location for a tenant.
+   *
+   * @param tenantId - The UUID of the tenant.
+   * @param input - Branch parameters including title, code, and timezone.
+   * @returns The newly created branch record.
+   * @throws {ConflictException} If a branch with the specified code already exists in the tenant.
+   */
+  async create(
+    tenantId: string,
+    input: { name: string; code: string; timezone?: string },
+  ) {
     const existing = await this.db
       .select()
       .from(schema.branches)
-      .where(and(eq(schema.branches.tenantId, tenantId), eq(schema.branches.code, input.code)))
+      .where(
+        and(
+          eq(schema.branches.tenantId, tenantId),
+          eq(schema.branches.code, input.code),
+        ),
+      )
       .limit(1);
 
     if (existing.length > 0) {

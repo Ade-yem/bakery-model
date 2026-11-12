@@ -16,6 +16,8 @@ import { SuppliersModule } from './suppliers/suppliers.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { AccessControlApiModule } from './access-control/access-control.module.js';
 import { HealthModule } from './health/health.module.js';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
+import { WebhooksModule } from './webhooks/webhooks.module.js';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { HealthModule } from './health/health.module.js';
     CustomersModule,
     AccessControlApiModule,
     HealthModule,
+    SubscriptionsModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

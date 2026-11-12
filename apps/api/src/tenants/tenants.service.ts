@@ -12,8 +12,18 @@ export class TenantsService {
     private readonly db: Database,
     private readonly auditService: AuditService,
     private readonly seederService: TenantTemplateSeederService,
-  ) { }
+  ) {}
 
+  /**
+   * Onboards a new bakery tenant organization within an atomic database transaction.
+   *
+   * Creates the tenant entity with STANDARD subscription status, provisions the initial primary branch,
+   * invokes TenantTemplateSeederService to establish baseline factory departments (Reception, Production,
+   * Dispatch, Store) and system roles, sets up the initial OWNER membership, and records an audit log.
+   *
+   * @param input - The onboarding payload including business title, initial branch name, and owner details.
+   * @returns Object containing the created tenant, branch, departments, and owner membership.
+   */
   async onboardTenant(input: {
     tenantName: string;
     branchName?: string;
@@ -54,18 +64,22 @@ export class TenantsService {
         branch!.id,
         input.actorAuthUserId,
         input.userName || input.userEmail,
+        tx as unknown as Database,
       );
 
-      await this.auditService.log({
-        tenantId: tenant!.id,
-        actorAuthUserId: input.actorAuthUserId,
-        actorMembershipId: seeded.membership.id,
-        action: 'tenant:onboard',
-        subjectType: 'tenant',
-        subjectId: tenant!.id,
-        requestId: 'internal',
-        summary: { tenantName: tenant!.name },
-      });
+      await this.auditService.log(
+        {
+          tenantId: tenant!.id,
+          actorAuthUserId: input.actorAuthUserId,
+          actorMembershipId: seeded.membership.id,
+          action: 'tenant:onboard',
+          subjectType: 'tenant',
+          subjectId: tenant!.id,
+          requestId: 'internal',
+          summary: { tenantName: tenant!.name },
+        },
+        tx as unknown as Database,
+      );
 
       return {
         tenant: tenant!,

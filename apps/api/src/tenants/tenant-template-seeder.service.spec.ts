@@ -29,7 +29,9 @@ describe('TenantTemplateSeederService - Starter Baseline Seeding', () => {
             }
             return [
               {
-                id: vals.code ? `role-${roleIdCounter++}` : `item-${deptIdCounter++}`,
+                id: vals.code
+                  ? `role-${roleIdCounter++}`
+                  : `item-${deptIdCounter++}`,
                 ...vals,
               },
             ];
@@ -50,29 +52,45 @@ describe('TenantTemplateSeederService - Starter Baseline Seeding', () => {
   });
 
   it('TEST-DFDR-SEED-001: seeds default bakery departments, roles, and mappings for new tenant', async () => {
-    const result = await seeder.seedBaseline(tenantId, branchId, ownerUserId, 'Owner Name');
+    const result = await seeder.seedBaseline(
+      tenantId,
+      branchId,
+      ownerUserId,
+      'Owner Name',
+    );
 
     expect(result.departments).toHaveLength(4);
     const deptCodes = result.departments.map((d: any) => d.code);
-    expect(deptCodes).toEqual(expect.arrayContaining(['REC', 'PROD', 'DISP', 'STORE']));
+    expect(deptCodes).toEqual(
+      expect.arrayContaining(['REC', 'PROD', 'DISP', 'STORE']),
+    );
 
     expect(result.roles).toHaveLength(5);
     const roleCodes = result.roles.map((r: any) => r.code);
     expect(roleCodes).toEqual(
-      expect.arrayContaining(['OWNER', 'MANAGER', 'RECEPTIONIST', 'PRODUCTION_SUPERVISOR', 'DISPATCH_OFFICER']),
+      expect.arrayContaining([
+        'OWNER',
+        'MANAGER',
+        'RECEPTIONIST',
+        'PRODUCTION_SUPERVISOR',
+        'DISPATCH_OFFICER',
+      ]),
     );
 
     // Verify roleDepartments mappings exist
     const roleDeptInserts = insertedRows.find(
-      (entry) => Array.isArray(entry.values) && entry.values.some((v) => v.roleId && v.departmentId),
+      (entry) =>
+        Array.isArray(entry.values) &&
+        entry.values.some((v) => v.roleId && v.departmentId),
     );
     expect(roleDeptInserts).toBeDefined();
 
     // Verify permissions were seeded for roles
     const permInserts = insertedRows.find(
-      (entry) => Array.isArray(entry.values) && entry.values.some((v) => v.roleKey && v.permissionKey),
+      (entry) =>
+        Array.isArray(entry.values) &&
+        entry.values.some((v) => v.roleKey && v.permissionKey),
     );
     expect(permInserts).toBeDefined();
   });
 });
-

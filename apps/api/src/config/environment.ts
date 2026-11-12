@@ -6,6 +6,9 @@ export interface EnvironmentVariables {
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   TRUSTED_ORIGINS: string[];
+  FLW_SECRET_KEY?: string;
+  FLW_WEBHOOK_HASH?: string;
+  FLW_V3_BASE_URL: string;
 }
 
 const nodeEnvironments = new Set<EnvironmentVariables['NODE_ENV']>([
@@ -82,7 +85,10 @@ export function validateEnvironment(
   const rawOrigins = values.TRUSTED_ORIGINS;
   let trustedOrigins: string[] = [];
   if (typeof rawOrigins === 'string' && rawOrigins.trim().length > 0) {
-    trustedOrigins = rawOrigins.split(',').map((o) => o.trim()).filter(Boolean);
+    trustedOrigins = rawOrigins
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
   } else if (nodeEnvironment === 'production') {
     throw new Error('TRUSTED_ORIGINS is required in production');
   } else {
@@ -101,5 +107,18 @@ export function validateEnvironment(
     BETTER_AUTH_SECRET: authSecret,
     BETTER_AUTH_URL: authUrl,
     TRUSTED_ORIGINS: trustedOrigins,
+    FLW_SECRET_KEY:
+      typeof values.FLW_SECRET_KEY === 'string'
+        ? values.FLW_SECRET_KEY.trim()
+        : undefined,
+    FLW_WEBHOOK_HASH:
+      typeof values.FLW_WEBHOOK_HASH === 'string'
+        ? values.FLW_WEBHOOK_HASH.trim()
+        : undefined,
+    FLW_V3_BASE_URL:
+      typeof values.FLW_V3_BASE_URL === 'string' &&
+      values.FLW_V3_BASE_URL.trim().length > 0
+        ? values.FLW_V3_BASE_URL.trim()
+        : 'https://api.flutterwave.com/v3',
   };
 }

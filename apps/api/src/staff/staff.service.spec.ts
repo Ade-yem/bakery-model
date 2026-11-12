@@ -1,7 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { StaffService } from './staff.service.js';
 import type { Database } from '../database/database.types.js';
-import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PERMISSION_KEYS } from '../access-control/permissions.js';
 
 describe('StaffService - Membership Scopes & Role Assignments', () => {
@@ -80,7 +84,8 @@ describe('StaffService - Membership Scopes & Role Assignments', () => {
           where: vi.fn().mockReturnValue({
             limit: vi.fn().mockImplementation(() => {
               selectCount++;
-              if (selectCount === 1) return Promise.resolve([existingMembership]);
+              if (selectCount === 1)
+                return Promise.resolve([existingMembership]);
               return Promise.resolve([]);
             }),
           }),
@@ -188,9 +193,11 @@ describe('StaffService - Membership Scopes & Role Assignments', () => {
       update: vi.fn().mockReturnValue({
         set: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            returning: vi.fn().mockResolvedValue([
-              { ...existingMembership, roleKey: 'MANAGER' },
-            ]),
+            returning: vi
+              .fn()
+              .mockResolvedValue([
+                { ...existingMembership, roleKey: 'MANAGER' },
+              ]),
           }),
         }),
       }),
@@ -217,7 +224,8 @@ describe('StaffService - Membership Scopes & Role Assignments', () => {
             if (selectCount === 4) {
               // role lookup
               return {
-                limit: () => Promise.resolve([{ id: 'role-mgr', code: 'MANAGER' }]),
+                limit: () =>
+                  Promise.resolve([{ id: 'role-mgr', code: 'MANAGER' }]),
               };
             }
             // role departments lookup (none -> global)
@@ -274,12 +282,21 @@ describe('StaffService - Membership Scopes & Role Assignments', () => {
             if (selectCount === 3) {
               // tenant_roles lookup: find role
               return {
-                limit: () => Promise.resolve([{ id: 'role-oven-op', code: 'OVEN_OPERATOR', isSystem: false }]),
+                limit: () =>
+                  Promise.resolve([
+                    {
+                      id: 'role-oven-op',
+                      code: 'OVEN_OPERATOR',
+                      isSystem: false,
+                    },
+                  ]),
               };
             }
             if (selectCount === 4) {
               // role_departments lookup: role is bound to dept-baking-1, not dept-reception-1
-              return Promise.resolve([{ roleId: 'role-oven-op', departmentId: 'dept-baking-1' }]);
+              return Promise.resolve([
+                { roleId: 'role-oven-op', departmentId: 'dept-baking-1' },
+              ]);
             }
             return Promise.resolve([]);
           }),

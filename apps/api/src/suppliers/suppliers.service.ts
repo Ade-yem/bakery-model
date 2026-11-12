@@ -6,6 +6,9 @@ import { eq } from 'drizzle-orm';
 import { AuditService } from '../audit/audit.service.js';
 import type { ActorContext } from '../auth/actor-context.js';
 
+/**
+ * Service managing supplier directories and vendor procurement references.
+ */
 @Injectable()
 export class SuppliersService {
   constructor(
@@ -14,6 +17,12 @@ export class SuppliersService {
     private readonly auditService: AuditService,
   ) {}
 
+  /**
+   * Retrieves all suppliers for the specified tenant.
+   *
+   * @param tenantId - The UUID of the authenticated tenant.
+   * @returns Array of supplier records.
+   */
   async list(tenantId: string) {
     return this.db
       .select()
@@ -21,6 +30,14 @@ export class SuppliersService {
       .where(eq(schema.suppliers.tenantId, tenantId));
   }
 
+  /**
+   * Registers a new vendor supplier with audit attribution.
+   *
+   * @param tenantId - The UUID of the tenant.
+   * @param actor - The calling actor context for audit attribution.
+   * @param input - Supplier parameters including name, contact details, and external reference.
+   * @returns The newly created supplier record.
+   */
   async create(
     tenantId: string,
     actor: ActorContext,

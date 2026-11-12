@@ -14,6 +14,10 @@ export const ERROR_CODES = {
   UNKNOWN_PERMISSION: 'UNKNOWN_PERMISSION',
   DEPENDENCY_UNAVAILABLE: 'DEPENDENCY_UNAVAILABLE',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
+  SUBSCRIPTION_REQUIRED: 'SUBSCRIPTION_REQUIRED',
+  SUBSCRIPTION_EXPIRED: 'SUBSCRIPTION_EXPIRED',
+  PAYMENT_VERIFICATION_FAILED: 'PAYMENT_VERIFICATION_FAILED',
+  INVALID_WEBHOOK_SIGNATURE: 'INVALID_WEBHOOK_SIGNATURE',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
@@ -146,4 +150,95 @@ export interface RoleDto {
   departmentIds: string[];
   createdAt: Date | string;
   updatedAt: Date | string;
+}
+
+// Subscription Enums & Contracts
+export const SUBSCRIPTION_TIERS = {
+  STARTER: 'STARTER',
+  GROWTH: 'GROWTH',
+  ENTERPRISE: 'ENTERPRISE',
+} as const;
+
+export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[keyof typeof SUBSCRIPTION_TIERS];
+
+export const SUBSCRIPTION_STATUSES = {
+  TRIALING: 'TRIALING',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  SUSPENDED: 'SUSPENDED',
+  CANCELED: 'CANCELED',
+} as const;
+
+export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[keyof typeof SUBSCRIPTION_STATUSES];
+
+export const BILLING_INTERVALS = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY',
+} as const;
+
+export type BillingInterval = (typeof BILLING_INTERVALS)[keyof typeof BILLING_INTERVALS];
+
+export const INVOICE_STATUSES = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED',
+} as const;
+
+export type InvoiceStatus = (typeof INVOICE_STATUSES)[keyof typeof INVOICE_STATUSES];
+
+export interface SubscriptionPlanDto {
+  id: string;
+  code: string;
+  name: string;
+  tier: SubscriptionTier;
+  description?: string | null;
+  priceAmount: string;
+  currency: string;
+  interval: BillingInterval;
+  maxBranches: number;
+  maxStaff: number;
+  active: boolean;
+}
+
+export interface TenantSubscriptionDto {
+  id: string;
+  tenantId: string;
+  planId: string;
+  status: SubscriptionStatus;
+  currentPeriodStart: string | Date;
+  currentPeriodEnd: string | Date;
+  gracePeriodEnd?: string | Date | null;
+  cancelAtPeriodEnd: boolean;
+  plan?: SubscriptionPlanDto;
+}
+
+export interface CreateCheckoutDto {
+  planId: string;
+  interval?: BillingInterval;
+}
+
+export interface CheckoutSessionDto {
+  paymentLink: string;
+  txRef: string;
+  invoiceId: string;
+}
+
+export interface SubscriptionInvoiceDto {
+  id: string;
+  tenantId: string;
+  invoiceNumber: string;
+  amount: string;
+  currency: string;
+  status: InvoiceStatus;
+  txRef: string;
+  flwRef?: string | null;
+  paymentMethod?: string | null;
+  paidAt?: string | Date | null;
+  createdAt: string | Date;
+}
+
+export interface VerifySubscriptionDto {
+  transactionId: string;
+  txRef: string;
 }

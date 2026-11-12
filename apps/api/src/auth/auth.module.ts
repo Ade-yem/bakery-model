@@ -4,7 +4,11 @@ import { getDrizzleToken } from '@nestjs/drizzle';
 import type { Database } from '../database/database.types.js';
 import type { EnvironmentVariables } from '../config/environment.js';
 import { AuthController } from './auth.controller.js';
-import { AUTH_INSTANCE, AuthService, createBetterAuthInstance } from './auth.service.js';
+import {
+  AUTH_INSTANCE,
+  AuthService,
+  createBetterAuthInstance,
+} from './auth.service.js';
 import { TestGuardedController } from './test-guarded.controller.js';
 
 @Global()

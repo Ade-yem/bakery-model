@@ -13,7 +13,9 @@ export class SessionGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request & { session?: unknown; user?: unknown }>();
+    const request = context
+      .switchToHttp()
+      .getRequest<Request & { session?: unknown; user?: unknown }>();
 
     const sessionData = await this.authService.auth.api.getSession({
       headers: fromNodeHeaders(request.headers),

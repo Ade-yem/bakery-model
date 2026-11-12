@@ -78,7 +78,13 @@ describe('DepartmentsService - Dynamic Factory Department Management', () => {
               }
               // Existing department with same code or name
               return Promise.resolve([
-                { id: 'dept-existing', code: 'OB-01', name: 'Other Name', branchId: branchA, tenantId: tenantA },
+                {
+                  id: 'dept-existing',
+                  code: 'OB-01',
+                  name: 'Other Name',
+                  branchId: branchA,
+                  tenantId: tenantA,
+                },
               ]);
             }),
           }),
@@ -180,8 +186,20 @@ describe('DepartmentsService - Dynamic Factory Department Management', () => {
 
   it('lists departments strictly scoped to tenantId', async () => {
     const tenantDepts = [
-      { id: 'dept-1', tenantId: tenantA, name: 'Reception', code: 'REC', status: 'ACTIVE' },
-      { id: 'dept-2', tenantId: tenantA, name: 'Production', code: 'PROD', status: 'ACTIVE' },
+      {
+        id: 'dept-1',
+        tenantId: tenantA,
+        name: 'Reception',
+        code: 'REC',
+        status: 'ACTIVE',
+      },
+      {
+        id: 'dept-2',
+        tenantId: tenantA,
+        name: 'Production',
+        code: 'PROD',
+        status: 'ACTIVE',
+      },
     ];
 
     mockDb = {

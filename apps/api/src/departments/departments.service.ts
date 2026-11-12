@@ -1,4 +1,9 @@
-import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { getDrizzleToken } from '@nestjs/drizzle';
 import type { Database } from '../database/database.types.js';
 import * as schema from '../database/schema/index.js';
@@ -17,7 +22,7 @@ export class DepartmentsService {
   constructor(
     @Inject(getDrizzleToken())
     private readonly db: Database,
-  ) { }
+  ) {}
 
   /**
    * Retrieves all departments belonging strictly to the specified tenant.
@@ -60,7 +65,11 @@ export class DepartmentsService {
 
     // 2. Verify department name and code uniqueness in the branch
     const existing = await this.db
-      .select({ id: schema.departments.id, code: schema.departments.code, name: schema.departments.name })
+      .select({
+        id: schema.departments.id,
+        code: schema.departments.code,
+        name: schema.departments.name,
+      })
       .from(schema.departments)
       .where(
         and(
@@ -77,9 +86,13 @@ export class DepartmentsService {
     if (existing.length > 0) {
       const match = existing[0]!;
       if (match.code === input.code) {
-        throw new ConflictException('Department code already exists in this branch');
+        throw new ConflictException(
+          'Department code already exists in this branch',
+        );
       }
-      throw new ConflictException('Department name already exists in this branch');
+      throw new ConflictException(
+        'Department name already exists in this branch',
+      );
     }
 
     const [dept] = await this.db
@@ -108,7 +121,11 @@ export class DepartmentsService {
    * @throws {NotFoundException} If the department is not found in the tenant.
    * @throws {ConflictException} If name or code conflicts with another department in the branch.
    */
-  async update(tenantId: string, departmentId: string, input: UpdateDepartmentInput) {
+  async update(
+    tenantId: string,
+    departmentId: string,
+    input: UpdateDepartmentInput,
+  ) {
     // 1. Locate department within tenant scope
     const [department] = await this.db
       .select()
@@ -131,11 +148,17 @@ export class DepartmentsService {
 
     if (nameChanged || codeChanged) {
       const collisionConditions = [];
-      if (nameChanged) collisionConditions.push(eq(schema.departments.name, input.name!));
-      if (codeChanged) collisionConditions.push(eq(schema.departments.code, input.code!));
+      if (nameChanged)
+        collisionConditions.push(eq(schema.departments.name, input.name!));
+      if (codeChanged)
+        collisionConditions.push(eq(schema.departments.code, input.code!));
 
       const conflict = await this.db
-        .select({ id: schema.departments.id, code: schema.departments.code, name: schema.departments.name })
+        .select({
+          id: schema.departments.id,
+          code: schema.departments.code,
+          name: schema.departments.name,
+        })
         .from(schema.departments)
         .where(
           and(
@@ -150,9 +173,13 @@ export class DepartmentsService {
       if (conflict.length > 0) {
         const match = conflict[0]!;
         if (codeChanged && match.code === input.code) {
-          throw new ConflictException('Department code already exists in this branch');
+          throw new ConflictException(
+            'Department code already exists in this branch',
+          );
         }
-        throw new ConflictException('Department name already exists in this branch');
+        throw new ConflictException(
+          'Department name already exists in this branch',
+        );
       }
     }
 
@@ -163,7 +190,9 @@ export class DepartmentsService {
         ...(input.name !== undefined ? { name: input.name } : {}),
         ...(input.code !== undefined ? { code: input.code } : {}),
         ...(input.type !== undefined ? { type: input.type } : {}),
-        ...(input.description !== undefined ? { description: input.description } : {}),
+        ...(input.description !== undefined
+          ? { description: input.description }
+          : {}),
         ...(input.status !== undefined ? { status: input.status } : {}),
         updatedAt: new Date(),
       })

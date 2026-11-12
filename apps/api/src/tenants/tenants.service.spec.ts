@@ -87,6 +87,7 @@ describe('TenantsService - Baseline Catalog Seeding', () => {
       'branch-uuid-1',
       'user-auth-1',
       'Alice Baker',
+      expect.anything(),
     );
 
     const createdDeptNames = result.departments.map((d: any) => d.name);
@@ -110,6 +111,7 @@ describe('TenantsService - Baseline Catalog Seeding', () => {
         tenantId: 'tenant-uuid-1',
         actorAuthUserId: 'user-auth-1',
       }),
+      expect.anything(),
     );
   });
 });

@@ -12,7 +12,9 @@ describe('TenantScopeGuard - Department Scope & Inactive Department Check', () =
   const activeDeptId = 'dept-active-1';
   const inactiveDeptId = 'dept-inactive-2';
 
-  const createMockContext = (headers: Record<string, string>): ExecutionContext => {
+  const createMockContext = (
+    headers: Record<string, string>,
+  ): ExecutionContext => {
     const request = {
       headers,
       user: { id: userId },
@@ -49,17 +51,26 @@ describe('TenantScopeGuard - Department Scope & Inactive Department Check', () =
               return Promise.resolve([mockMembership]);
             }
             if (queryCount === 2) {
+              // Tenant status query
+              return Promise.resolve([{ id: tenantId, status: 'ACTIVE' }]);
+            }
+            if (queryCount === 3) {
               // Branch rows
               return Promise.resolve([{ branchId: 'branch-1' }]);
             }
-            if (queryCount === 3) {
+            if (queryCount === 4) {
               // Department rows (membership has inactiveDeptId assigned previously)
               return Promise.resolve([{ departmentId: inactiveDeptId }]);
             }
-            if (queryCount === 4) {
+            if (queryCount === 5) {
               // Department record lookup: status is INACTIVE
               return Promise.resolve([
-                { id: inactiveDeptId, tenantId, status: 'INACTIVE', name: 'Closed Store' },
+                {
+                  id: inactiveDeptId,
+                  tenantId,
+                  status: 'INACTIVE',
+                  name: 'Closed Store',
+                },
               ]);
             }
             // Role permissions
@@ -75,7 +86,9 @@ describe('TenantScopeGuard - Department Scope & Inactive Department Check', () =
       'x-department-id': inactiveDeptId,
     });
 
-    await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 
   it('AC-4: blocks x-department-id if department belongs to a different tenant', async () => {
@@ -97,12 +110,15 @@ describe('TenantScopeGuard - Department Scope & Inactive Department Check', () =
               return Promise.resolve([mockMembership]);
             }
             if (queryCount === 2) {
-              return Promise.resolve([{ branchId: 'branch-1' }]);
+              return Promise.resolve([{ id: tenantId, status: 'ACTIVE' }]);
             }
             if (queryCount === 3) {
-              return Promise.resolve([]);
+              return Promise.resolve([{ branchId: 'branch-1' }]);
             }
             if (queryCount === 4) {
+              return Promise.resolve([]);
+            }
+            if (queryCount === 5) {
               // Department lookup for tenantId returns empty (belongs to another tenant)
               return Promise.resolve([]);
             }
@@ -118,7 +134,9 @@ describe('TenantScopeGuard - Department Scope & Inactive Department Check', () =
       'x-department-id': 'foreign-dept-id',
     });
 
-    await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 
   it('AC-3: allows active operation when x-department-id points to an ACTIVE department in scope', async () => {
@@ -140,15 +158,23 @@ describe('TenantScopeGuard - Department Scope & Inactive Department Check', () =
               return Promise.resolve([mockMembership]);
             }
             if (queryCount === 2) {
-              return Promise.resolve([{ branchId: 'branch-1' }]);
+              return Promise.resolve([{ id: tenantId, status: 'ACTIVE' }]);
             }
             if (queryCount === 3) {
-              return Promise.resolve([{ departmentId: activeDeptId }]);
+              return Promise.resolve([{ branchId: 'branch-1' }]);
             }
             if (queryCount === 4) {
+              return Promise.resolve([{ departmentId: activeDeptId }]);
+            }
+            if (queryCount === 5) {
               // Department lookup: ACTIVE
               return Promise.resolve([
-                { id: activeDeptId, tenantId, status: 'ACTIVE', name: 'Reception' },
+                {
+                  id: activeDeptId,
+                  tenantId,
+                  status: 'ACTIVE',
+                  name: 'Reception',
+                },
               ]);
             }
             return Promise.resolve([]);
@@ -168,5 +194,70 @@ describe('TenantScopeGuard - Department Scope & Inactive Department Check', () =
 
     const req = context.switchToHttp().getRequest() as any;
     expect(req.actorContext.activeDepartmentId).toBe(activeDeptId);
+  });
+
+  it('TEST-SUB-E2E-006: blocks mutating operational requests when tenant status is SUSPENDED', async () => {
+    const mockMembership = {
+      id: 'membership-1',
+      tenantId,
+      authUserId: userId,
+      roleKey: 'OWNER',
+      status: 'ACTIVE',
+    };
+
+    let queryCount = 0;
+    mockDb = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockImplementation(() => {
+            queryCount++;
+            if (queryCount === 1) {
+              return Promise.resolve([mockMembership]);
+            }
+            if (queryCount === 2) {
+              // Tenant is SUSPENDED!
+              return Promise.resolve([{ id: tenantId, status: 'SUSPENDED' }]);
+            }
+            return Promise.resolve([]);
+          }),
+        }),
+      }),
+    } as unknown as Database;
+
+    guard = new TenantScopeGuard(mockDb);
+
+    // 1. Mutating operational request (e.g. POST /items) -> must throw
+    const mutatingContext = {
+      switchToHttp: () => ({
+        getRequest: () => ({
+          headers: { 'x-tenant-id': tenantId },
+          user: { id: userId },
+          method: 'POST',
+          url: '/items',
+          id: 'req-1',
+        }),
+      }),
+    } as unknown as ExecutionContext;
+
+    await expect(guard.canActivate(mutatingContext)).rejects.toThrow(
+      ForbiddenException,
+    );
+
+    // 2. Subscription recovery request (e.g. POST /subscriptions/checkout) -> must be allowed
+    queryCount = 0;
+    const recoveryContext = {
+      switchToHttp: () => ({
+        getRequest: () => ({
+          headers: { 'x-tenant-id': tenantId },
+          user: { id: userId },
+          method: 'POST',
+          url: '/subscriptions/checkout',
+          id: 'req-2',
+        }),
+      }),
+    } as unknown as ExecutionContext;
+
+    const allowed = await guard.canActivate(recoveryContext);
+    expect(allowed).toBe(true);
   });
 });

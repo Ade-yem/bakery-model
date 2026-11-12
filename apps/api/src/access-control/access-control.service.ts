@@ -219,7 +219,8 @@ export class AccessControlService {
     await this.auditService.log({
       tenantId,
       actorAuthUserId: actorAuthUserId || 'system',
-      actorMembershipId: actorMembershipId || '00000000-0000-0000-0000-000000000000',
+      actorMembershipId:
+        actorMembershipId || '00000000-0000-0000-0000-000000000000',
       action: 'role:create',
       subjectType: 'role',
       subjectId: createdRole.id,
@@ -288,7 +289,9 @@ export class AccessControlService {
         .update(schema.tenantRoles)
         .set({
           ...(input.name !== undefined ? { name: input.name } : {}),
-          ...(input.description !== undefined ? { description: input.description } : {}),
+          ...(input.description !== undefined
+            ? { description: input.description }
+            : {}),
           ...(input.status !== undefined ? { status: input.status } : {}),
           updatedAt: new Date(),
         })
@@ -346,7 +349,8 @@ export class AccessControlService {
     await this.auditService.log({
       tenantId,
       actorAuthUserId: actorAuthUserId || 'system',
-      actorMembershipId: actorMembershipId || '00000000-0000-0000-0000-000000000000',
+      actorMembershipId:
+        actorMembershipId || '00000000-0000-0000-0000-000000000000',
       action: 'role:update',
       subjectType: 'role',
       subjectId: roleId,
@@ -394,7 +398,9 @@ export class AccessControlService {
     }
 
     if (role.isSystem) {
-      throw new ForbiddenException('System OWNER role cannot be deleted or deactivated');
+      throw new ForbiddenException(
+        'System OWNER role cannot be deleted or deactivated',
+      );
     }
 
     await this.db
@@ -413,7 +419,8 @@ export class AccessControlService {
     await this.auditService.log({
       tenantId,
       actorAuthUserId: actorAuthUserId || 'system',
-      actorMembershipId: actorMembershipId || '00000000-0000-0000-0000-000000000000',
+      actorMembershipId:
+        actorMembershipId || '00000000-0000-0000-0000-000000000000',
       action: 'role:deactivate',
       subjectType: 'role',
       subjectId: roleId,
@@ -513,7 +520,8 @@ export class AccessControlService {
     await this.auditService.log({
       tenantId,
       actorAuthUserId: actorAuthUserId || 'system',
-      actorMembershipId: actorMembershipId || '00000000-0000-0000-0000-000000000000',
+      actorMembershipId:
+        actorMembershipId || '00000000-0000-0000-0000-000000000000',
       action: 'role:permissions:update',
       subjectType: 'role',
       subjectId: roleKey,
@@ -535,18 +543,24 @@ export class AccessControlService {
   ) {
     const sourceCeiling = ROLE_CEILINGS[input.sourceRoleKey];
     if (!sourceCeiling) {
-      throw new NotFoundException(`Source role not found: ${input.sourceRoleKey}`);
+      throw new NotFoundException(
+        `Source role not found: ${input.sourceRoleKey}`,
+      );
     }
 
     let targetPermissions: PermissionKey[];
     if (input.permissions && input.permissions.length > 0) {
-      const invalidPerms = input.permissions.filter((p) => !VALID_PERMISSIONS.has(p));
+      const invalidPerms = input.permissions.filter(
+        (p) => !VALID_PERMISSIONS.has(p),
+      );
       if (invalidPerms.length > 0) {
         throw new BadRequestException(
           `Unknown permission key: ${invalidPerms.join(', ')}`,
         );
       }
-      const ceilingViolations = input.permissions.filter((p) => !sourceCeiling.has(p));
+      const ceilingViolations = input.permissions.filter(
+        (p) => !sourceCeiling.has(p),
+      );
       if (ceilingViolations.length > 0) {
         throw new ForbiddenException(
           `Permissions exceed ceiling for source role: ${ceilingViolations.join(', ')}`,
@@ -569,7 +583,9 @@ export class AccessControlService {
       .limit(1);
 
     if (existing.length > 0) {
-      throw new ConflictException(`Role key already exists: ${input.newRoleKey}`);
+      throw new ConflictException(
+        `Role key already exists: ${input.newRoleKey}`,
+      );
     }
 
     await this.db.insert(schema.rolePermissions).values(
@@ -583,7 +599,8 @@ export class AccessControlService {
     await this.auditService.log({
       tenantId,
       actorAuthUserId: actorAuthUserId || 'system',
-      actorMembershipId: actorMembershipId || '00000000-0000-0000-0000-000000000000',
+      actorMembershipId:
+        actorMembershipId || '00000000-0000-0000-0000-000000000000',
       action: 'role:clone',
       subjectType: 'role',
       subjectId: input.newRoleKey,

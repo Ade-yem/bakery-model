@@ -87,6 +87,29 @@ export class TenantScopeGuard implements CanActivate {
 
     const membership = memberships[0]!;
 
+    // Check tenant active/suspended status
+    const [tenantRecord] = await this.db
+      .select({ id: schema.tenants.id, status: schema.tenants.status })
+      .from(schema.tenants)
+      .where(eq(schema.tenants.id, membership.tenantId));
+
+    if (tenantRecord?.status === 'SUSPENDED') {
+      const path = request.path || request.url || '';
+      const method = request.method || 'GET';
+      const isSubscriptionRoute = path.includes('/subscriptions');
+      const isMutatingMethod = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(
+        method.toUpperCase(),
+      );
+
+      if (isMutatingMethod && !isSubscriptionRoute) {
+        throw new ForbiddenException({
+          code: 'ACTIVE_TENANT_REQUIRED',
+          message:
+            'Tenant is suspended due to past-due subscription. Operational mutations are locked.',
+        });
+      }
+    }
+
     // Query assigned branch IDs
     const branchRows = await this.db
       .select({ branchId: schema.membershipBranches.branchId })
@@ -141,14 +164,19 @@ export class TenantScopeGuard implements CanActivate {
       if (deptRecord.status !== 'ACTIVE') {
         throw new ForbiddenException({
           code: 'SCOPE_FORBIDDEN',
-          message: 'Inactive departments cannot be selected for active operations',
+          message:
+            'Inactive departments cannot be selected for active operations',
         });
       }
 
-      if (membership.roleKey !== 'OWNER' && !departmentIds.includes(departmentHeader)) {
+      if (
+        membership.roleKey !== 'OWNER' &&
+        !departmentIds.includes(departmentHeader)
+      ) {
         throw new ForbiddenException({
           code: 'SCOPE_FORBIDDEN',
-          message: 'Department selector is outside authorized membership departments',
+          message:
+            'Department selector is outside authorized membership departments',
         });
       }
       activeDepartmentId = departmentHeader;
@@ -180,7 +208,8 @@ export class TenantScopeGuard implements CanActivate {
     }
 
     const actorContext: ActorContext = {
-      requestId: request.id || (request.headers['x-request-id'] as string) || 'unknown',
+      requestId:
+        request.id || (request.headers['x-request-id'] as string) || 'unknown',
       authUserId: userId,
       membershipId: membership.id,
       tenantId: membership.tenantId,

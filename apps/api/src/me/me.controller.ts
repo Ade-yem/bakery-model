@@ -1,5 +1,11 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiTags,
+  ApiCookieAuth,
+} from '@nestjs/swagger';
 import { Inject } from '@nestjs/common';
 import { getDrizzleToken } from '@nestjs/drizzle';
 import { eq } from 'drizzle-orm';
@@ -13,7 +19,11 @@ import {
   VALID_PERMISSIONS,
 } from '../access-control/permissions.js';
 
-@ApiTags('me')
+/**
+ * Controller exposing identity and active operational context discovery.
+ */
+@ApiTags('Identity')
+@ApiCookieAuth('better-auth.session_token')
 @Controller('me')
 @UseGuards(SessionGuard)
 export class MeController {
@@ -22,14 +32,27 @@ export class MeController {
     private readonly db: Database,
   ) {}
 
+  /**
+   * Resolves the authenticated caller's profile, tenant memberships, and active context.
+   *
+   * @param req - Request object containing authenticated user credentials.
+   * @returns Object containing user profile, array of memberships, and primary activeContext.
+   */
   @Get()
   @ApiOperation({
     summary: 'Discover authenticated identity and scopes',
     description:
-      'Resolves the authenticated user, active tenant memberships, roles, and effective permissions.',
+      'Resolves the authenticated user, active tenant memberships, roles, and effective permissions without leaking sensitive secrets.',
   })
-  @ApiResponse({ status: 200, description: 'Identity and scopes summary.' })
-  async getMe(@Req() req: Request & { user: { id: string; email: string; name: string } }) {
+  @ApiOkResponse({
+    description: 'Identity and scopes summary successfully resolved.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Authentication is required.',
+  })
+  async getMe(
+    @Req() req: Request & { user: { id: string; email: string; name: string } },
+  ) {
     const userId = req.user.id;
 
     // Fetch memberships for this user
@@ -46,7 +69,9 @@ export class MeController {
       const ceiling = ROLE_CEILINGS[primaryMembership.roleKey] || new Set();
       const basePerms =
         DEFAULT_ROLE_PERMISSIONS[primaryMembership.roleKey] || [];
-      permissions = basePerms.filter((p) => VALID_PERMISSIONS.has(p) && ceiling.has(p));
+      permissions = basePerms.filter(
+        (p) => VALID_PERMISSIONS.has(p) && ceiling.has(p),
+      );
     }
 
     return {

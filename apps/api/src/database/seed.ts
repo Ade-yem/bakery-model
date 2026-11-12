@@ -89,7 +89,9 @@ async function seed() {
   );
 
   const departmentsByName = new Map(
-    insertedDepartments.flat().map((department) => [department.name, department]),
+    insertedDepartments
+      .flat()
+      .map((department) => [department.name, department]),
   );
 
   const ownerDepartmentIds = [
@@ -126,13 +128,14 @@ async function seed() {
   );
 
   // 6. Seed default role permissions for the tenant
-  const defaultRolePermissions = Object.entries(DEFAULT_ROLE_PERMISSIONS).flatMap(
-    ([roleKey, permissions]) =>
-      permissions.map((permissionKey) => ({
-        tenantId: tenant.id,
-        roleKey,
-        permissionKey,
-      })),
+  const defaultRolePermissions = Object.entries(
+    DEFAULT_ROLE_PERMISSIONS,
+  ).flatMap(([roleKey, permissions]) =>
+    permissions.map((permissionKey) => ({
+      tenantId: tenant.id,
+      roleKey,
+      permissionKey,
+    })),
   );
 
   if (defaultRolePermissions.length > 0) {
@@ -172,6 +175,85 @@ async function seed() {
     currency: 'USD',
     status: 'ACTIVE',
   });
+
+  // 10. Create subscription plans
+  await db
+    .insert(schema.subscriptionPlans)
+    .values([
+      {
+        code: 'STARTER_MONTHLY',
+        name: 'Starter Monthly',
+        tier: 'STARTER',
+        description: 'Ideal for single-location bakeries with up to 5 staff',
+        priceAmount: '15000.00',
+        currency: 'NGN',
+        interval: 'MONTHLY',
+        maxBranches: 1,
+        maxStaff: 5,
+        active: true,
+      },
+      {
+        code: 'STARTER_YEARLY',
+        name: 'Starter Yearly',
+        tier: 'STARTER',
+        description: 'Starter plan with 2 months free annual billing discount',
+        priceAmount: '1650000.00',
+        currency: 'NGN',
+        interval: 'YEARLY',
+        maxBranches: 1,
+        maxStaff: 5,
+        active: true,
+      },
+      {
+        code: 'GROWTH_MONTHLY',
+        name: 'Growth Monthly',
+        tier: 'GROWTH',
+        description: 'For growing commercial bakeries with up to 3 branches',
+        priceAmount: '35000.00',
+        currency: 'NGN',
+        interval: 'MONTHLY',
+        maxBranches: 3,
+        maxStaff: 20,
+        active: true,
+      },
+      {
+        code: 'GROWTH_YEARLY',
+        name: 'Growth Yearly',
+        tier: 'GROWTH',
+        description: 'Growth plan with annual discount',
+        priceAmount: '385000.00',
+        currency: 'NGN',
+        interval: 'YEARLY',
+        maxBranches: 3,
+        maxStaff: 20,
+        active: true,
+      },
+      {
+        code: 'ENTERPRISE_MONTHLY',
+        name: 'Enterprise Monthly',
+        tier: 'ENTERPRISE',
+        description: 'High-volume production facility with up to 10 branches',
+        priceAmount: '50000.00',
+        currency: 'NGN',
+        interval: 'MONTHLY',
+        maxBranches: 10,
+        maxStaff: 100,
+        active: true,
+      },
+      {
+        code: 'ENTERPRISE_YEARLY',
+        name: 'Enterprise Yearly',
+        tier: 'ENTERPRISE',
+        description: 'High-volume production facility with up to 10 branches',
+        priceAmount: '550000.00',
+        currency: 'NGN',
+        interval: 'YEARLY',
+        maxBranches: 10,
+        maxStaff: 100,
+        active: true,
+      },
+    ])
+    .onConflictDoNothing();
 
   console.log('Seed completed successfully for tenant:', tenant.id);
   process.exit(0);

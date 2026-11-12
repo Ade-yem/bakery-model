@@ -14,7 +14,8 @@ describe('Phase 3 Auth and Access Control Tests', () => {
   let db: Database;
 
   beforeAll(async () => {
-    process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/tallybakery';
+    process.env.DATABASE_URL =
+      'postgresql://postgres:postgres@localhost:5432/tallybakery';
     process.env.NODE_ENV = 'test';
     process.env.BETTER_AUTH_SECRET = 'a'.repeat(32);
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
@@ -36,13 +37,11 @@ describe('Phase 3 Auth and Access Control Tests', () => {
   // TEST-W1-AUTH-003 — Invalid credentials
   it('TEST-W1-AUTH-003: sign in with invalid password returns 401/error without leaking secrets', async () => {
     const email = `phase3-invalid-${Date.now()}@tallybakery.com`;
-    await request(app.getHttpServer())
-      .post('/api/auth/sign-up/email')
-      .send({
-        email,
-        password: 'CorrectPassword123!',
-        name: 'User 3',
-      });
+    await request(app.getHttpServer()).post('/api/auth/sign-up/email').send({
+      email,
+      password: 'CorrectPassword123!',
+      name: 'User 3',
+    });
 
     const res = await request(app.getHttpServer())
       .post('/api/auth/sign-in/email')
@@ -78,13 +77,11 @@ describe('Phase 3 Auth and Access Control Tests', () => {
   // TEST-W1-ACCESS-017 — /me safe summary
   it('TEST-W1-ACCESS-017: /me returns safe summary with user, memberships, and activeContext without secrets', async () => {
     const email = `phase3-me-${Date.now()}@tallybakery.com`;
-    await request(app.getHttpServer())
-      .post('/api/auth/sign-up/email')
-      .send({
-        email,
-        password: 'Password123!',
-        name: 'Persona Me',
-      });
+    await request(app.getHttpServer()).post('/api/auth/sign-up/email').send({
+      email,
+      password: 'Password123!',
+      name: 'Persona Me',
+    });
 
     const signInRes = await request(app.getHttpServer())
       .post('/api/auth/sign-in/email')
@@ -110,13 +107,11 @@ describe('Phase 3 Auth and Access Control Tests', () => {
   // TEST-W1-ACCESS-013 — Selector tampering & TenantScopeGuard verification
   it('TEST-W1-ACCESS-013: rejects caller without active membership with 403 ACTIVE_TENANT_REQUIRED', async () => {
     const email = `phase3-nomembership-${Date.now()}@tallybakery.com`;
-    await request(app.getHttpServer())
-      .post('/api/auth/sign-up/email')
-      .send({
-        email,
-        password: 'Password123!',
-        name: 'No Member User',
-      });
+    await request(app.getHttpServer()).post('/api/auth/sign-up/email').send({
+      email,
+      password: 'Password123!',
+      name: 'No Member User',
+    });
 
     const signInRes = await request(app.getHttpServer())
       .post('/api/auth/sign-in/email')

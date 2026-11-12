@@ -60,9 +60,7 @@ export const suppliers = pgTable(
     status: varchar('status', { length: 50 }).default('ACTIVE').notNull(),
     ...timestamps,
   },
-  (table) => [
-    index('suppliers_tenant_idx').on(table.tenantId),
-  ],
+  (table) => [index('suppliers_tenant_idx').on(table.tenantId)],
 );
 
 export const customers = pgTable(
@@ -77,14 +75,14 @@ export const customers = pgTable(
     externalReference: varchar('external_reference', { length: 100 }),
     phone: varchar('phone', { length: 50 }),
     email: varchar('email', { length: 255 }),
-    creditCeiling: numeric('credit_ceiling', { precision: 19, scale: 4 }).default('0.0000').notNull(),
+    creditCeiling: numeric('credit_ceiling', { precision: 19, scale: 4 })
+      .default('0.0000')
+      .notNull(),
     currency: varchar('currency', { length: 3 }).default('USD').notNull(),
     status: varchar('status', { length: 50 }).default('ACTIVE').notNull(),
     ...timestamps,
   },
-  (table) => [
-    index('customers_tenant_idx').on(table.tenantId),
-  ],
+  (table) => [index('customers_tenant_idx').on(table.tenantId)],
 );
 
 export const auditEvents = pgTable(
@@ -105,9 +103,7 @@ export const auditEvents = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (table) => [
-    index('audit_events_tenant_idx').on(table.tenantId),
-  ],
+  (table) => [index('audit_events_tenant_idx').on(table.tenantId)],
 );
 
 export const idempotencyRecords = pgTable(
@@ -119,7 +115,9 @@ export const idempotencyRecords = pgTable(
       .references(() => tenants.id, { onDelete: 'restrict' }),
     idempotencyKey: varchar('idempotency_key', { length: 255 }).notNull(),
     operation: varchar('operation', { length: 100 }).notNull(),
-    requestFingerprint: varchar('request_fingerprint', { length: 255 }).notNull(),
+    requestFingerprint: varchar('request_fingerprint', {
+      length: 255,
+    }).notNull(),
     status: varchar('status', { length: 50 }).default('STARTED').notNull(),
     responseBody: jsonb('response_body'),
     responseStatus: varchar('response_status', { length: 10 }),
@@ -129,7 +127,10 @@ export const idempotencyRecords = pgTable(
       .notNull(),
   },
   (table) => [
-    unique('idempotency_tenant_key_unique').on(table.tenantId, table.idempotencyKey),
+    unique('idempotency_tenant_key_unique').on(
+      table.tenantId,
+      table.idempotencyKey,
+    ),
     index('idempotency_tenant_idx').on(table.tenantId),
   ],
 );

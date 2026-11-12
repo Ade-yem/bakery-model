@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { getDrizzleToken } from '@nestjs/drizzle';
 import type { Database } from '../database/database.types.js';
 import * as schema from '../database/schema/index.js';
@@ -10,6 +6,9 @@ import { eq, and } from 'drizzle-orm';
 import { AuditService } from '../audit/audit.service.js';
 import type { ActorContext } from '../auth/actor-context.js';
 
+/**
+ * Service managing inventory catalog items, SKU uniqueness, and audit tracking.
+ */
 @Injectable()
 export class CatalogService {
   constructor(
@@ -18,6 +17,12 @@ export class CatalogService {
     private readonly auditService: AuditService,
   ) {}
 
+  /**
+   * Retrieves all catalog items for a given tenant.
+   *
+   * @param tenantId - The UUID of the authenticated tenant.
+   * @returns Array of catalog item records.
+   */
   async list(tenantId: string) {
     return this.db
       .select()
@@ -25,6 +30,15 @@ export class CatalogService {
       .where(eq(schema.catalogItems.tenantId, tenantId));
   }
 
+  /**
+   * Creates a new catalog inventory item with audit provenance.
+   *
+   * @param tenantId - The UUID of the tenant.
+   * @param actor - The calling actor context for audit attribution.
+   * @param input - Item attributes including SKU, name, UOM, and price.
+   * @returns The newly created catalog item record.
+   * @throws {ConflictException} If an item with the specified SKU already exists in the tenant.
+   */
   async create(
     tenantId: string,
     actor: ActorContext,

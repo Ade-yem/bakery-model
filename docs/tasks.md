@@ -172,12 +172,12 @@ This document tracks the phased implementation of TallyBakery across all modules
 
 ### Module 14: Tenant Subscription Billing & Flutterwave Integration
 
-- [ ] Database schema for subscriptions, billing plans, payment transactions, and webhook event logs (`subscription_plans`, `tenant_subscriptions`, `subscription_invoices`, `payment_webhook_events`).
-- [ ] Subscription lifecycle state machine (`TRIALING`, `ACTIVE`, `PAST_DUE`, `SUSPENDED`, `CANCELED`) with 7-day grace period logic.
-- [ ] Flutterwave client integration module (v3 hosted checkout, bearer authentication, parameter mapping, error handling).
-- [ ] Subscription checkout initiation API (`POST /subscriptions/checkout`) returning Flutterwave hosted payment URL with unique deterministic `tx_ref`.
-- [ ] Server-side zero-trust transaction verification handler (`GET /subscriptions/verify`) verifying payment amount, currency, and status against Flutterwave API before state activation.
-- [ ] Secure Flutterwave webhook endpoint (`POST /webhooks/flutterwave`) with constant-time `verif-hash` header signature verification, immediate HTTP 200 acknowledgement, and asynchronous event processing (`charge.completed`, `subscription.cancelled`).
-- [ ] Owner-only access control and ceiling validation (`subscription:read`, `subscription:manage`) preventing non-owner roles from accessing billing.
-- [ ] Soft operational write restriction in `TenantScopeGuard` for `SUSPENDED` tenants with billing recovery exemption.
-- [ ] Automated E2E & integration tests: Flutterwave subscription checkout, webhook signature verification, transaction verification replay, and tenant suspension enforcement.
+- [x] Database schema for subscriptions, billing plans, payment transactions, and webhook event logs (`subscription_plans`, `tenant_subscriptions`, `subscription_invoices`, `payment_webhook_events`).
+- [x] Subscription lifecycle state machine (`TRIALING`, `ACTIVE`, `PAST_DUE`, `SUSPENDED`, `CANCELED`) with 7-day grace period logic.
+- [x] Flutterwave client integration module (v3 hosted checkout, bearer authentication, parameter mapping, error handling).
+- [x] Subscription checkout initiation API (`POST /subscriptions/checkout`) returning Flutterwave hosted payment URL with unique deterministic `tx_ref`.
+- [x] Server-side zero-trust transaction verification handler (`GET /subscriptions/verify`) verifying payment amount, currency, and status against Flutterwave API before state activation.
+- [x] Secure Flutterwave webhook endpoint (`POST /webhooks/flutterwave`) with constant-time `verif-hash` header signature verification, immediate HTTP 200 acknowledgement, and asynchronous event processing (`charge.completed`, `subscription.cancelled`).
+- [x] Owner-only access control and ceiling validation (`subscription:read`, `subscription:manage`) preventing non-owner roles from accessing billing.
+- [x] Soft operational write restriction in `TenantScopeGuard` for `SUSPENDED` tenants with billing recovery exemption.
+- [x] Automated E2E & integration tests: Flutterwave subscription checkout, webhook signature verification, transaction verification replay, and tenant suspension enforcement.

@@ -29,6 +29,7 @@ export class TenantTemplateSeederService {
    * @param branchId - The UUID of the primary branch.
    * @param actorAuthUserId - The authenticated user ID of the tenant owner.
    * @param displayName - Display name or email of the owner.
+   * @param dbClient - Optional existing database or transaction context.
    * @returns Seeded departments, roles, and owner membership.
    */
   async seedBaseline(
@@ -36,61 +37,105 @@ export class TenantTemplateSeederService {
     branchId: string,
     actorAuthUserId: string,
     displayName: string,
+    dbClient?: Database,
   ): Promise<SeedBaselineResult> {
-    return this.db.transaction(async (tx) => {
+    const runner = async (tx: Database): Promise<SeedBaselineResult> => {
       // 1. Seed default departments
       const defaultDepartments = [
-        { name: 'Reception', code: 'REC', type: 'RECEPTION', description: 'Customer order entry & cash collection' },
-        { name: 'Production', code: 'PROD', type: 'PRODUCTION', description: 'Bakehouse & manufacturing floor' },
-        { name: 'Dispatch', code: 'DISP', type: 'DISPATCH', description: 'Finished goods fulfillment & staging' },
-        { name: 'Store', code: 'STORE', type: 'STORE', description: 'Raw materials & packaging warehouse' },
+        {
+          name: 'Reception',
+          code: 'REC',
+          type: 'RECEPTION',
+          description: 'Customer order entry & cash collection',
+        },
+        {
+          name: 'Production',
+          code: 'PROD',
+          type: 'PRODUCTION',
+          description: 'Bakehouse & manufacturing floor',
+        },
+        {
+          name: 'Dispatch',
+          code: 'DISP',
+          type: 'DISPATCH',
+          description: 'Finished goods fulfillment & staging',
+        },
+        {
+          name: 'Store',
+          code: 'STORE',
+          type: 'STORE',
+          description: 'Raw materials & packaging warehouse',
+        },
       ];
 
-      const createdDepartments = await Promise.all(
-        defaultDepartments.map(async (dept) => {
-          const [inserted] = await tx
-            .insert(schema.departments)
-            .values({
-              tenantId,
-              branchId,
-              name: dept.name,
-              code: dept.code,
-              type: dept.type,
-              description: dept.description,
-              status: 'ACTIVE',
-            })
-            .returning();
-          return inserted!;
-        }),
-      );
+      const createdDepartments: schema.Department[] = [];
+      for (const dept of defaultDepartments) {
+        const [inserted] = await tx
+          .insert(schema.departments)
+          .values({
+            tenantId,
+            branchId,
+            name: dept.name,
+            code: dept.code,
+            type: dept.type,
+            description: dept.description,
+            status: 'ACTIVE',
+          })
+          .returning();
+        createdDepartments.push(inserted!);
+      }
 
       const deptsByCode = new Map(createdDepartments.map((d) => [d.code, d]));
 
       // 2. Seed default roles in tenant_roles
       const defaultRoles = [
-        { code: 'OWNER', name: 'Super Admin (Owner)', description: 'Full organization authority', isSystem: true },
-        { code: 'MANAGER', name: 'Shift / Branch Manager', description: 'Facility & procurement management', isSystem: false },
-        { code: 'RECEPTIONIST', name: 'Receptionist (Cashier)', description: 'Order billing and customer receipts', isSystem: false },
-        { code: 'PRODUCTION_SUPERVISOR', name: 'Production Supervisor', description: 'Batch yield and materials consumption', isSystem: false },
-        { code: 'DISPATCH_OFFICER', name: 'Packaging & Dispatch Officer', description: 'Order packing and transfer acceptance', isSystem: false },
+        {
+          code: 'OWNER',
+          name: 'Super Admin (Owner)',
+          description: 'Full organization authority',
+          isSystem: true,
+        },
+        {
+          code: 'MANAGER',
+          name: 'Shift / Branch Manager',
+          description: 'Facility & procurement management',
+          isSystem: false,
+        },
+        {
+          code: 'RECEPTIONIST',
+          name: 'Receptionist (Cashier)',
+          description: 'Order billing and customer receipts',
+          isSystem: false,
+        },
+        {
+          code: 'PRODUCTION_SUPERVISOR',
+          name: 'Production Supervisor',
+          description: 'Batch yield and materials consumption',
+          isSystem: false,
+        },
+        {
+          code: 'DISPATCH_OFFICER',
+          name: 'Packaging & Dispatch Officer',
+          description: 'Order packing and transfer acceptance',
+          isSystem: false,
+        },
       ];
 
-      const createdRoles = await Promise.all(
-        defaultRoles.map(async (r) => {
-          const [inserted] = await tx
-            .insert(schema.tenantRoles)
-            .values({
-              tenantId,
-              code: r.code,
-              name: r.name,
-              description: r.description,
-              isSystem: r.isSystem,
-              status: 'ACTIVE',
-            })
-            .returning();
-          return inserted!;
-        }),
-      );
+      const createdRoles: schema.TenantRole[] = [];
+      for (const r of defaultRoles) {
+        const [inserted] = await tx
+          .insert(schema.tenantRoles)
+          .values({
+            tenantId,
+            code: r.code,
+            name: r.name,
+            description: r.description,
+            isSystem: r.isSystem,
+            status: 'ACTIVE',
+          })
+          .returning();
+        createdRoles.push(inserted!);
+      }
 
       const rolesByCode = new Map(createdRoles.map((r) => [r.code, r]));
 
@@ -101,7 +146,12 @@ export class TenantTemplateSeederService {
         { roleCode: 'DISPATCH_OFFICER', deptCodes: ['DISP', 'STORE'] },
       ];
 
-      const roleDeptRows: { tenantId: string; roleId: string; departmentId: string; isPrimary: boolean }[] = [];
+      const roleDeptRows: {
+        tenantId: string;
+        roleId: string;
+        departmentId: string;
+        isPrimary: boolean;
+      }[] = [];
       for (const mapping of roleDeptMappings) {
         const role = rolesByCode.get(mapping.roleCode);
         if (role) {
@@ -169,7 +219,11 @@ export class TenantTemplateSeederService {
         roles: createdRoles,
         membership: membership!,
       };
-    });
+    };
+
+    if (dbClient) {
+      return runner(dbClient);
+    }
+    return this.db.transaction((tx) => runner(tx as unknown as Database));
   }
 }
-

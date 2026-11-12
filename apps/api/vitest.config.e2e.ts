@@ -5,7 +5,10 @@ export default defineConfig({
   test: {
     globals: true,
     root: './',
+    globalSetup: ['./test/e2e-global-setup.ts'],
     include: ['**/*.e2e-spec.ts', 'test/**/*.spec.ts'],
+    testTimeout: 60000,
+    hookTimeout: 60000,
     env: {
       NODE_ENV: 'test',
       DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/tallybakery',

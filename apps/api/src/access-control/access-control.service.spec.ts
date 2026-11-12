@@ -2,7 +2,11 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { AccessControlService } from './access-control.service.js';
 import type { Database } from '../database/database.types.js';
 import { AuditService } from '../audit/audit.service.js';
-import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PERMISSION_KEYS } from './permissions.js';
 
 describe('AccessControlService - Dynamic Factory Role & Department Catalog', () => {
@@ -68,13 +72,19 @@ describe('AccessControlService - Dynamic Factory Role & Department Catalog', () 
       }),
     } as unknown as Database;
 
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+    service = new AccessControlService(
+      mockDb,
+      mockAuditService as AuditService,
+    );
 
     const result = await service.createRole(tenantA, {
       code: 'QUALITY_INSPECTOR',
       name: 'Quality Assurance Lead',
       description: 'Inspects mixing batches and oven outputs',
-      permissions: [PERMISSION_KEYS.ITEMS_READ, PERMISSION_KEYS.DEPARTMENTS_READ],
+      permissions: [
+        PERMISSION_KEYS.ITEMS_READ,
+        PERMISSION_KEYS.DEPARTMENTS_READ,
+      ],
       departmentIds: ['dept-mixing-1', 'dept-oven-1'],
     });
 
@@ -86,7 +96,10 @@ describe('AccessControlService - Dynamic Factory Role & Department Catalog', () 
 
   it('TEST-DFDR-ROLE-002: rejects custom role creation with unknown permission keys', async () => {
     mockDb = {} as unknown as Database;
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+    service = new AccessControlService(
+      mockDb,
+      mockAuditService as AuditService,
+    );
 
     await expect(
       service.createRole(tenantA, {
@@ -102,13 +115,18 @@ describe('AccessControlService - Dynamic Factory Role & Department Catalog', () 
       select: vi.fn().mockReturnValue({
         from: vi.fn().mockReturnValue({
           where: vi.fn().mockReturnValue({
-            limit: vi.fn().mockResolvedValue([{ id: 'existing-role', code: 'MANAGER' }]),
+            limit: vi
+              .fn()
+              .mockResolvedValue([{ id: 'existing-role', code: 'MANAGER' }]),
           }),
         }),
       }),
     } as unknown as Database;
 
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+    service = new AccessControlService(
+      mockDb,
+      mockAuditService as AuditService,
+    );
 
     await expect(
       service.createRole(tenantA, {
@@ -137,11 +155,14 @@ describe('AccessControlService - Dynamic Factory Role & Department Catalog', () 
       }),
     } as unknown as Database;
 
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+    service = new AccessControlService(
+      mockDb,
+      mockAuditService as AuditService,
+    );
 
-    await expect(
-      service.deleteRole(tenantA, 'role-owner'),
-    ).rejects.toThrow(ForbiddenException);
+    await expect(service.deleteRole(tenantA, 'role-owner')).rejects.toThrow(
+      ForbiddenException,
+    );
 
     await expect(
       service.updateRole(tenantA, 'role-owner', {
@@ -166,8 +187,14 @@ describe('AccessControlService - Dynamic Factory Role & Department Catalog', () 
       }),
     } as unknown as Database;
 
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
-    const assigned = await service.assignRoleDepartments(tenantA, roleId, ['dept-1', 'dept-2']);
+    service = new AccessControlService(
+      mockDb,
+      mockAuditService as AuditService,
+    );
+    const assigned = await service.assignRoleDepartments(tenantA, roleId, [
+      'dept-1',
+      'dept-2',
+    ]);
 
     expect(assigned).toEqual(['dept-1', 'dept-2']);
   });
@@ -191,9 +218,7 @@ describe('AccessControlService - Dynamic Factory Role & Department Catalog', () 
       { roleKey: 'OPERATOR', permissionKey: PERMISSION_KEYS.ITEMS_READ },
     ];
 
-    const deptsFromDb = [
-      { roleId: 'role-1', departmentId: 'dept-baking-1' },
-    ];
+    const deptsFromDb = [{ roleId: 'role-1', departmentId: 'dept-baking-1' }];
 
     let selectCallCount = 0;
     mockDb = {
@@ -209,7 +234,10 @@ describe('AccessControlService - Dynamic Factory Role & Department Catalog', () 
       }),
     } as unknown as Database;
 
-    service = new AccessControlService(mockDb, mockAuditService as AuditService);
+    service = new AccessControlService(
+      mockDb,
+      mockAuditService as AuditService,
+    );
     const result = await service.listRoles(tenantA);
 
     expect(result.roles).toHaveLength(1);

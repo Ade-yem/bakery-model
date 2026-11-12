@@ -6,6 +6,9 @@ import { eq } from 'drizzle-orm';
 import { AuditService } from '../audit/audit.service.js';
 import type { ActorContext } from '../auth/actor-context.js';
 
+/**
+ * Service managing customer directories, credit ceiling boundaries, and audit logging.
+ */
 @Injectable()
 export class CustomersService {
   constructor(
@@ -14,6 +17,12 @@ export class CustomersService {
     private readonly auditService: AuditService,
   ) {}
 
+  /**
+   * Retrieves all customers belonging to the tenant.
+   *
+   * @param tenantId - The UUID of the authenticated tenant.
+   * @returns Array of customer records.
+   */
   async list(tenantId: string) {
     return this.db
       .select()
@@ -21,6 +30,14 @@ export class CustomersService {
       .where(eq(schema.customers.tenantId, tenantId));
   }
 
+  /**
+   * Registers a new customer with normalized names and audit logging.
+   *
+   * @param tenantId - The UUID of the tenant.
+   * @param actor - The calling actor context for audit attribution.
+   * @param input - Customer parameters including name, contact info, and credit ceiling.
+   * @returns The newly created customer record.
+   */
   async create(
     tenantId: string,
     actor: ActorContext,
