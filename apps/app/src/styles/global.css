@@ -1,0 +1,79 @@
+@import "tailwindcss";
+@import "./variables.css";
+
+@theme {
+  --font-sans: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --color-oven-black: #10201F;
+  --color-verdigris: #0B5C63;
+  --color-verdigris-lift: #0F7480;
+  --color-copper: #A9501A;
+  --color-flour: #F6F3EA;
+  --color-ledger: #EFEBDB;
+  --color-rule: #D9D3C0;
+
+  --color-status-open: #8A5A00;
+  --color-status-balanced: #3F7A2A;
+  --color-status-unbalanced: #B3261E;
+
+  --color-dark-ground: #0C1716;
+  --color-dark-paper: #E9E4D2;
+  --color-dark-verdigris: #52C2C9;
+  --color-dark-copper: #F09A5E;
+  --color-dark-rye: #9BD46F;
+  --color-dark-egg-wash: #F2C14E;
+  --color-dark-red: #FF8A7D;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-family-base);
+  background-color: #F6F3EA;
+  color: #10201F;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: #F6F3EA;
+  color: #10201F;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle ledger graph pattern for architectural / financial SaaS feel */
+.bg-ledger-pattern {
+  background-size: 28px 28px;
+  background-image: 
+    linear-gradient(to right, rgba(217, 211, 192, 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 211, 192, 0.45) 1px, transparent 1px);
+}
+
+.bg-dark-grid {
+  background-size: 28px 28px;
+  background-image: 
+    linear-gradient(to right, rgba(82, 194, 201, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(82, 194, 201, 0.08) 1px, transparent 1px);
+}
+
+/* Continuous self-smooth marquee slider */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-scroll {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 38s linear infinite;
+}
+
+.animate-marquee-scroll:hover {
+  animation-play-state: paused;
+}
+
