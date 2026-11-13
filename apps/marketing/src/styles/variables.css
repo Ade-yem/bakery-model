@@ -1,0 +1,32 @@
+/**
+ * @file Official TallyBakery Design Tokens (Copper & Verdigris Palette).
+ * All hex values strictly adhere to official brand identity specification.
+ */
+
+:root {
+  /* Official Core Palette */
+  --color-oven-black: #10201F;
+  --color-verdigris: #0B5C63;
+  --color-verdigris-lift: #0F7480;
+  --color-copper: #A9501A;
+  --color-flour: #F6F3EA;
+  --color-ledger: #EFEBDB;
+  --color-rule: #D9D3C0;
+
+  /* Operational Status Colours (reserved for operational states) */
+  --color-status-open: #8A5A00;
+  --color-status-balanced: #3F7A2A;
+  --color-status-unbalanced: #B3261E;
+
+  /* Dark Surface Palette (for dark sections and dark dashboard preview) */
+  --color-dark-ground: #0C1716;
+  --color-dark-paper: #E9E4D2;
+  --color-dark-verdigris: #52C2C9;
+  --color-dark-copper: #F09A5E;
+  --color-dark-rye: #9BD46F;
+  --color-dark-egg-wash: #F2C14E;
+  --color-dark-red: #FF8A7D;
+
+  /* Typography */
+  --font-family-base: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
