@@ -62,7 +62,7 @@ export function Logo({
       <div className="flex flex-col leading-none">
         <div className="flex items-center tracking-tight font-extrabold text-xl font-sans uppercase">
           <span className={isDark ? 'text-[#E9E4D2]' : 'text-[#0B5C63]'}>TALLY</span>
-          <span className={`${isDark ? 'text-[#F09A5E]' : 'text-[#A9501A]'} ml-0.5`}>BAKERY</span>
+          <span className="text-[#A9501A] ml-0.5">BAKERY</span>
         </div>
         {showTagline && (
           <span

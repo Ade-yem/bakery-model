@@ -18,7 +18,7 @@
 .sw-table td {
   font-size: 11px;
   padding: 18px 22px;
-  border-bottom: 1px solid #e6e0d0;
+  border-bottom: 1px solid var(--color-rule);
   font-variant-numeric: tabular-nums;
 }
 .sw-table td strong {
@@ -36,7 +36,7 @@
   border-bottom: 0;
 }
 .sw-table tbody tr:hover {
-  background: #f3f0e7;
+  background: var(--color-ledger);
 }
 .sw-label {
   border: 1px solid var(--sw-rule);
@@ -76,7 +76,7 @@
   max-width: 370px;
   border: 1px solid var(--sw-rule);
   border-radius: 4px;
-  background: #fbf9f3;
+  background: var(--color-flour);
   padding: 0 12px;
   margin-bottom: 20px;
   color: var(--sw-muted);
@@ -219,7 +219,7 @@
   border: 1px solid var(--sw-rule);
   background: var(--sw-paper);
   padding: 28px;
-  border-radius: 16px;
+  border-radius: 12px;
   color: var(--sw-ink);
 }
 .sw-dialog::backdrop {
@@ -258,7 +258,7 @@
 .sw-dialog textarea {
   display: block;
   width: 100%;
-  background: #fbf9f3;
+  background: var(--color-flour);
   border: 1px solid var(--sw-rule);
   border-radius: 8px;
   padding: 11px;
