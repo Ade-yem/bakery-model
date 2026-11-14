@@ -35,9 +35,25 @@ describe('Shared visual identity', () => {
     );
     expect(html).toContain('href="/workspace-preview"');
   });
-  it('declares the agreed Switzer family consistently for app typography', () => {
-    expect(tokens).toContain("--font-family-base: 'Switzer'");
-    expect(globalStyles).toContain("--font-sans: 'Switzer'");
-    expect(tokens + globalStyles).not.toContain('Figtree');
+  it('matches the frontend branch Figtree typography', () => {
+    expect(tokens).toContain("--font-family-base: 'Figtree'");
+    expect(globalStyles).toContain("--font-sans: 'Figtree'");
+    expect(tokens + globalStyles).not.toContain('Switzer');
+  });
+  it('keeps the frontend core palette in the global and component tokens', () => {
+    const palette = {
+      'oven-black': '#10201F',
+      verdigris: '#0B5C63',
+      'verdigris-lift': '#0F7480',
+      copper: '#A9501A',
+      flour: '#F6F3EA',
+      ledger: '#EFEBDB',
+      rule: '#D9D3C0',
+    };
+    for (const [name, value] of Object.entries(palette)) {
+      for (const css of [tokens, globalStyles]) {
+        expect(css).toContain(`--color-${name}: ${value}`);
+      }
+    }
   });
 });

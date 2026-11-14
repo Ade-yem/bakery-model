@@ -64,7 +64,7 @@
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
-  background: #edeee2;
+  background: var(--color-ledger);
   border: 1px solid var(--sw-rule);
   border-left: 3px solid var(--sw-teal);
   padding: 14px 18px;
@@ -102,12 +102,12 @@
   border-radius: 50%;
 }
 .sw-stats {
-  border-radius: 16px;
+  border-radius: 24px;
   overflow: hidden;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   border: 1px solid var(--sw-rule);
-  background: #fbf9f3;
+  background: var(--color-flour);
   margin-bottom: 28px;
 }
 .sw-stats > div {
@@ -150,9 +150,9 @@
   margin-bottom: 26px;
 }
 .sw-panel {
-  border-radius: 16px;
+  border-radius: 24px;
   overflow: hidden;
-  background: #fbf9f3;
+  background: var(--color-flour);
   border: 1px solid var(--sw-rule);
   min-width: 0;
 }

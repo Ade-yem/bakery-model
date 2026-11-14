@@ -3,7 +3,7 @@
 @import "./fonts.css";
 
 @theme {
-  --font-sans: 'Switzer', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   --color-oven-black: #10201F;
   --color-verdigris: #0B5C63;

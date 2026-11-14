@@ -13,7 +13,7 @@ Preview: `/workspace-preview/reception`. Live `/workspace` remains behind the ex
 - Own history, schedule and read-only profile.
 - Closing cash and outgoing handover draft, with expected cash derived from opening float + cash receipts − approved petty cash. Differences require an explanation. Draft variance uses brackets for deficits. Incoming independent verification and canonical sealing are not simulated.
 
-Shared `StaffShell`, Logo, Button, Switzer fonts and staff styles keep Reception consistent with Production and the existing app identity. No production batch, raw-material, procurement, transfer-acceptance or fulfillment controls are exposed.
+Shared `StaffShell`, Logo, Button, Figtree fonts and staff styles keep Reception consistent with Production and the existing app identity. No production batch, raw-material, procurement, transfer-acceptance or fulfillment controls are exposed.
 
 ## Persistence and financial limits
 

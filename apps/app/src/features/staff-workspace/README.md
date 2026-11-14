@@ -1,6 +1,6 @@
 # Staff workspace — first UI slice
 
-The first slice is a production-only UI preview at `/workspace-preview`, with home, tasks, records/detail, history, personal schedule and own profile. Switzer is bundled locally and is the font family for the app, including existing shared components. The workspace reuses the existing landing/auth Logo and Button components, the same palette, rounded controls and a compatible surface/heading hierarchy.
+The first slice is a production-only UI preview at `/workspace-preview`, with home, tasks, records/detail, history, personal schedule and own profile. Figtree is bundled locally and is the font family for the app, including existing shared components. The workspace reuses the existing landing/auth Logo and Button components, the same palette, rounded controls and a compatible surface/heading hierarchy.
 
 `/workspace` shows a sign-in/integration boundary until the agreed session contract is connected. This implementation does not create an alternative auth mechanism, claim server authorization, submit inventory movements or grant role-switching access.
 
@@ -29,4 +29,4 @@ Reception now has a separate preview at `/workspace-preview/reception`, sharing 
 
 ## Cross-app brand alignment
 
-The agreed font from the design brief is Switzer. `apps/app` now loads it locally and declares it in both CSS font tokens. The separately owned `apps/marketing` still declares Figtree; its owner must update that declaration to Switzer for full typography consistency. No marketing source was changed. The staff sidebar reuses the shared loaf logo, and primary controls reuse the existing Button component rather than creating a separate identity.
+The `frontend` branch is the visual reference for the application. Its Figtree typography, Copper & Verdigris tokens, shared loaf Logo and shared Button define the workspace identity. Figtree weights 400–800 are bundled locally so the declared family actually renders without a third-party font request. Production, Reception and connection status inherit this same family. The existing marketing source is outside this contribution's scope.

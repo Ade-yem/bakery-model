@@ -13,6 +13,7 @@ import {
   LogOut,
   ShieldCheck,
 } from 'lucide-react';
+import { GlobalSyncStatus } from '../sync/SyncStatus';
 import { Logo } from '../../components/shared/Logo';
 import { getStaffNavigation, type StaffAccess } from './access';
 interface Props {
@@ -131,6 +132,7 @@ export function StaffShell({
           </div>
           <span className="sw-preview-badge">Sample data · UI preview</span>
         </header>
+        <GlobalSyncStatus />
         <div className="sw-preview-notice">
           Preview only. No live shift, stock or server connection. <span>{department} role</span>
         </div>
