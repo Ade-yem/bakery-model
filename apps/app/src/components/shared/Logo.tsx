@@ -9,6 +9,7 @@ export interface LogoProps {
   variant?: 'light' | 'dark';
   className?: string;
   showTagline?: boolean;
+  to?: string;
 }
 
 /**
@@ -20,12 +21,13 @@ export function Logo({
   variant = 'light',
   className = '',
   showTagline = false,
+  to = '/',
 }: LogoProps): React.ReactElement {
   const isDark = variant === 'dark';
 
   return (
     <Link
-      to="/"
+      to={to}
       className={`inline-flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B5C63] rounded-md ${className}`}
       aria-label="TallyBakery Home"
     >

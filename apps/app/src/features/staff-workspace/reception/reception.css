@@ -1,0 +1,239 @@
+/* Reception uses the staff shell, shared brand tokens and existing primary Button. */
+.rc-money {
+  color: var(--color-copper);
+  font-variant-numeric: tabular-nums;
+}
+.rc-money-stat {
+  font-size: clamp(18px, 2.1vw, 28px);
+  letter-spacing: -0.5px;
+  overflow-wrap: anywhere;
+}
+.rc-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+  margin: 12px 0;
+}
+.rc-spaced {
+  margin-top: 20px;
+}
+.rc-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.rc-entry-grid .sw-detail {
+  width: 100%;
+  max-width: none;
+}
+.rc-form {
+  font-family: var(--font-family-base);
+}
+.rc-form label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 16px 0;
+  color: var(--color-oven-black);
+}
+.rc-form input,
+.rc-form select,
+.rc-form textarea,
+.rc-filter select {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-rule);
+  border-radius: 8px;
+  background: var(--color-flour);
+  padding: 10px 12px;
+  margin-top: 8px;
+  font: inherit;
+  color: var(--color-oven-black);
+}
+.rc-form input:focus-visible,
+.rc-form select:focus-visible,
+.rc-filter select:focus-visible {
+  outline: 2px solid var(--color-verdigris-lift);
+  outline-offset: 3px;
+}
+.rc-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+.rc-line-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 20px 0;
+}
+.rc-line-heading h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.rc-line-heading button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rc-order-line {
+  display: grid;
+  grid-template-columns: 1fr 85px 36px;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid var(--color-rule);
+  padding: 15px 0;
+}
+.rc-order-line strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.rc-order-line p {
+  font-size: 11px;
+  color: var(--sw-muted);
+  margin: 5px 0;
+}
+.rc-order-line label {
+  margin: 0;
+  font-size: 10px;
+}
+.rc-order-line input {
+  padding: 8px;
+  min-width: 0;
+}
+.rc-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+  padding: 20px 22px;
+  border-top: 3px double var(--color-copper);
+  font-size: 13px;
+  color: var(--color-copper);
+  font-variant-numeric: tabular-nums;
+}
+.sw-detail .rc-total {
+  padding-left: 0;
+  padding-right: 0;
+}
+.rc-total strong {
+  font-weight: 600;
+}
+.rc-tender {
+  border: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+.rc-tender legend {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.rc-tender > p {
+  font-size: 11px;
+  color: var(--sw-muted);
+  line-height: 1.8;
+}
+.rc-form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: end;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.rc-toolbar {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.rc-toolbar .sw-search {
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+.rc-filter select {
+  font-size: 12px;
+  margin: 0;
+  min-height: 44px;
+}
+.rc-form .sw-field-error {
+  margin-bottom: 18px;
+}
+.rc-entry-grid > .sw-detail > button {
+  margin-top: 12px;
+}
+.rc-entry-grid .sw-detail > dl {
+  margin-top: 15px;
+}
+.rc-entry-grid .sw-detail dd {
+  font-weight: 500;
+}
+@media (max-width: 1200px) {
+  .rc-entry-grid {
+    grid-template-columns: 1fr;
+  }
+  .rc-money-stat {
+    font-size: 23px;
+  }
+}
+@media (max-width: 800px) {
+  .rc-money-stat {
+    font-size: 21px;
+  }
+  .rc-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .rc-order-line {
+    grid-template-columns: minmax(0, 1fr) 70px 32px;
+  }
+  .rc-order-line .sw-icon-button {
+    min-width: 32px;
+  }
+  .rc-entry-grid {
+    gap: 20px;
+  }
+  .rc-toolbar {
+    align-items: stretch;
+  }
+  .rc-toolbar .sw-search,
+  .rc-filter {
+    width: 100%;
+    max-width: none;
+  }
+  .rc-total {
+    font-size: 12px;
+  }
+  .rc-order-line strong {
+    font-size: 11px;
+  }
+  .rc-toolbar > a {
+    align-self: start;
+  }
+}
+
+@media (max-width: 1150px) {
+  .rc-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rc-stats > div:nth-child(2) {
+    border-right: 0;
+  }
+  .rc-stats > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--color-rule);
+  }
+}
+.rc-money-stat {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.rc-form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
