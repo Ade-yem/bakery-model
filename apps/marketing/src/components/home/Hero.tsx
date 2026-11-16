@@ -64,7 +64,7 @@ export function HomeHero(): React.ReactElement {
   const currentColor = TYPING_COLORS[colorIndex];
 
   return (
-    <section className="relative pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-60 overflow-hidden bg-[#F6F3EA]">
+    <section className="relative flex items-center py-16 sm:py-20 overflow-hidden h-screen bg-[#F6F3EA]">
       {/* Background Video Layer */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <video
@@ -93,7 +93,7 @@ export function HomeHero(): React.ReactElement {
       </div>
 
       {/* Centered Hero Content Container */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+      <div className="relative z-10 max-w-4xl px-4 sm:px-6 lg:px-8 flex justify-center flex-col items-start">
         {/* Finview 4-dot diamond cluster + Eyebrow */}
 
         {/* Headline with multi-color typewriter animation on "Perfect Control" */}
@@ -106,15 +106,15 @@ export function HomeHero(): React.ReactElement {
             {displayedText}
             <span
               style={{ backgroundColor: currentColor }}
-              className="inline-block w-[3px] h-[0.9em] align-middle ml-1 animate-pulse"
+              className="inline-block w-0.75 h-[0.9em] align-middle ml-1 animate-pulse"
             />
           </span>{' '}
           for Your Operational Needs
         </h1>
 
         {/* Description */}
-        <p className="text-base sm:text-lg text-[#10201F]/85 leading-relaxed max-w-2xl mx-auto mb-8">
-          Welcome to TallyBakery, your all-in-one platform for managing business operations,
+        <p className="text-base sm:text-lg text-[#10201F]/85 leading-relaxed max-w-2xl mb-8">
+          Your all-in-one platform for managing business operations,
           inventory, sales, staff, and finances with better control and accountability.
         </p>
 

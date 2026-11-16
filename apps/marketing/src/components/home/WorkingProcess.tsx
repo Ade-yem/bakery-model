@@ -167,23 +167,66 @@ export function HomeWorkingProcess(): React.ReactElement {
         {/* Process Cards with Transmission Flow Lines */}
         <div
           data-reveal-group
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-10 lg:gap-y-12 px-6 sm:px-8 lg:px-0 relative"
         >
+          {/* Desktop (lg) Wrap-around Transmission Line: Card 04 -> Card 05 */}
+          <div
+            className="hidden lg:block pointer-events-none absolute inset-0 z-20"
+            aria-hidden="true"
+          >
+            <div className="absolute top-14.75 left-full w-8 h-[calc(50%-59px)] border-t-2 border-r-2 border-b-2 border-[#0B5C63]/55 rounded-r-3xl" />
+            <div className="absolute top-1/2 -translate-y-px inset-x-0 h-[2px] bg-gradient-to-l from-[#0B5C63]/55 via-[#A9501A]/60 to-[#0B5C63]/55" />
+            <div className="absolute top-1/2 -left-8 w-8 h-[84px] border-t-2 border-l-2 border-b-2 border-[#0B5C63]/55 rounded-l-3xl">
+              <span className="absolute -bottom-[5px] right-0 translate-x-1 w-2 h-2 rounded-full bg-[#A9501A] shadow-xs" />
+            </div>
+          </div>
+
           {WORKING_STEPS.map((item, index) => {
             const isActive = activeStep === item.step;
-            const isNotLastInRow = (index + 1) % 4 !== 0;
+            const isNotLast = index < WORKING_STEPS.length - 1;
+            const isNotLastInLgRow = (index + 1) % 4 !== 0;
+            const isNotLastInSmRow = (index + 1) % 2 !== 0;
 
             return (
               <div key={item.step} className="relative flex flex-col h-full">
-                {/* Horizontal Transmission Line between step nodes on desktop */}
-                {isNotLastInRow && (
+                {/* Horizontal Transmission Line between adjacent cards in the same row */}
+                {isNotLast && (
                   <div
-                    className="hidden lg:flex items-center absolute top-[52px] -right-5 w-5 h-4 z-20 pointer-events-none"
+                    className={`hidden ${isNotLastInSmRow ? 'sm:flex' : ''} ${
+                      isNotLastInLgRow ? 'lg:flex' : 'lg:hidden'
+                    } items-center absolute top-[52px] -right-5 w-5 h-4 z-20 pointer-events-none`}
                     aria-hidden="true"
                   >
                     <div className="w-full h-[2px] bg-gradient-to-r from-[#0B5C63]/60 via-[#A9501A]/60 to-[#0B5C63]/60 relative flex items-center justify-end">
-                      {/* Pulse Node Indicator */}
                       <span className="w-2 h-2 rounded-full bg-[#A9501A] shadow-xs translate-x-1" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile (< sm) Wrap-around Transmission Line between every consecutive card */}
+                {isNotLast && (
+                  <div
+                    className="sm:hidden pointer-events-none absolute inset-0 z-20"
+                    aria-hidden="true"
+                  >
+                    <div className="absolute top-[59px] -bottom-[20px] left-full w-5 border-t-2 border-r-2 border-b-2 border-[#0B5C63]/55 rounded-r-2xl" />
+                    <div className="absolute -bottom-[20px] inset-x-0 h-[2px] bg-gradient-to-l from-[#0B5C63]/55 via-[#A9501A]/60 to-[#0B5C63]/55" />
+                    <div className="absolute top-[calc(100%+18px)] -left-5 w-5 h-[82px] border-t-2 border-l-2 border-b-2 border-[#0B5C63]/55 rounded-l-2xl">
+                      <span className="absolute -bottom-[5px] right-0 translate-x-1 w-2 h-2 rounded-full bg-[#A9501A] shadow-xs" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Tablet (sm..lg) Wrap-around Transmission Line at end of 2-card rows (02->03, 04->05, 06->07) */}
+                {isNotLast && !isNotLastInSmRow && (
+                  <div
+                    className="hidden sm:block lg:hidden pointer-events-none absolute top-0 bottom-0 right-0 w-[calc(200%+1.25rem)] z-20"
+                    aria-hidden="true"
+                  >
+                    <div className="absolute top-[59px] -bottom-[20px] left-full w-6 border-t-2 border-r-2 border-b-2 border-[#0B5C63]/55 rounded-r-3xl" />
+                    <div className="absolute -bottom-[20px] inset-x-0 h-[2px] bg-gradient-to-l from-[#0B5C63]/55 via-[#A9501A]/60 to-[#0B5C63]/55" />
+                    <div className="absolute top-[calc(100%+18px)] -left-6 w-6 h-[82px] border-t-2 border-l-2 border-b-2 border-[#0B5C63]/55 rounded-l-3xl">
+                      <span className="absolute -bottom-[5px] right-0 translate-x-1 w-2 h-2 rounded-full bg-[#A9501A] shadow-xs" />
                     </div>
                   </div>
                 )}
