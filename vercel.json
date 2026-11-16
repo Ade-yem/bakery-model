@@ -4,17 +4,17 @@
     "api": {
       "root": "apps/api",
       "framework": "nestjs",
-      "installCommand": "corepack enable && pnpm install"
+      "installCommand": "pnpm install"
     },
     "app": {
       "root": "apps/app",
       "framework": "vite",
-      "installCommand": "corepack enable && pnpm install"
+      "installCommand": "pnpm install"
     },
     "marketing": {
       "root": "apps/marketing",
       "framework": "vite",
-      "installCommand": "corepack enable && pnpm install"
+      "installCommand": "pnpm install"
     }
   },
   "rewrites": [
