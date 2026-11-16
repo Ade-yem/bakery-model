@@ -2,10 +2,6 @@
   "name": "bakery-model",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@9.0.0",
-  "engines": {
-    "node": "22.x"
-  },
   "scripts": {
     "dev:api": "pnpm --filter @repo/api dev",
     "dev:marketing": "pnpm --filter @repo/marketing dev",
@@ -17,12 +13,6 @@
     "start:api": "pnpm --filter @repo/api start",
     "start:marketing": "pnpm --filter @repo/marketing preview",
     "start:app": "pnpm --filter @repo/app preview",
-    "build:app": "pnpm --filter @repo/app build",
-    "build:marketing": "pnpm --filter @repo/marketing build",
-    "build": "pnpm run build:api && pnpm run build:app && pnpm run build:marketing",
-    "start:api": "pnpm --filter @repo/api start",
-    "start:app": "pnpm --filter @repo/app preview",
-    "start:marketing": "pnpm --filter @repo/marketing preview",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",

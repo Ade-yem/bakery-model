@@ -15,10 +15,8 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return welcome message', () => {
-      expect(appController.getHello()).toBe(
-        'Hello there 🤗, This is TalleyBakery API service. Welcome 🫡',
-      );
+    it('should return "Hello World!"', () => {
+      expect(appController.getHello()).toBe('Hello World!');
     });
   });
 });
