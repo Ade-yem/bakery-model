@@ -32,16 +32,16 @@ trigger: always_on
 * Never send unauthorized project data, documents, or BIM data to OpenAI.
 * Never log secrets, tokens, or sensitive project data.
 
-## 4. Database & Prisma
+## 4. Database & Drizzle
 
-* Use Prisma as the database access layer.
+* Use Drizzle as the database access layer.
 * Keep database queries inside repositories/services, not UI components.
 * Use transactions for related mutations that must succeed or fail together.
 * Enforce important integrity rules with PostgreSQL constraints and indexes.
 * Avoid unbounded queries.
 * Preserve project and organization ownership relationships.
 * Use migrations for all schema changes.
-* Never bypass Prisma migrations to modify production data.
+* Never bypass Drizzle migrations to modify production data.
 
 ## 5. BIM Data
 
@@ -84,7 +84,7 @@ trigger: always_on
 * Use oRPC and zod as the typed API boundary.
 * Keep API procedures thin and delegate business logic to services.
 * Validate inputs at API boundaries.
-* Do not expose Prisma models directly to clients.
+* Do not expose Drizzle models directly to clients.
 * Use strict TypeScript. Avoid `any`, `@ts-ignore`, and unsafe type casts.
 
 ## 10. Code Quality
@@ -113,7 +113,7 @@ trigger: always_on
 
 * Use a centralized error-handling strategy for server and oRPC operations.
 * Define typed application errors with stable error codes.
-* Validate and map Prisma, OpenAI, Cloudinary, authentication, and validation errors to safe application errors.
+* Validate and map Drizzle, OpenAI, Cloudinary, authentication, and validation errors to safe application errors.
 * Never expose raw database, API, stack-trace, or infrastructure errors to clients.
 * Log unexpected errors server-side with sufficient context for debugging, without logging secrets or sensitive data.
 * Do not catch errors unless they can be handled, transformed, or enriched.
