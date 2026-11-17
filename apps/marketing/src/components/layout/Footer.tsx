@@ -10,15 +10,15 @@ import { FOOTER_SECTIONS } from '../../data/navigation';
 const CURRENT_YEAR = 2026;
 
 /**
- * @description Master footer for TallyBakery public pages with organized navigation columns.
+ * @description Master footer for Cadence public pages with organized navigation columns.
  * @returns {React.ReactElement} Comprehensive footer.
  */
 export function Footer(): React.ReactElement {
   return (
-    <footer className="bg-[#10201F] text-[#E9E4D2] border-t border-[#0F7480]/20 pt-16 pb-12 font-sans">
+    <footer className="bg-oven-black text-[#E9E4D2] border-t border-verdigris-lift/20 pt-16 pb-12 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8 pb-12 border-b border-[#D9D3C0]/15">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8 pb-12 border-b border-rule/15">
           {/* Brand Info (2 cols) */}
           <div className="lg:col-span-2 flex flex-col gap-4">
             <Logo variant="dark" showTagline={true} />
@@ -40,7 +40,7 @@ export function Footer(): React.ReactElement {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-[#52C2C9]" aria-hidden="true" />
-                <span>inquiries@tallybakery.com</span>
+                <span>inquiries@cadence.com</span>
               </div>
             </div> */}
           </div>
@@ -71,7 +71,7 @@ export function Footer(): React.ReactElement {
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Copyright & Finview Circular Social Icons */}
           <div className="flex flex-col items-center md:items-end gap-3 text-xs text-[#E9E4D2]/60">
-            <p>© {CURRENT_YEAR} TallyBakery SaaS. All rights reserved.</p>
+            <p>© {CURRENT_YEAR} Cadence SaaS. All rights reserved.</p>
           </div>
         </div>
       </div>

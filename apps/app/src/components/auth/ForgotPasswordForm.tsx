@@ -81,18 +81,17 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
     <div>
       {!isSubmitted ? (
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          <p className="text-xs text-[#10201F]/70 leading-relaxed font-sans">
+          <p className="text-xs text-oven-black/70 leading-relaxed font-sans">
             Enter your business email address and we&apos;ll send you a link to reset your password.
           </p>
 
           {/* Email Address Field */}
           <div>
             <div
-              className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-[#0B5C63] ${
-                errors.email ? 'border-[#B3261E]' : 'border-[#D9D3C0]'
-              }`}
+              className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-verdigris ${errors.email ? 'border-[#B3261E]' : 'border-rule'
+                }`}
             >
-              <div className="flex items-center justify-center px-3.5 py-2.5 text-[#0B5C63] border-r border-[#E5E0D0] bg-[#F9F7F1]/60">
+              <div className="flex items-center justify-center px-3.5 py-2.5 text-verdigris border-r border-[#E5E0D0] bg-[#F9F7F1]/60">
                 <Mail className="w-4 h-4" />
               </div>
               <input
@@ -106,7 +105,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
                 aria-label="Business Email Address"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? 'forgot-email-err' : undefined}
-                className="w-full px-3.5 py-2.5 text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none bg-transparent font-sans"
+                className="w-full px-3.5 py-2.5 text-sm text-oven-black placeholder-oven-black/40 focus:outline-none bg-transparent font-sans"
               />
             </div>
             {errors.email && (
@@ -119,7 +118,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full mt-2 py-2.5 px-4 rounded-md bg-[#0B5C63] hover:bg-[#08484E] text-white font-medium text-sm transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B5C63] cursor-pointer"
+            className="w-full mt-2 py-2.5 px-4 rounded-md bg-verdigris hover:bg-[#08484E] text-white font-medium text-sm transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-verdigris cursor-pointer"
           >
             Send Reset Link
           </button>
@@ -127,14 +126,14 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
       ) : (
         <div className="space-y-5 animate-fade-in font-sans">
           {/* Clean Message Box */}
-          <div className="p-4 rounded-xl bg-[#F6F3EA] border border-[#D9D3C0] text-center space-y-2">
-            <div className="w-9 h-9 rounded-full bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-5 h-5 text-[#0B5C63]" />
+          <div className="p-4 rounded-xl bg-flour border border-rule text-center space-y-2">
+            <div className="w-9 h-9 rounded-full bg-verdigris/10 text-verdigris flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-5 h-5 text-verdigris" />
             </div>
-            <h2 className="text-sm font-bold text-[#10201F]">Check your email</h2>
-            <p className="text-xs text-[#10201F]/70 leading-relaxed max-w-xs mx-auto">
+            <h2 className="text-sm font-bold text-oven-black">Check your email</h2>
+            <p className="text-xs text-oven-black/70 leading-relaxed max-w-xs mx-auto">
               We sent a password reset link to{' '}
-              <span className="font-semibold text-[#10201F]">{maskEmail(values.email)}</span>.
+              <span className="font-semibold text-oven-black">{maskEmail(values.email)}</span>.
             </p>
           </div>
 
@@ -149,10 +148,10 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
             type="button"
             onClick={handleResend}
             disabled={isResending || countdown > 0}
-            className="w-full py-2.5 px-4 rounded-md border border-[#D9D3C0] bg-white hover:bg-[#F9F7F1] text-[#10201F] font-medium text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-[#F6F3EA]/50"
+            className="w-full py-2.5 px-4 rounded-md border border-rule bg-white hover:bg-[#F9F7F1] text-oven-black font-medium text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-flour/50"
           >
             <RotateCw
-              className={`w-3.5 h-3.5 text-[#0B5C63] ${isResending ? 'animate-spin' : ''}`}
+              className={`w-3.5 h-3.5 text-verdigris ${isResending ? 'animate-spin' : ''}`}
             />
             <span>
               {isResending
@@ -171,7 +170,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
                 setResendNotice(null);
                 setCountdown(30);
               }}
-              className="text-xs text-[#0B5C63] hover:underline cursor-pointer"
+              className="text-xs text-verdigris hover:underline cursor-pointer"
             >
               Use a different email address
             </button>
@@ -183,7 +182,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
       <div className="mt-5 pt-4 border-t border-[#E5E0D0] text-center">
         <Link
           to="/login"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0B5C63] hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-verdigris hover:underline"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Return to Sign In</span>

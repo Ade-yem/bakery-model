@@ -60,16 +60,16 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
   };
 
   return (
-    <div className={`bg-[#EFEBDB] p-6 sm:p-8 rounded-2xl border border-[#D9D3C0] font-sans ${className}`}>
-      <h3 className="text-xl font-bold text-[#10201F] mb-1">Send an Inquiry</h3>
-      <p className="text-xs text-[#10201F]/70 mb-6">
+    <div className={`bg-ledger p-6 sm:p-8 rounded-2xl border border-rule font-sans ${className}`}>
+      <h3 className="text-xl font-bold text-oven-black mb-1">Send an Inquiry</h3>
+      <p className="text-xs text-oven-black/70 mb-6">
         Have questions about scaling across departments or shifts? Our team responds within 24 hours.
       </p>
 
       {validatedNotice && (
         <div
           role="status"
-          className="mb-6 p-4 rounded-xl bg-[#0B5C63]/10 border border-[#0B5C63]/30 text-xs text-[#0B5C63] flex items-start gap-2.5"
+          className="mb-6 p-4 rounded-xl bg-verdigris/10 border border-verdigris/30 text-xs text-verdigris flex items-start gap-2.5"
         >
           <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
           <span>{validatedNotice}</span>
@@ -79,7 +79,7 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         {/* Name */}
         <div>
-          <label htmlFor="contact-name" className="block text-xs font-semibold text-[#10201F] mb-1">
+          <label htmlFor="contact-name" className="block text-xs font-semibold text-oven-black mb-1">
             Full Name <span className="text-[#B3261E]">*</span>
           </label>
           <input
@@ -91,9 +91,8 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
             placeholder="Sarah Jenkins"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'contact-name-err' : undefined}
-            className={`w-full px-3.5 py-2.5 rounded-lg bg-[#F6F3EA] border text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none focus:ring-2 focus:ring-[#0B5C63] ${
-              errors.name ? 'border-[#B3261E]' : 'border-[#D9D3C0]'
-            }`}
+            className={`w-full px-3.5 py-2.5 rounded-lg bg-flour border text-sm text-oven-black placeholder-oven-black/40 focus:outline-none focus:ring-2 focus:ring-verdigris ${errors.name ? 'border-[#B3261E]' : 'border-rule'
+              }`}
           />
           {errors.name && (
             <p id="contact-name-err" className="text-xs text-[#B3261E] mt-1">
@@ -104,7 +103,7 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
 
         {/* Email */}
         <div>
-          <label htmlFor="contact-email" className="block text-xs font-semibold text-[#10201F] mb-1">
+          <label htmlFor="contact-email" className="block text-xs font-semibold text-oven-black mb-1">
             Email Address <span className="text-[#B3261E]">*</span>
           </label>
           <input
@@ -116,9 +115,8 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
             placeholder="sarah@company.com"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? 'contact-email-err' : undefined}
-            className={`w-full px-3.5 py-2.5 rounded-lg bg-[#F6F3EA] border text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none focus:ring-2 focus:ring-[#0B5C63] ${
-              errors.email ? 'border-[#B3261E]' : 'border-[#D9D3C0]'
-            }`}
+            className={`w-full px-3.5 py-2.5 rounded-lg bg-flour border text-sm text-oven-black placeholder-oven-black/40 focus:outline-none focus:ring-2 focus:ring-verdigris ${errors.email ? 'border-[#B3261E]' : 'border-rule'
+              }`}
           />
           {errors.email && (
             <p id="contact-email-err" className="text-xs text-[#B3261E] mt-1">
@@ -129,7 +127,7 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
 
         {/* Subject */}
         <div>
-          <label htmlFor="contact-subject" className="block text-xs font-semibold text-[#10201F] mb-1">
+          <label htmlFor="contact-subject" className="block text-xs font-semibold text-oven-black mb-1">
             Subject <span className="text-[#B3261E]">*</span>
           </label>
           <input
@@ -141,9 +139,8 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
             placeholder="Inquiry regarding multi-department business setup"
             aria-invalid={!!errors.subject}
             aria-describedby={errors.subject ? 'contact-subject-err' : undefined}
-            className={`w-full px-3.5 py-2.5 rounded-lg bg-[#F6F3EA] border text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none focus:ring-2 focus:ring-[#0B5C63] ${
-              errors.subject ? 'border-[#B3261E]' : 'border-[#D9D3C0]'
-            }`}
+            className={`w-full px-3.5 py-2.5 rounded-lg bg-flour border text-sm text-oven-black placeholder-oven-black/40 focus:outline-none focus:ring-2 focus:ring-verdigris ${errors.subject ? 'border-[#B3261E]' : 'border-rule'
+              }`}
           />
           {errors.subject && (
             <p id="contact-subject-err" className="text-xs text-[#B3261E] mt-1">
@@ -154,7 +151,7 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
 
         {/* Message */}
         <div>
-          <label htmlFor="contact-message" className="block text-xs font-semibold text-[#10201F] mb-1">
+          <label htmlFor="contact-message" className="block text-xs font-semibold text-oven-black mb-1">
             Message <span className="text-[#B3261E]">*</span>
           </label>
           <textarea
@@ -166,9 +163,8 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
             placeholder="Tell us about your bakery, current shift volume, and operational challenges..."
             aria-invalid={!!errors.message}
             aria-describedby={errors.message ? 'contact-message-err' : undefined}
-            className={`w-full px-3.5 py-2.5 rounded-lg bg-[#F6F3EA] border text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none focus:ring-2 focus:ring-[#0B5C63] resize-none ${
-              errors.message ? 'border-[#B3261E]' : 'border-[#D9D3C0]'
-            }`}
+            className={`w-full px-3.5 py-2.5 rounded-lg bg-flour border text-sm text-oven-black placeholder-oven-black/40 focus:outline-none focus:ring-2 focus:ring-verdigris resize-none ${errors.message ? 'border-[#B3261E]' : 'border-rule'
+              }`}
           />
           {errors.message && (
             <p id="contact-message-err" className="text-xs text-[#B3261E] mt-1">
@@ -180,7 +176,7 @@ export function ContactForm({ className = '' }: ContactFormProps): React.ReactEl
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-[#0B5C63] text-[#F6F3EA] font-semibold text-sm hover:bg-[#0F7480] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B5C63] cursor-pointer"
+          className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-verdigris text-flour font-semibold text-sm hover:bg-verdigris-lift transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-verdigris cursor-pointer"
         >
           <Send className="w-4 h-4" />
           <span>Submit Inquiry</span>

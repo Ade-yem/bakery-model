@@ -36,11 +36,10 @@ export function SectionHeading({
       {eyebrow && (
         <div className={`mb-3 inline-flex items-center gap-2 ${isCenter ? 'justify-center' : ''}`}>
           <span
-            className={`inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border ${
-              isDark
-                ? 'bg-[#52C2C9]/10 text-[#52C2C9] border-[#52C2C9]/30'
-                : 'bg-[#0B5C63]/10 text-[#0B5C63] border-[#0B5C63]/25'
-            }`}
+            className={`inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border ${isDark
+              ? 'bg-[#52C2C9]/10 text-[#52C2C9] border-[#52C2C9]/30'
+              : 'bg-verdigris/10 text-verdigris border-verdigris/25'
+              }`}
           >
             {eyebrow}
           </span>
@@ -48,18 +47,16 @@ export function SectionHeading({
       )}
 
       <h2
-        className={`text-3xl sm:text-4xl lg:text-4xl font-extrabold tracking-tight font-sans leading-tight ${
-          isDark ? 'text-[#E9E4D2]' : 'text-[#10201F]'
-        }`}
+        className={`text-3xl sm:text-4xl lg:text-4xl font-extrabold tracking-tight font-sans leading-tight ${isDark ? 'text-[#E9E4D2]' : 'text-oven-black'
+          }`}
       >
         {title}
       </h2>
 
       {description && (
         <p
-          className={`mt-4 text-base sm:text-lg font-normal leading-relaxed ${
-            isDark ? 'text-[#E9E4D2]/80' : 'text-[#10201F]/80'
-          }`}
+          className={`mt-4 text-base sm:text-lg font-normal leading-relaxed ${isDark ? 'text-[#E9E4D2]/80' : 'text-oven-black/80'
+            }`}
         >
           {description}
         </p>

@@ -1,5 +1,5 @@
 ---
-title: "TallyBakery"
+title: "Cadence"
 subtitle: "Software Design Document | Shift-Based Inventory & Sales Reconciliation Platform"
 author: "Engineering Design"
 date: "29 October 2026"
@@ -43,9 +43,9 @@ lang: en
 
 ## 1. Purpose and scope
 
-This document translates the TallyBakery PRD into an implementation design. It defines the application architecture, feature modules, principal data structures, authorization model, operating workflows, offline synchronization approach, API boundaries, testing strategy, and a four-week implementation sequence.
+This document translates the Cadence PRD into an implementation design. It defines the application architecture, feature modules, principal data structures, authorization model, operating workflows, offline synchronization approach, API boundaries, testing strategy, and a four-week implementation sequence.
 
-TallyBakery is a multi-tenant, offline-first operating ledger for shift-based businesses, anchored on commercial bakeries. It must connect the events that happen across Procurement/Store, Production, Reception, and Packaging & Disbursement so that inventory, orders, payments, and shift closure can be reconciled to named people and devices.
+Cadence is a multi-tenant, offline-first operating ledger for shift-based businesses, anchored on commercial bakeries. It must connect the events that happen across Procurement/Store, Production, Reception, and Packaging & Disbursement so that inventory, orders, payments, and shift closure can be reconciled to named people and devices.
 
 ### 1.1 Design goals
 
@@ -921,7 +921,7 @@ Do not commit actual secret values. The exact environment variables depend on ch
 
 ### Product source
 
-- TallyBakery, *Product Requirements Document: Shift-Based Inventory & Sales Reconciliation Platform*, version 1.0.0, supplied for this task.
+- Cadence, *Product Requirements Document: Shift-Based Inventory & Sales Reconciliation Platform*, version 1.0.0, supplied for this task.
 
 ### Technical references reviewed
 

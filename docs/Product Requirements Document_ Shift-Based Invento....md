@@ -8,7 +8,7 @@
 
 ### **1.1 Executive Summary**
 
-TallyBakery is a multi-tenant, offline-first Software-as-a-Service (SaaS) platform engineered for shift-based manufacturing and retail operations (using commercial bakeries as the anchor reference). The software enforces zero-trust departmental accountability by cross-reconciling raw materials consumed, finished units produced, customer orders billed, units disbursed, and cash drawer balances across recurring shift handovers.
+Cadence is a multi-tenant, offline-first Software-as-a-Service (SaaS) platform engineered for shift-based manufacturing and retail operations (using commercial bakeries as the anchor reference). The software enforces zero-trust departmental accountability by cross-reconciling raw materials consumed, finished units produced, customer orders billed, units disbursed, and cash drawer balances across recurring shift handovers.
 
 ### **1.2 Problem Statement**
 

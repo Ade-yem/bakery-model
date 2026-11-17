@@ -1,5 +1,5 @@
 /**
- * @file Type definitions for TallyBakery public website.
+ * @file Type definitions for Cadence public website.
  */
 
 /**

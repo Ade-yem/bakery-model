@@ -1,5 +1,5 @@
 /**
- * @file Finview-styled Features page for TallyBakery.
+ * @file Finview-styled Features page for Cadence.
  * Matches the clean layout, dark banner, and concise feature pillars.
  */
 
@@ -11,12 +11,12 @@ import { Button } from '../components/shared/Button';
 import { ArrowRight } from 'lucide-react';
 
 /**
- * @description Features page providing an overview of TallyBakery's operational capabilities.
+ * @description Features page providing an overview of Cadence's operational capabilities.
  * @returns {React.ReactElement} Features page view.
  */
 export function Features(): React.ReactElement {
   return (
-    <div className="bg-[#F6F3EA] text-[#10201F] font-sans">
+    <div className="bg-flour text-oven-black font-sans">
       {/* 1. Cinematic Full-Width Photographic Hero */}
       <InnerPageHero
         heading="Everything Your Business Needs to Operate Better."
@@ -39,12 +39,12 @@ export function Features(): React.ReactElement {
       <HomeWorkingProcess />
 
       {/* 5. Call To Action */}
-      <section className="py-20 sm:py-24 bg-[#0B5C63] text-[#F6F3EA]">
+      <section className="py-20 sm:py-24 bg-verdigris text-flour">
         <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
             Take Control of Your Business Operations Today
           </h2>
-          <p className="text-base sm:text-lg text-[#F6F3EA]/90 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-flour/90 max-w-xl mx-auto leading-relaxed">
             Start organizing your inventory, operational runs, sales, and shift handovers with one
             unified platform.
           </p>
@@ -61,7 +61,7 @@ export function Features(): React.ReactElement {
               to="/pricing"
               variant="secondary"
               size="lg"
-              className="bg-[#F6F3EA] text-[#0B5C63] hover:bg-[#EFEBDB]"
+              className="bg-flour text-verdigris hover:bg-ledger"
             >
               View Pricing
             </Button>

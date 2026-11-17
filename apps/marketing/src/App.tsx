@@ -1,5 +1,5 @@
 /**
- * @file Application router root for TallyBakery public website.
+ * @file Application router root for Cadence public website.
  */
 
 import React from 'react';
@@ -30,7 +30,7 @@ export function App(): React.ReactElement {
       <ScrollToTop />
       <SmoothScrollProvider />
       <ScrollRevealManager />
-      <div className="min-h-screen flex flex-col bg-[#F6F3EA] text-[#10201F] selection:bg-[#0B5C63] selection:text-[#F6F3EA] font-sans antialiased">
+      <div className="min-h-screen flex flex-col bg-flour text-oven-black selection:bg-verdigris selection:text-flour font-sans antialiased">
         {/* Global Navigation Header */}
         <Navbar />
 

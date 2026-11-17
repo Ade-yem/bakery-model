@@ -2,7 +2,7 @@
 
 ## Project overview
 
-TallyBakery is intended to be a multi-tenant, offline-first operations and reconciliation platform for shift-based businesses, with commercial bakeries as the initial use case. It connects procurement, raw-material usage, production, finished-stock transfers, customer orders and payments, disbursement, and shift handovers so that stock and cash movements can be reconciled to their actors.
+Cadence is intended to be a multi-tenant, offline-first operations and reconciliation platform for shift-based businesses, with commercial bakeries as the initial use case. It connects procurement, raw-material usage, production, finished-stock transfers, customer orders and payments, disbursement, and shift handovers so that stock and cash movements can be reconciled to their actors.
 
 The repository is a pnpm TypeScript monorepo:
 
@@ -16,7 +16,7 @@ The implementation is currently a starter scaffold. Do not assume the proposed d
 Read the relevant sections of these documents before changing product behavior:
 
 - `docs/Product Requirements Document_ Shift-Based Invento....md` — personas, access boundaries, workflows, goals, and product requirements.
-- `docs/tallybakery_software_design_document.md` — proposed architecture, domain model, ledger rules, API conventions, offline synchronization, security, and acceptance criteria.
+- `docs/cadence_software_design_document.md` — proposed architecture, domain model, ledger rules, API conventions, offline synchronization, security, and acceptance criteria.
 
 ## Workspace and commands
 

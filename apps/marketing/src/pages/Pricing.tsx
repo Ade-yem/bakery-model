@@ -17,7 +17,7 @@ export function Pricing(): React.ReactElement {
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
-    <div className="bg-[#F6F3EA] text-[#10201F] font-sans">
+    <div className="bg-flour text-oven-black font-sans">
       {/* 1. Cinematic Full-Width Photographic Hero */}
       <InnerPageHero
 
@@ -35,14 +35,13 @@ export function Pricing(): React.ReactElement {
       />
 
       {/* 2. Pricing Tiers Section */}
-      <section className="py-20 sm:py-24 border-b border-[#D9D3C0]">
+      <section className="py-20 sm:py-24 border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Billing Switch */}
           <div className="flex items-center justify-center gap-3 mb-14">
             <span
-              className={`text-sm font-semibold ${
-                !isAnnual ? 'text-[#10201F]' : 'text-[#10201F]/60'
-              }`}
+              className={`text-sm font-semibold ${!isAnnual ? 'text-oven-black' : 'text-oven-black/60'
+                }`}
             >
               Monthly Billing
             </span>
@@ -51,18 +50,16 @@ export function Pricing(): React.ReactElement {
               role="switch"
               aria-checked={isAnnual}
               onClick={() => setIsAnnual(!isAnnual)}
-              className="relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-[#0B5C63] focus:outline-none focus:ring-2 focus:ring-[#0B5C63]"
+              className="relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-verdigris focus:outline-none focus:ring-2 focus:ring-verdigris"
             >
               <span
-                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-[#F6F3EA] shadow-md ring-0 transition duration-200 ease-in-out ${
-                  isAnnual ? 'translate-x-7' : 'translate-x-0'
-                }`}
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-flour shadow-md ring-0 transition duration-200 ease-in-out ${isAnnual ? 'translate-x-7' : 'translate-x-0'
+                  }`}
               />
             </button>
             <span
-              className={`text-sm font-semibold flex items-center gap-1.5 ${
-                isAnnual ? 'text-[#10201F]' : 'text-[#10201F]/60'
-              }`}
+              className={`text-sm font-semibold flex items-center gap-1.5 ${isAnnual ? 'text-oven-black' : 'text-oven-black/60'
+                }`}
             >
               <span>Annual Billing</span>
               <span className="px-2.5 py-0.5 rounded-full bg-[#A9501A]/10 text-[#A9501A] text-xs font-bold border border-[#A9501A]/30">
@@ -81,12 +78,12 @@ export function Pricing(): React.ReactElement {
       </section>
 
       {/* 4. CTA */}
-      <section className="py-20 sm:py-24 bg-[#0B5C63] text-[#F6F3EA]">
+      <section className="py-20 sm:py-24 bg-verdigris text-flour">
         <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
             Ready to Empower Your Operations Team?
           </h2>
-          <p className="text-base sm:text-lg text-[#F6F3EA]/90 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-flour/90 max-w-xl mx-auto leading-relaxed">
             Choose the plan that suits your operational volume and start gaining clarity across all shifts.
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-2">
@@ -97,7 +94,7 @@ export function Pricing(): React.ReactElement {
               to="/contact"
               variant="secondary"
               size="lg"
-              className="bg-[#F6F3EA] text-[#0B5C63] hover:bg-[#EFEBDB]"
+              className="bg-flour text-verdigris hover:bg-ledger"
             >
               Contact Sales
             </Button>

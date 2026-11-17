@@ -1,5 +1,5 @@
 /**
- * @file Accessible button and action link component for TallyBakery.
+ * @file Accessible button and action link component for Cadence.
  */
 
 import React from 'react';
@@ -52,15 +52,15 @@ export function Button({
 
   const variantStyles = {
     primary:
-      'bg-[#0B5C63] text-[#F6F3EA] hover:bg-[#0F7480] shadow-sm focus-visible:ring-[#0B5C63] border border-transparent',
+      'bg-verdigris text-flour hover:bg-verdigris-lift shadow-sm focus-visible:ring-verdigris border border-transparent',
     secondary:
-      'bg-[#EFEBDB] text-[#10201F] hover:bg-[#EFEBDB]/70 border border-[#D9D3C0] focus-visible:ring-[#0B5C63]',
+      'bg-ledger text-oven-black hover:bg-ledger/70 border border-rule focus-visible:ring-verdigris',
     copper:
-      'bg-[#A9501A] text-[#F6F3EA] hover:bg-[#8f4314] shadow-sm focus-visible:ring-[#A9501A] border border-transparent',
+      'bg-[#A9501A] text-flour hover:bg-[#8f4314] shadow-sm focus-visible:ring-[#A9501A] border border-transparent',
     ghost:
-      'bg-transparent text-[#10201F] hover:bg-[#EFEBDB]/50 border border-transparent focus-visible:ring-[#0B5C63]',
+      'bg-transparent text-oven-black hover:bg-ledger/50 border border-transparent focus-visible:ring-verdigris',
     dark:
-      'bg-[#0C1716] text-[#E9E4D2] hover:bg-[#10201F] border border-[#52C2C9]/30 focus-visible:ring-[#52C2C9]',
+      'bg-[#0C1716] text-[#E9E4D2] hover:bg-oven-black border border-[#52C2C9]/30 focus-visible:ring-[#52C2C9]',
   }[variant];
 
   const widthStyle = fullWidth ? 'w-full' : '';

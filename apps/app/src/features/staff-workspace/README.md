@@ -15,7 +15,7 @@ The first slice is a production-only UI preview at `/workspace-preview`, with ho
 
 ## Draft limits
 
-The single preview draft is saved under `tallybakery:production-preview-draft` in browser localStorage. It is restored when the form reopens, with corrupt/blocked storage handled. Positive waste requires a note. This is a sample draft editor, not the PRD's IndexedDB operational repository or sync outbox; no sync success is simulated. Authenticated offline production entries must wait for an agreed event contract, access policy and durable outbox implementation.
+The single preview draft is saved under `cadence:production-preview-draft` in browser localStorage. It is restored when the form reopens, with corrupt/blocked storage handled. Positive waste requires a note. This is a sample draft editor, not the PRD's IndexedDB operational repository or sync outbox; no sync success is simulated. Authenticated offline production entries must wait for an agreed event contract, access policy and durable outbox implementation.
 
 ## Remaining integration work
 

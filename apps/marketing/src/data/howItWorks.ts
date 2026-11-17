@@ -1,5 +1,5 @@
 /**
- * @file Step-by-step workflows for TallyBakery setup and daily operations.
+ * @file Step-by-step workflows for Cadence setup and daily operations.
  */
 
 export interface WorkflowStep {

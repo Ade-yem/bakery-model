@@ -29,7 +29,7 @@ export function Register(): React.ReactElement {
       </video>
 
       {/* Translucent Soft Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#F6F3EA]/85 via-[#F6F3EA]/75 to-[#10201F]/80 backdrop-blur-[2px] z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-flour/85 via-flour/75 to-oven-black/80 backdrop-blur-[2px] z-0 pointer-events-none" />
 
       {/* Spacer to push card towards optical center */}
       <div className="w-full h-2 z-10" />
@@ -46,7 +46,7 @@ export function Register(): React.ReactElement {
           {/* Title & Amber Accent Line */}
           <div className="mb-5 flex items-end justify-between">
             <div>
-              <h1 className="text-xl font-bold text-[#10201F] tracking-tight">
+              <h1 className="text-xl font-bold text-oven-black tracking-tight">
                 Create an account
               </h1>
               <div className="w-10 h-1 bg-[#A9501A] mt-1.5 rounded-full" />
@@ -60,9 +60,9 @@ export function Register(): React.ReactElement {
           <RegisterForm selectedPlan={selectedPlan} />
 
           {/* Switch to Login */}
-          <div className="mt-5 pt-4 border-t border-[#E5E0D0] text-center text-xs text-[#10201F]/70">
-            <span>Already operating on TallyBakery? </span>
-            <Link to="/login" className="font-semibold text-[#0B5C63] hover:underline">
+          <div className="mt-5 pt-4 border-t border-[#E5E0D0] text-center text-xs text-oven-black/70">
+            <span>Already operating on Cadence? </span>
+            <Link to="/login" className="font-semibold text-verdigris hover:underline">
               Sign In to workspace
             </Link>
           </div>
@@ -70,8 +70,8 @@ export function Register(): React.ReactElement {
       </div>
 
       {/* Bottom Ribbon Banner (Matching Reference) */}
-      <div className="relative z-10 mt-6 w-full max-w-lg bg-[#0B5C63] text-white/95 text-xs py-2.5 px-4 rounded-md shadow-md flex items-center justify-center gap-2 border-l-4 border-[#A9501A] font-medium tracking-wide">
-        <span>2026 © TallyBakery Operations & Reconciliation Platform</span>
+      <div className="relative z-10 mt-6 w-full max-w-lg bg-verdigris text-white/95 text-xs py-2.5 px-4 rounded-md shadow-md flex items-center justify-center gap-2 border-l-4 border-[#A9501A] font-medium tracking-wide">
+        <span>2026 © Cadence Operations & Reconciliation Platform</span>
       </div>
     </div>
   );

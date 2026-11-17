@@ -82,10 +82,10 @@ const MARQUEE_ITEMS = [...OVERVIEW_FEATURES, ...OVERVIEW_FEATURES];
  */
 export function HomePlatformOverview(): React.ReactElement {
   return (
-    <section className="relative py-24 sm:py-32 bg-[#F6F3EA] border-b border-[#D9D3C0] overflow-hidden">
+    <section className="relative py-24 sm:py-32 bg-flour border-b border-rule overflow-hidden">
       {/* Decorative top-right currency watermark matching Finview template */}
       <div
-        className="hidden md:flex absolute top-12 right-12 w-14 h-14 rounded-full border border-[#D9D3C0]/80 items-center justify-center text-[#10201F]/20 select-none pointer-events-none"
+        className="hidden md:flex absolute top-12 right-12 w-14 h-14 rounded-full border border-rule/80 items-center justify-center text-oven-black/20 select-none pointer-events-none"
         aria-hidden="true"
       >
         <span className="text-2xl font-serif">§</span>
@@ -106,16 +106,16 @@ export function HomePlatformOverview(): React.ReactElement {
               <circle cx="8" cy="14" r="1.5" fill="#A9501A" />
               <circle cx="2" cy="8" r="1.5" fill="#0B5C63" />
             </svg>
-            <span className="text-sm sm:text-base font-semibold text-[#0B5C63] tracking-wide">
+            <span className="text-sm sm:text-base font-semibold text-verdigris tracking-wide">
               Platform Overview
             </span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#10201F] tracking-tight leading-[1.18]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-oven-black tracking-tight leading-[1.18]">
             Empowering Your Business with Real-Time Operations and Control
           </h2>
 
-          <p className="mt-5 text-base sm:text-lg text-[#10201F]/75 leading-relaxed font-normal max-w-2xl mx-auto">
+          <p className="mt-5 text-base sm:text-lg text-oven-black/75 leading-relaxed font-normal max-w-2xl mx-auto">
             Take control of your entire business operations with connected tools for inventory,
             production, sales, staff management, and shift reconciliation.
           </p>
@@ -126,11 +126,11 @@ export function HomePlatformOverview(): React.ReactElement {
       <div className="relative mt-16 sm:mt-20 overflow-hidden w-full">
         {/* Edge fade gradients for elegant seamless transition */}
         <div
-          className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#F6F3EA] to-transparent z-10"
+          className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-flour to-transparent z-10"
           aria-hidden="true"
         />
         <div
-          className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#F6F3EA] to-transparent z-10"
+          className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-flour to-transparent z-10"
           aria-hidden="true"
         />
 
@@ -138,7 +138,7 @@ export function HomePlatformOverview(): React.ReactElement {
         <div className="animate-marquee-scroll flex gap-6 px-4 py-4">
           {MARQUEE_ITEMS.map((item, idx) => (
             <TiltCard key={`${item.id}-${idx}`}>
-              <div className="shrink-0 w-[300px] sm:w-[350px] lg:w-[380px] group bg-[#EFEBDB]/60 hover:bg-[#EFEBDB] rounded-3xl p-8 border border-[#D9D3C0]/90 hover:border-[#0B5C63]/60 transition-all duration-300 flex flex-col justify-between items-center text-center shadow-xs hover:shadow-md cursor-grab active:cursor-grabbing select-none h-full">
+              <div className="shrink-0 w-[300px] sm:w-[350px] lg:w-[380px] group bg-ledger/60 hover:bg-ledger rounded-3xl p-8 border border-rule/90 hover:border-verdigris/60 transition-all duration-300 flex flex-col justify-between items-center text-center shadow-xs hover:shadow-md cursor-grab active:cursor-grabbing select-none h-full">
                 <div>
                   {/* Visual Vector Illustration in Circular Badge */}
                   <div className="mb-7">
@@ -146,12 +146,12 @@ export function HomePlatformOverview(): React.ReactElement {
                   </div>
 
                   {/* Card Title with Clear Typography */}
-                  <h3 className="text-xl font-bold text-[#10201F] tracking-tight group-hover:text-[#0B5C63] transition-colors min-h-[56px] flex items-center justify-center">
+                  <h3 className="text-xl font-bold text-oven-black tracking-tight group-hover:text-verdigris transition-colors min-h-[56px] flex items-center justify-center">
                     {item.title}
                   </h3>
 
                   {/* Description with readable font size and high contrast */}
-                  <p className="mt-3.5 text-sm sm:text-[15px] leading-relaxed text-[#10201F]/75">
+                  <p className="mt-3.5 text-sm sm:text-[15px] leading-relaxed text-oven-black/75">
                     {item.description}
                   </p>
                 </div>
@@ -161,7 +161,7 @@ export function HomePlatformOverview(): React.ReactElement {
                   <Link
                     to={item.link}
                     aria-label={`Explore ${item.title}`}
-                    className="w-10 h-10 rounded-full border border-[#D9D3C0] group-hover:border-[#0B5C63] bg-[#F6F3EA] group-hover:bg-[#0B5C63] flex items-center justify-center text-[#10201F]/70 group-hover:text-[#F6F3EA] transition-all duration-200"
+                    className="w-10 h-10 rounded-full border border-rule group-hover:border-verdigris bg-flour group-hover:bg-verdigris flex items-center justify-center text-oven-black/70 group-hover:text-flour transition-all duration-200"
                   >
                     <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </Link>

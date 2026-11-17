@@ -139,7 +139,7 @@ export function StaffShell({
         <div className="sw-content" id="staff-content" tabIndex={-1}>
           {children}
           <footer className="sw-footer">
-            <span>TallyBakery · Staff workspace</span>
+            <span>Cadence · Staff workspace</span>
             <span>Every shift, accounted for.</span>
           </footer>
         </div>

@@ -25,7 +25,7 @@ describe('Validation Utilities', () => {
     });
 
     it('returns valid for well-formed emails', () => {
-      expect(validateEmail('baker@tallybakery.com').isValid).toBe(true);
+      expect(validateEmail('baker@cadence.com').isValid).toBe(true);
       expect(validateEmail('admin.bakery@domain.co.uk').isValid).toBe(true);
     });
   });
@@ -105,7 +105,7 @@ describe('Validation Utilities', () => {
     });
 
     it('succeeds with identifier and valid password', () => {
-      const res = validateLoginForm({ identifier: 'admin@tallybakery.com', password: 'Password123' });
+      const res = validateLoginForm({ identifier: 'admin@cadence.com', password: 'Password123' });
       expect(res.isValid).toBe(true);
       expect(Object.keys(res.errors)).toHaveLength(0);
     });

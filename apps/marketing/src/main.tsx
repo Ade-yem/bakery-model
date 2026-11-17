@@ -1,5 +1,5 @@
 /**
- * @file Browser entrypoint for TallyBakery public client application.
+ * @file Browser entrypoint for Cadence public client application.
  */
 
 import { StrictMode } from 'react';
