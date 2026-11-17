@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Logo } from '../components/shared/Logo';
+import { Logo } from '@repo/shared/component/Logo';
 import { RegisterForm } from '../components/auth/RegisterForm';
 
 /**
@@ -17,25 +17,12 @@ export function Register(): React.ReactElement {
 
   return (
     <div className="relative min-h-screen flex flex-col justify-between items-center py-10 px-4 sm:px-6 overflow-hidden font-sans">
-      {/* Background Video Layer */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
-      >
-        <source src="/videos/hero-background.mp4" type="video/mp4" />
-      </video>
-
-      {/* Translucent Soft Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-flour/85 via-flour/75 to-oven-black/80 backdrop-blur-[2px] z-0 pointer-events-none" />
 
       {/* Spacer to push card towards optical center */}
       <div className="w-full h-2 z-10" />
 
       {/* Floating Center Card */}
-      <div className="relative z-10 w-full max-w-[480px] bg-white rounded-xl shadow-2xl border border-white/60 overflow-hidden my-auto animate-fade-in">
+      <div className="relative z-10 w-full max-w-150 bg-white rounded-xl shadow-2xl border border-white/60 overflow-hidden my-auto animate-fade-in">
         {/* Top Logo Badge Matching Brand Header */}
         <div className="pt-8 pb-3 px-8 text-center flex flex-col items-center">
           <Logo showTagline={true} />
@@ -49,9 +36,9 @@ export function Register(): React.ReactElement {
               <h1 className="text-xl font-bold text-oven-black tracking-tight">
                 Create an account
               </h1>
-              <div className="w-10 h-1 bg-[#A9501A] mt-1.5 rounded-full" />
+              <div className="w-10 h-1 bg-copper mt-1.5 rounded-full" />
             </div>
-            <span className="text-[11px] font-semibold text-[#A9501A] uppercase tracking-wider bg-[#A9501A]/10 px-2.5 py-1 rounded-full">
+            <span className="text-[11px] font-semibold text-copper uppercase tracking-wider bg-[#A9501A]/10 px-2.5 py-1 rounded-full">
               {selectedPlan} Plan
             </span>
           </div>
@@ -70,8 +57,8 @@ export function Register(): React.ReactElement {
       </div>
 
       {/* Bottom Ribbon Banner (Matching Reference) */}
-      <div className="relative z-10 mt-6 w-full max-w-lg bg-verdigris text-white/95 text-xs py-2.5 px-4 rounded-md shadow-md flex items-center justify-center gap-2 border-l-4 border-[#A9501A] font-medium tracking-wide">
-        <span>2026 © Cadence Operations & Reconciliation Platform</span>
+      <div className="relative z-10 mt-6 w-full max-w-lg text-oven-black/95 text-xs py-2.5 px-4 flex items-center justify-center gap-2 font-medium tracking-wide">
+        <span>2026 &copy; Cadence Operations & Reconciliation Platform</span>
       </div>
     </div>
   );

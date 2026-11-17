@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+
 
 export interface LogoProps {
   variant?: 'light' | 'dark';
@@ -26,8 +26,8 @@ export function Logo({
   const isDark = variant === 'dark';
 
   return (
-    <Link
-      to={to}
+    <a
+      href={to}
       className={`inline-flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris rounded-md ${className}`}
       aria-label="Cadence Home"
     >
@@ -60,19 +60,21 @@ export function Logo({
       </div>
 
       <div className="flex flex-col leading-none">
-        <div className="flex items-center tracking-tight font-extrabold text-xl font-sans uppercase">
-          <span className={isDark ? 'text-[#E9E4D2]' : 'text-verdigris'}>TALLY</span>
-          <span className="text-[#A9501A] ml-0.5">BAKERY</span>
+        <div className="flex items-center tracking-tight font-extrabold text-xl font-sans">
+          <span className={isDark ? 'text-[#E9E4D2]' : 'text-verdigris'}>Cad</span>
+          <span className="text-[#A9501A]">ence</span>
         </div>
         {showTagline && (
           <span
-            className={`text-[9px] tracking-widest uppercase font-semibold mt-0.5 ${isDark ? 'text-[#E9E4D2]/60' : 'text-oven-black/60'
-              }`}
+            className={`text-[9px] tracking-widest font-semibold mt-0.5 ${
+              isDark ? 'text-[#E9E4D2]/60' : 'text-oven-black/60'
+            }`}
           >
-            Connected Operations
+            Business Cadence
           </span>
         )}
       </div>
-    </Link>
+    </a>
   );
 }
+

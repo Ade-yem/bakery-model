@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "./variables.css";
+@import "@repo/shared/styles/variables.css";
 @import "./fonts.css";
 
 @theme {

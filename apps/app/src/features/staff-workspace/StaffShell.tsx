@@ -14,7 +14,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { GlobalSyncStatus } from '../sync/SyncStatus';
-import { Logo } from '../../components/shared/Logo';
+import { Logo } from '@repo/shared/component/Logo';
 import { getStaffNavigation, type StaffAccess } from './access';
 interface Props {
   base: string;
