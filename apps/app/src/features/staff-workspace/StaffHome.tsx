@@ -1,8 +1,11 @@
+import { ShiftBadge } from './ShiftBadge';
+import { Allowed } from './Allowed';
+import { useProductionRecords } from './production-store';
 import { Button } from '../../components/shared/Button';
 /** @file Production staff home, with assigned work above routine history. */
 import { ArrowRight, ArrowUpRight, Clock3, ClipboardList, PackageCheck, Wheat } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { previewTasks } from './preview-data';
+import { productionTasks } from '../mock-auth/production-data';
 import { StaffTable } from './StaffTable';
 interface Props {
   base: string;
@@ -10,24 +13,27 @@ interface Props {
 }
 /**
  * @description Prioritizes production staff's current shift, pending work and own batch history.
- * @param props Preview route base and batch draft action.
+ * @param props Workspace route base and batch draft action.
  * @returns Production home without cross-department private data.
  */
 export function StaffHome({ base, onBatch }: Props) {
+  const records = useProductionRecords();
   return (
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Wednesday, 04 November 2026 · Sample shift</p>
+          <p className="sw-eyebrow">Wednesday, 04 November 2026</p>
           <h1>Good morning, Ada.</h1>
           <p>Here’s what’s on your production floor today.</p>
         </div>
-        <Button className="sw-primary" onClick={onBatch}>
-          Record a batch <ArrowUpRight size={16} />
-        </Button>
+        <Allowed action="production:create">
+          <Button className="sw-primary" onClick={onBatch}>
+            Record a batch <ArrowUpRight size={16} />
+          </Button>
+        </Allowed>
       </header>
       <section className="sw-shift-banner" aria-label="Current shift">
-        <span className="sw-state sw-open">Open shift</span>
+        <ShiftBadge department="production" />
         <strong>Morning · 06:00–14:00</strong>
         <span>Production / Ikeja branch</span>
         <Link to={`${base}/schedule`}>
@@ -38,14 +44,23 @@ export function StaffHome({ base, onBatch }: Props) {
         {[
           {
             label: 'Batches recorded',
-            value: '3',
+            value: String(records.length),
             note: 'In your current shift',
             Icon: ClipboardList,
           },
-          { label: 'Units submitted', value: '590', note: 'Across two product sizes', Icon: Wheat },
+          {
+            label: 'Units submitted',
+            value: String(records.reduce((sum, r) => sum + r.quantity, 0)),
+            note: 'Across two product sizes',
+            Icon: Wheat,
+          },
           {
             label: 'Awaiting acceptance',
-            value: '250',
+            value: String(
+              records
+                .filter((r) => r.state === 'Pending acceptance')
+                .reduce((sum, r) => sum + r.quantity, 0)
+            ),
             note: 'Physical receiving still required',
             Icon: PackageCheck,
           },
@@ -72,7 +87,7 @@ export function StaffHome({ base, onBatch }: Props) {
               All tasks <ArrowRight size={14} />
             </Link>
           </div>
-          {previewTasks.map((task, i) => (
+          {productionTasks.map((task, i) => (
             <article className="sw-task-row" key={task.id}>
               <span className="sw-task-number">0{i + 1}</span>
               <div>
@@ -121,7 +136,7 @@ export function StaffHome({ base, onBatch }: Props) {
         </div>
         <StaffTable base={base} />
         <div className="sw-panel-footer">
-          Production records only · Values shown are sample data.
+          Production records · Receiving counts are recorded independently.
         </div>
       </section>
     </>

@@ -180,26 +180,6 @@
 .sw-top-divider {
   color: #b8b6a5;
 }
-.sw-preview-badge {
-  border: 1px solid var(--sw-rule);
-  border-radius: 999px;
-  padding: 5px 9px;
-  font-size: 10px;
-  white-space: nowrap;
-}
-.sw-preview-notice {
-  display: flex;
-  justify-content: space-between;
-  background: var(--color-ledger);
-  color: #5d665e;
-  font-size: 10px;
-  padding: 9px 36px;
-  border-bottom: 1px solid var(--sw-rule);
-  gap: 16px;
-}
-.sw-preview-notice span {
-  white-space: nowrap;
-}
 .sw-content {
   max-width: 1440px;
   margin: auto;

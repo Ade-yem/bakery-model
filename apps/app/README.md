@@ -52,9 +52,9 @@ Or from this directory:
 pnpm build
 ```
 
-### Preview
+### Serve the production build
 
-To preview the production build locally:
+To serve the production build locally:
 
 ```bash
 pnpm preview

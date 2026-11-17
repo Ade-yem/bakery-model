@@ -1,32 +1,55 @@
-# Staff workspace — first UI slice
+# Staff application
 
-The first slice is a production-only UI preview at `/workspace-preview`, with home, tasks, records/detail, history, personal schedule and own profile. Figtree is bundled locally and is the font family for the app, including existing shared components. The workspace reuses the existing landing/auth Logo and Button components, the same palette, rounded controls and a compatible surface/heading hierarchy.
+All implementation is inside `apps/app`. The staff frontend uses canonical routes
+`/workspace/production`, `/workspace/reception`, `/workspace/disbursement` and
+`/workspace/procurement`. Authentication and current source data are supplied by
+the explicitly requested mock implementation; the pages themselves are normal
+application pages following the existing Figtree, Logo, Button and palette.
 
-`/workspace` shows a sign-in/integration boundary until the agreed session contract is connected. This implementation does not create an alternative auth mechanism, claim server authorization, submit inventory movements or grant role-switching access.
+## Implemented frontend journeys
 
-## PRD alignment
+- Production: flour/bags, sugar/kg, yeast/kg, output and waste entry; draft recovery;
+  batch submission; records, summary and history; independent receiving feedback.
+- Reception: orders and split allocations; required bank/customer evidence;
+  manual handoff; fulfillment feedback; linked cash/transfer repayments; customers
+  and outstanding credit; cash closing counts and dual-person handover.
+- Disbursement: pending Production transfers; independent received counts and
+  explained differences; only manually pushed orders; atomic full multi-product
+  fulfillment, available stock, physical closing counts and dual-person handover.
+- Procurement: supplier lookup; multi-material receipts with explicit units,
+  decimal-safe totals and references; duplicate checks; drafts, records and history.
+- All departments: own schedule/profile, module/permission-aware navigation,
+  route/action denial, account/session/subscription states, local pending-work and
+  conflict inspection, durable saved changes and offline app-shell reload.
 
-- Production preview contains no sales amounts, cash, customer data, raw-material balances or disbursement inventory views. It can show its own material consumption and submitted batch's receiving result.
-- Submitted output is pending acceptance, not available finished stock.
-- Submitted and accepted quantities are shown separately; history is read-only.
-- Staff cannot edit their role, department or schedule.
-- A next-day label makes overnight shifts explicit.
-- Navigation helpers require module access plus permissions for departmental tasks. These are client display checks only; server enforcement remains required.
+The shared mock transport returns quantity-only projections to Disbursement.
+Customer/contact/payment data are not part of those projections. Actual backend
+field-level authorization must enforce the same separation.
 
-## Draft limits
+## Pending-service semantics
 
-The single preview draft is saved under `cadence:production-preview-draft` in browser localStorage. It is restored when the form reopens, with corrupt/blocked storage handled. Positive waste requires a note. This is a sample draft editor, not the PRD's IndexedDB operational repository or sync outbox; no sync success is simulated. Authenticated offline production entries must wait for an agreed event contract, access policy and durable outbox implementation.
+Independent signatures produce `SEALED_PENDING_SYNC`, never a fabricated server
+seal. The shell shows actual local queued-work counts. Manual sync remains disabled
+without an authenticated transport. See `journal/README.md` for persistence and
+transport requirements and `handover/README.md` for the signer contract.
 
-## Remaining integration work
+The production build emits `sw.js` to cache hashed static assets, fonts and the
+HTML shell. API/auth responses and operational records are not cached by the
+service worker. See [Vite's plugin API](https://vite.dev/guide/api-plugin) for the
+build hook used by `tooling/offline-shell.ts`.
 
-Backend-resolved identity, tenant, branch and department membership; entitlements and permissions; active shift; own task/record/schedule endpoints; authoritative mutations and input validation; offline authorization lifetime and cache isolation; authenticated logout and session expiry. No API, shared-package or root configuration files are changed.
+## Development access
 
-Reception now has a separate preview at `/workspace-preview/reception`, sharing the same shell and design; see `reception/README.md`. Disbursement, Procurement and the complete canonical shift handover flow remain unchecked in `apps/app/CHECKLIST.md`.
+`<department>@demo.tallybakery.test` with `TallyDemo2026!`. Incoming mock verifier
+credentials use `<department>.incoming@demo.tallybakery.test` for Reception or
+Disbursement only, with the same password. No password is persisted.
 
-## Verification
+## Release boundary
 
-47 tests cover existing auth utilities plus navigation access, page rendering/privacy, unknown routes, draft quantity checks and recovery. Browser checks cover invalid draft input, saved draft recovery, empty search, navigation and 320px mobile layout. Build and lint checks run through the app package.
-
-## Cross-app brand alignment
-
-The `frontend` branch is the visual reference for the application. Its Figtree typography, Copper & Verdigris tokens, shared loaf Logo and shared Button define the workspace identity. Figtree weights 400–800 are bundled locally so the declared family actually renders without a third-party font request. Production, Reception and connection status inherit this same family. The existing marketing source is outside this contribution's scope.
+This completes the staff frontend against the local/mock contract. It does not
+complete live identity, tenant isolation, financial/stock posting, canonical shift
+lifecycle, operational IndexedDB sync, notification delivery or server conflict
+resolution. Those are explicitly separate integration acceptance gates in
+`CHECKLIST.md`. No API, shared-package, marketing or root configuration changes
+are included. Management approvals/settings and Super/Client Admin areas are not
+staff capabilities.

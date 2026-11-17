@@ -3,7 +3,8 @@
  */
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { authenticateDemo, DEMO_SESSION_KEY } from '../../features/mock-auth/session';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { validateLoginForm } from '../../utils/validation';
 import type { LoginFormValues } from '../../types';
@@ -18,6 +19,7 @@ export interface LoginFormProps {
  * @returns {React.ReactElement} Login form element.
  */
 export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
+  const navigate = useNavigate();
   const [values, setValues] = useState<LoginFormValues>({
     identifier: '',
     password: '',
@@ -54,11 +56,25 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
     }
 
     setErrors({});
-    setStatusNotice({
-      type: 'error',
-      message: 'Unable to connect to the server. Please check your internet connection and try again.',
-    });
-    if (onSuccess) onSuccess();
+    const session = authenticateDemo(values.identifier, values.password);
+    if (!session) {
+      setStatusNotice({
+        type: 'error',
+        message: 'Incorrect email or password. Please try again.',
+      });
+      return;
+    }
+    try {
+      sessionStorage.setItem(DEMO_SESSION_KEY, JSON.stringify(session));
+    } catch {
+      setStatusNotice({
+        type: 'error',
+        message: 'Browser session storage is unavailable. Allow storage and try again.',
+      });
+      return;
+    }
+    onSuccess?.();
+    navigate(`/workspace/${session.department}`, { replace: true });
   };
 
   return (
@@ -156,6 +172,7 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
             className="flex items-center gap-2 cursor-pointer select-none"
           >
             <input
+              disabled
               id="login-remember-me"
               name="rememberMe"
               type="checkbox"

@@ -75,3 +75,12 @@ describe('Connection banner and sync pill', () => {
     expect(html).not.toContain('All synced');
   });
 });
+
+it('does not present a clear queue as success while a conflict remains unresolved', () => {
+  const html = renderToStaticMarkup(
+    <SyncStatusPill snapshot={{ ...base, pending: 0, conflicts: 1 }} />
+  );
+  expect(html).toContain('Review required');
+  expect(html).toContain('1 conflict');
+  expect(html).not.toContain('No pending changes');
+});

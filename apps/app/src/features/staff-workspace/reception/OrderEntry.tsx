@@ -1,4 +1,4 @@
-/** @file New-order preview; totals and split tenders are validated before local capture. */
+/** @file New-order workspace; totals and split tenders are validated before local capture. */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Trash2, ArrowLeft } from 'lucide-react';
@@ -19,7 +19,7 @@ interface Props {
 }
 /**
  * @description Captures customer order lines and cash/transfer/debt allocations as a local sample record.
- * @param props Preview route base and durable local-save callback; no server posting occurs here.
+ * @param props Workspace route base and durable local-save callback; no server posting occurs here.
  * @returns Validated order-entry form with editable quantities, safe totals and recovery from errors.
  */
 export function OrderEntry({ base, onSave }: Props) {
@@ -63,7 +63,7 @@ export function OrderEntry({ base, onSave }: Props) {
           setError('');
           try {
             const order: ReceptionOrder = {
-              id: `ORD-PREVIEW-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+              id: `ORD-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
               customer: customer.trim() || 'Walk-in customer',
               contact: contact.trim(),
               createdAt: new Date().toISOString(),
@@ -169,8 +169,7 @@ export function OrderEntry({ base, onSave }: Props) {
           <section className="sw-panel sw-detail">
             <TenderFields value={tender} onChange={setTender} />
             <p className="sw-callout">
-              This saves a sample order on this browser. It does not send the order to Disbursement
-              or change stock.
+              Saving an order does not send it to Disbursement or change stock.
             </p>
             {error && (
               <p className="sw-field-error" role="alert">
@@ -181,7 +180,7 @@ export function OrderEntry({ base, onSave }: Props) {
               <Link className="sw-quiet" to={`${base}/records`}>
                 Cancel
               </Link>
-              <Button type="submit">Capture preview order</Button>
+              <Button type="submit">Save order</Button>
             </div>
           </section>
         </div>

@@ -1,9 +1,11 @@
+import { Allowed } from './Allowed';
+import { useProductionRecords } from './production-store';
 import { Button } from '../../components/shared/Button';
 /** @file Supporting staff pages; all records are synthetic production fixtures. */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowUpRight, Search } from 'lucide-react';
-import { productionRecords, previewTasks } from './preview-data';
+import { productionTasks } from '../mock-auth/production-data';
 import { StaffTable } from './StaffTable';
 interface Props {
   base: string;
@@ -19,7 +21,7 @@ export function StaffHeading({ title, description }: { title: string; descriptio
   return (
     <header className="sw-page-header">
       <div>
-        <p className="sw-eyebrow">Production / My workspace</p>
+        <p className="sw-eyebrow">My workspace</p>
         <h1>{title}</h1>
         <p>{description}</p>
       </div>
@@ -28,7 +30,7 @@ export function StaffHeading({ title, description }: { title: string; descriptio
 }
 /**
  * @description Lists department tasks without exposing other departments' controls.
- * @param props Preview base and local draft action.
+ * @param props Workspace base and local draft action.
  * @returns Assigned production task page.
  */
 export function StaffTasks({ base, onBatch }: Props) {
@@ -39,7 +41,7 @@ export function StaffTasks({ base, onBatch }: Props) {
         description="The work assigned to you for this production shift."
       />
       <section className="sw-panel">
-        {previewTasks.map((task) => (
+        {productionTasks.map((task) => (
           <article className="sw-task-detail" key={task.id}>
             <div>
               <span className="sw-eyebrow">{task.id} · Morning shift</span>
@@ -48,10 +50,12 @@ export function StaffTasks({ base, onBatch }: Props) {
               <p className="sw-muted">{task.note}</p>
             </div>
             {task.kind === 'batch' ? (
-              <Button className="sw-primary" onClick={onBatch}>
-                Record batch
-                <ArrowUpRight size={16} />
-              </Button>
+              <Allowed action="production:create">
+                <Button className="sw-primary" onClick={onBatch}>
+                  Record batch
+                  <ArrowUpRight size={16} />
+                </Button>
+              </Allowed>
             ) : (
               <Link className="sw-quiet" to={`${base}/records/BAT-0184`}>
                 Review batch
@@ -66,7 +70,7 @@ export function StaffTasks({ base, onBatch }: Props) {
 }
 /**
  * @description Searches read-only production records by reference, product or state.
- * @param props Preview route base.
+ * @param props Workspace route base.
  * @returns Batch record list with an explicit empty result state.
  */
 export function StaffRecords({ base }: Pick<Props, 'base'>) {
@@ -94,11 +98,11 @@ export function StaffRecords({ base }: Pick<Props, 'base'>) {
 }
 /**
  * @description Explains submitted and physically accepted quantities without changing original records.
- * @param props Preview route base and selected record reference.
+ * @param props Workspace route base and selected record reference.
  * @returns Immutable batch detail or a record-not-found message.
  */
 export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'recordId'>) {
-  const record = productionRecords.find((item) => item.id === recordId);
+  const record = useProductionRecords().find((item) => item.id === recordId);
   if (!record)
     return (
       <>
@@ -112,11 +116,13 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
       </>
     );
   const accepted =
-    record.id === 'BAT-0186'
-      ? 'Awaiting physical count'
-      : record.id === 'BAT-0184'
-        ? '238 units'
-        : '100 units';
+    record.accepted !== undefined
+      ? `${record.accepted} units`
+      : record.state === 'Pending acceptance'
+        ? 'Awaiting physical count'
+        : record.id === 'BAT-0184'
+          ? '238 units'
+          : '100 units';
   return (
     <>
       <Link className="sw-back" to={`${base}/records`}>
@@ -126,6 +132,10 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
       <StaffHeading title={record.id} description={record.product} />
       <section className="sw-panel sw-detail">
         <h2>Batch record</h2>
+        {record.receivingNote && (
+          <p className="sw-callout">Receiving explanation: {record.receivingNote}</p>
+        )}
+        {record.note && <p className="sw-callout">{record.note}</p>}
         <dl>
           {[
             ['Recorded by', 'Ada Okonkwo · Production'],
@@ -133,8 +143,10 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
             ['Accepted output', accepted],
             ['Receiving state', record.state],
             ['Flour consumed', record.flour],
+            ['Sugar consumed', record.sugar !== undefined ? `${record.sugar} kg` : 'Not recorded'],
+            ['Yeast consumed', record.yeast !== undefined ? `${record.yeast} kg` : 'Not recorded'],
             ['Scrap / waste recorded', `${record.waste} units`],
-            ['Server state', `${record.sync} · sample`],
+            ['Record status', record.state],
           ].map(([label, value]) => (
             <div key={label}>
               <dt>{label}</dt>
@@ -143,7 +155,7 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
           ))}
         </dl>
         <p className="sw-callout">
-          {record.id === 'BAT-0186'
+          {record.state === 'Pending acceptance'
             ? 'Pending acceptance: submitted output is not available stock until Disbursement confirms the physical count.'
             : 'The production submission and receiving count are preserved separately. Differences require review, not an overwritten batch count.'}
         </p>
@@ -160,6 +172,7 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
  * @returns Personal activity timeline.
  */
 export function StaffHistory() {
+  const records = useProductionRecords();
   return (
     <>
       <StaffHeading
@@ -167,19 +180,16 @@ export function StaffHistory() {
         description="Your work, in the order it was recorded."
       />
       <section className="sw-panel sw-detail">
-        <h2>04 November 2026</h2>
+        <h2>Production activity</h2>
         <ol className="sw-timeline">
-          {[
-            ['09:35', 'Submitted BAT-0186', '250 family loaves · pending physical acceptance'],
-            ['08:40', 'Submitted BAT-0185', '100 sandwich loaves · receiving confirmed'],
-            ['07:25', 'Submitted BAT-0184', '240 submitted · 238 received · difference recorded'],
-            ['06:00', 'Morning shift opened', 'Production · Ikeja branch'],
-          ].map(([time, title, note]) => (
-            <li key={time}>
-              <time>{time}</time>
+          {records.map((record) => (
+            <li key={record.id}>
+              <time>{record.time}</time>
               <div>
-                <h3>{title}</h3>
-                <p>{note}</p>
+                <h3>Submitted {record.id}</h3>
+                <p>
+                  {record.quantity} units · {record.product} · {record.state}
+                </p>
               </div>
             </li>
           ))}
@@ -197,7 +207,7 @@ export function StaffSchedule() {
     <>
       <StaffHeading
         title="My schedule"
-        description="Your assigned shifts for 02–08 November 2026. Sample schedule."
+        description="Your assigned shifts for 02–08 November 2026."
       />
       <section className="sw-panel">
         <div className="sw-panel-heading">
@@ -259,7 +269,7 @@ export function StaffProfile() {
           <span className="sw-avatar">AO</span>
           <div>
             <h2>Ada Okonkwo</h2>
-            <p className="sw-muted">Production supervisor · Sample profile</p>
+            <p className="sw-muted">Production supervisor</p>
           </div>
         </div>
         <dl>
@@ -269,7 +279,7 @@ export function StaffProfile() {
             ['Department', 'Production'],
             ['Role', 'Production supervisor'],
             ['Shift group', 'Group A'],
-            ['Account', 'ada.okonkwo · sample'],
+            ['Account', 'ada.okonkwo'],
           ].map(([label, value]) => (
             <div key={label}>
               <dt>{label}</dt>

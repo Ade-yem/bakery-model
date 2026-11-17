@@ -49,3 +49,9 @@ describe('Outgoing handover draft recovery', () => {
       expect(parseOutgoingDraft(raw)).toBeNull();
   });
 });
+
+it('includes received cash repayments separately from transfer/debt allocations', () => {
+  const summary = cashSummary([], 100000, 5000, 1025);
+  expect(summary.expected).toBe(96025);
+  expect(() => cashSummary([], 0, 0, -1)).toThrow();
+});

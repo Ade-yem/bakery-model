@@ -1,3 +1,5 @@
+import { useStaffActions } from '../policy';
+import { fulfilledQuantity } from '../receiving';
 /** @file Reception order detail, payment evidence and explicit manual dispatch. */
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,10 +15,11 @@ interface Props {
 }
 /**
  * @description Separates recorded money, customer debt and explicit dispatch, without fulfillment controls.
- * @param props Read-only source order, preview route base and local-save callback.
+ * @param props Read-only source order, workspace route base and local-save callback.
  * @returns Order detail with validated payment entry and a separate dispatch confirmation.
  */
 export function OrderDetail({ order, base, onSave }: Props) {
+  const permissions = useStaffActions();
   const confirm = useRef<HTMLDialogElement>(null);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState('');
@@ -30,6 +33,12 @@ export function OrderDetail({ order, base, onSave }: Props) {
         </Link>
       </>
     );
+  let fulfilled: number | null = null;
+  try {
+    fulfilled = fulfilledQuantity(order.id);
+  } catch {
+    /* Order evidence remains readable; receiving status is unavailable. */
+  }
   const total = orderTotal(order.lines);
   const debt = order.payments
     .filter((p) => p.method === 'DEBT')
@@ -125,11 +134,14 @@ export function OrderDetail({ order, base, onSave }: Props) {
             {!order.payments.length && <p className="sw-empty">No payments recorded.</p>}
           </div>
           <div className="sw-panel-footer">
-            Transfer entries record evidence; bank verification is not simulated.
+            A bank transfer reference records evidence; it does not verify settlement.
           </div>
         </section>
         <aside className="sw-panel sw-detail">
           <h2>Settlement & dispatch</h2>
+          {fulfilled !== null && (
+            <p className="sw-callout">Fulfilled by Disbursement · {fulfilled} units handed over.</p>
+          )}
           <dl>
             {[
               ['Money received', received],
@@ -144,7 +156,7 @@ export function OrderDetail({ order, base, onSave }: Props) {
           </dl>
           <p className="sw-callout">
             {order.status === 'PUSHED'
-              ? 'Reception has explicitly pushed this sample order. Only Disbursement can record fulfillment; no stock change is made here.'
+              ? 'Reception has recorded the handoff. Only Disbursement can record fulfillment.'
               : dispatchable
                 ? 'This order is eligible for manual dispatch. Payment alone does not send it to Disbursement.'
                 : debt > 0 && received + debt === total
@@ -156,19 +168,17 @@ export function OrderDetail({ order, base, onSave }: Props) {
               {error}
             </p>
           )}
-          {total - received - debt > 0 && (
+          {total - received - debt > 0 && permissions.allowed('payments:create') && (
             <Button variant="secondary" onClick={() => setPaying(true)}>
               Record payment
             </Button>
           )}
-          {dispatchable && (
+          {dispatchable && permissions.allowed('orders:push') && (
             <Button icon={<ArrowRight size={15} />} onClick={() => confirm.current?.showModal()}>
               Push to Disbursement
             </Button>
           )}
-          <p className="sw-muted rc-spaced">
-            Sample records are saved locally. No server dispatch or live financial posting occurs.
-          </p>
+          <p className="sw-muted rc-spaced">Only Disbursement can confirm fulfillment.</p>
         </aside>
       </div>
       {paying && <PaymentDialog order={order} onClose={() => setPaying(false)} onSave={onSave} />}
@@ -182,7 +192,7 @@ export function OrderDetail({ order, base, onSave }: Props) {
         </p>
         <p className="sw-callout">
           {order.lines.reduce((sum, line) => sum + line.quantity, 0)} units will be marked as pushed
-          in this preview. This is not fulfillment and does not deduct stock.
+          for handoff. Fulfillment is a separate action and deducts stock only when confirmed.
         </p>
         <div className="sw-dialog-actions">
           <button className="sw-quiet" onClick={() => confirm.current?.close()}>
@@ -202,7 +212,7 @@ export function OrderDetail({ order, base, onSave }: Props) {
               }
             }}
           >
-            Confirm preview push
+            Confirm push to Disbursement
           </Button>
         </div>
       </dialog>

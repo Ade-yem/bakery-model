@@ -1,0 +1,62 @@
+.db-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.db-filters .sw-search {
+  flex: 1 1 240px;
+  margin: 0;
+}
+.db-filter {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+.db-filter select,
+.db-form select,
+.db-form input:not([type='checkbox']),
+.db-form textarea {
+  border: 1px solid var(--sw-rule);
+  border-radius: 4px;
+  background: var(--color-flour);
+  color: var(--sw-ink);
+  padding: 12px;
+  font: inherit;
+}
+.db-detail {
+  margin-top: 20px;
+}
+.db-form {
+  display: grid;
+  gap: 16px;
+  max-width: 520px;
+  font-size: 13px;
+}
+.db-form label {
+  display: grid;
+  gap: 8px;
+}
+.db-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+.db-form .db-check {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  line-height: 1.6;
+}
+.db-form .db-check input {
+  margin-top: 4px;
+  accent-color: var(--sw-teal);
+}
+.db-form .sw-primary {
+  justify-self: start;
+}
+.db-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

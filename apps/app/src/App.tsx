@@ -1,3 +1,4 @@
+import { StaffState } from './features/staff-workspace/StaffState';
 /**
  * @file Application router root for Cadence app & authentication portal.
  */
@@ -6,10 +7,9 @@ import React from 'react';
 import { SyncProvider } from './features/sync/SyncProvider';
 import type { SyncAdapter } from './features/sync/types';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { WorkspaceRoute } from './features/staff-workspace/WorkspaceRoute';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
-import { ReceptionWorkspace } from './features/staff-workspace/reception/ReceptionWorkspace';
-import { StaffWorkspace } from './features/staff-workspace/StaffWorkspace';
 import { ForgotPassword } from './pages/ForgotPassword';
 
 /**
@@ -26,11 +26,19 @@ export function App({ syncAdapter }: { syncAdapter?: SyncAdapter } = {}): React.
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/workspace-preview/reception/*" element={<ReceptionWorkspace />} />
-              <Route path="/workspace-preview/*" element={<StaffWorkspace preview />} />
-              <Route path="/workspace/*" element={<StaffWorkspace />} />
-              {/* Fallback to Login */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="/workspace/*" element={<WorkspaceRoute />} />
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route
+                path="*"
+                element={
+                  <StaffState
+                    title="Page not found"
+                    description="The requested page is unavailable."
+                    to="/workspace"
+                    action="Return to my workspace"
+                  />
+                }
+              />
             </Routes>
           </main>
         </div>

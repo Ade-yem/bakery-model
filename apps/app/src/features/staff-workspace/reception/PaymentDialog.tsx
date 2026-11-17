@@ -43,7 +43,7 @@ export function PaymentDialog({ order, onClose, onSave }: Props) {
     >
       <div className="sw-dialog-heading">
         <div>
-          <p className="sw-eyebrow">{order.id} · Preview only</p>
+          <p className="sw-eyebrow">{order.id} · Payment allocation</p>
           <h2 id="payment-title">Record payment</h2>
         </div>
         <button className="sw-icon-button" onClick={onClose} aria-label="Close payment">
@@ -78,7 +78,7 @@ export function PaymentDialog({ order, onClose, onSave }: Props) {
           <button className="sw-quiet" type="button" onClick={onClose}>
             Cancel
           </button>
-          <Button type="submit">Save preview payment</Button>
+          <Button type="submit">Save payment</Button>
         </div>
       </form>
     </dialog>

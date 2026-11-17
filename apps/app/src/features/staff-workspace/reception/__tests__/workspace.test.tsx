@@ -18,11 +18,13 @@ for (const path of [
 ]) {
   it(`renders Reception ${path || '/'} with the approved shell and no forbidden operational controls`, () => {
     const html = renderToStaticMarkup(
-      <MemoryRouter initialEntries={[`/workspace-preview/reception${path}`]}>
+      <MemoryRouter initialEntries={[`/workspace/reception${path}`]}>
         <ReceptionWorkspace />
       </MemoryRouter>
     );
-    expect(html).toContain('Sample data');
+    expect(html).toContain('Staff navigation');
+    expect(html).toContain('Log out');
+    expect(html).not.toContain('Sample data');
     expect(html).toContain('Reception');
     expect(html).toContain('<h1');
     expect(html).toContain('M4 15C4 10.5');
@@ -35,7 +37,7 @@ for (const path of [
 describe('Reception views', () => {
   it('makes dispatch a separate Reception action and distinguishes credit from cash', () => {
     const html = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/workspace-preview/reception/records/ORD-0246']}>
+      <MemoryRouter initialEntries={['/workspace/reception/records/ORD-0246']}>
         <ReceptionWorkspace />
       </MemoryRouter>
     );
@@ -45,7 +47,7 @@ describe('Reception views', () => {
   });
   it('shows an unknown order without leaking another department record', () => {
     const html = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/workspace-preview/reception/records/BAT-0186']}>
+      <MemoryRouter initialEntries={['/workspace/reception/records/BAT-0186']}>
         <ReceptionWorkspace />
       </MemoryRouter>
     );

@@ -1,9 +1,14 @@
-/** @file Production staff preview and live session integration boundary. */
-import { useState } from 'react';
+import { useStaffActions } from './policy';
+import { commitRecord } from './journal/store';
+import { receivingResult } from './receiving';
+import { ProductionRecords, loadBatches, makeBatch, batchKey } from './production-store';
+import { productionRecords as initialBatches } from '../mock-auth/production-data';
+/** @file Production staff pages; the router owns session enforcement. */
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X } from 'lucide-react';
 import { StaffShell } from './StaffShell';
-import { previewAccess } from './preview-data';
+import { productionAccess } from '../mock-auth/production-data';
 import { StaffHome } from './StaffHome';
 import {
   StaffHeading,
@@ -17,38 +22,75 @@ import {
 import { BatchDraftDialog } from './BatchDraftDialog';
 import './workspace.css';
 interface Props {
-  preview?: boolean;
+  basePath?: string;
 }
 /**
- * @description Provides an isolated production staff UI preview; real workspace routes require backend session integration.
- * @param props Whether the explicitly labeled preview route is being rendered.
- * @returns Responsive staff shell or the unauthenticated integration boundary.
+ * @description Renders the Production workspace behind the shared staff route boundary.
+ * @param props Canonical route base for Production pages.
+ * @returns Responsive Production staff pages.
  */
-export function StaffWorkspace({ preview = false }: Props) {
+export function StaffWorkspace({ basePath }: Props) {
+  const permissions = useStaffActions();
+  const load = () => {
+    const loaded = loadBatches();
+    if (loaded.error) return loaded;
+    try {
+      return {
+        records: loaded.records.map((batch) => {
+          const result = receivingResult(batch.id);
+          return result
+            ? {
+                ...batch,
+                state: result.quantity === batch.quantity ? 'Accepted' : 'Accepted with difference',
+                accepted: result.quantity,
+                receivingNote: result.note,
+              }
+            : batch;
+        }),
+        error: '',
+      };
+    } catch (error) {
+      return {
+        records: [],
+        error: error instanceof Error ? error.message : 'Receiving results are unavailable.',
+      };
+    }
+  };
   const location = useLocation();
+  const [batches, setBatches] = useState(load);
+  useEffect(() => {
+    const refresh = () => setBatches(load());
+    window.addEventListener('storage', refresh);
+    window.addEventListener('focus', refresh);
+    return () => {
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
+  const [batchId, setBatchId] = useState('');
   const [batchOpen, setBatchOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const base = '/workspace-preview';
+  const base = basePath ?? '/workspace/production';
   const page = location.pathname.slice(base.length).replace(/\/$/, '');
-  if (!preview)
-    return (
-      <div className="sw-root sw-session">
-        <ShieldCheck size={32} />
-        <p className="sw-eyebrow">Staff workspace</p>
-        <h1>Sign in to your workspace</h1>
-        <p>
-          Your session, assigned department and permissions must be verified before your workspace
-          can open.
-        </p>
-        <Link className="sw-primary" to="/login">
-          Go to login <ArrowRight size={16} />
-        </Link>
-        <p className="sw-muted">Workspace session integration is not connected yet.</p>
-      </div>
-    );
-  const openBatch = () => setBatchOpen(true);
+  const openBatch = () => {
+    if (!permissions.allowed('production:create')) {
+      setMessage('Your permissions do not allow batch entry.');
+      return;
+    }
+    setBatchId(`BAT-${crypto.randomUUID()}`);
+    setBatchOpen(true);
+  };
   let content;
-  if (page === '') content = <StaffHome base={base} onBatch={openBatch} />;
+  if (batches.error)
+    content = (
+      <>
+        <StaffHeading title="Saved batches need attention" description={batches.error} />
+        <button className="sw-quiet" onClick={() => setBatches(load())}>
+          Retry loading batches
+        </button>
+      </>
+    );
+  else if (page === '') content = <StaffHome base={base} onBatch={openBatch} />;
   else if (page === '/tasks') content = <StaffTasks base={base} onBatch={openBatch} />;
   else if (page === '/records') content = <StaffRecords base={base} />;
   else if (/^\/records\/[^/]+$/.test(page))
@@ -69,40 +111,70 @@ export function StaffWorkspace({ preview = false }: Props) {
       </>
     );
   return (
-    <StaffShell
-      base={base}
-      department="Production"
-      name="Ada Okonkwo"
-      initials="AO"
-      role="Production supervisor"
-      access={previewAccess}
-      dialog={
-        batchOpen ? (
-          <BatchDraftDialog
-            onClose={() => setBatchOpen(false)}
-            onSaved={() => {
-              setBatchOpen(false);
-              setMessage(
-                'Preview draft saved on this browser. It has not been submitted to Production.'
-              );
-            }}
-          />
-        ) : undefined
-      }
-    >
-      {message && (
-        <div role="status" className="sw-feedback">
-          {message}
-          <button
-            className="sw-icon-button"
-            aria-label="Dismiss message"
-            onClick={() => setMessage('')}
-          >
-            <X size={16} />
-          </button>
-        </div>
-      )}
-      {content}
-    </StaffShell>
+    <ProductionRecords.Provider value={batches.records}>
+      <StaffShell
+        base={base}
+        department="Production"
+        name="Ada Okonkwo"
+        initials="AO"
+        role="Production supervisor"
+        access={productionAccess}
+        dialog={
+          batchOpen ? (
+            <BatchDraftDialog
+              onSubmitBatch={(values) => {
+                try {
+                  permissions.require('production:create');
+                  const current = loadBatches();
+                  if (current.error) return current.error;
+                  if (current.records.some((r) => r.id === batchId))
+                    return 'This batch has already been submitted.';
+                  const record = makeBatch(values, batchId);
+                  const records = [record, ...current.records];
+                  commitRecord(
+                    batchKey,
+                    JSON.stringify(
+                      records.filter((r) => !initialBatches.some((seed) => seed.id === r.id))
+                    )
+                  );
+                  setBatches(load());
+                  setBatchOpen(false);
+                  setMessage('Batch submitted. Output awaits independent receiving acceptance.');
+                  try {
+                    localStorage.removeItem('tallybakery:production-draft:v1');
+                  } catch {
+                    /* Submitted record remains durable. */
+                  }
+                  return null;
+                } catch (failure) {
+                  return failure instanceof Error
+                    ? failure.message
+                    : 'Batch could not be saved. Your input is retained.';
+                }
+              }}
+              onClose={() => setBatchOpen(false)}
+              onSaved={() => {
+                setBatchOpen(false);
+                setMessage('Draft saved.');
+              }}
+            />
+          ) : undefined
+        }
+      >
+        {message && (
+          <div role="status" className="sw-feedback">
+            {message}
+            <button
+              className="sw-icon-button"
+              aria-label="Dismiss message"
+              onClick={() => setMessage('')}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+        {content}
+      </StaffShell>
+    </ProductionRecords.Provider>
   );
 }

@@ -1,5 +1,7 @@
+import { localQueueStatus } from '../staff-workspace/journal/store';
+import { DEMO_SESSION_KEY, readDemoSession } from '../mock-auth/session';
 /** @file Accessible global network banner and reusable pending-mutation pill. */
-import { useContext, useSyncExternalStore } from 'react';
+import { useContext, useEffect, useState, useSyncExternalStore } from 'react';
 import { Wifi, WifiOff, CloudOff, RefreshCw, Clock3, Check, CircleAlert } from 'lucide-react';
 import { Button } from '../../components/shared/Button';
 import { SyncContext } from './context';
@@ -19,9 +21,18 @@ export function SyncStatusPill({ snapshot }: { snapshot: SyncSnapshot }) {
     snapshot.pending === null
       ? 'Pending count unavailable'
       : snapshot.pending === 0
-        ? 'No pending changes'
+        ? snapshot.conflicts
+          ? 'Review required'
+          : 'No pending changes'
         : `${snapshot.pending} pending`;
-  const Icon = snapshot.phase === 'syncing' ? RefreshCw : snapshot.pending === 0 ? Check : Clock3;
+  const Icon =
+    snapshot.phase === 'syncing'
+      ? RefreshCw
+      : snapshot.conflicts
+        ? CircleAlert
+        : snapshot.pending === 0
+          ? Check
+          : Clock3;
   return (
     <span className="cs-pill" aria-label={label}>
       <Icon
@@ -66,7 +77,9 @@ export function OnlineOfflineBanner({ snapshot, onSync }: BannerProps) {
   const description =
     snapshot.error ??
     (!snapshot.configured
-      ? 'Sync queue not connected. Pending mutations cannot be counted yet.'
+      ? snapshot.pending === null
+        ? 'Sync queue not connected. Pending mutations cannot be counted yet.'
+        : 'Saved changes are retained on this device. Server synchronization is not connected yet.'
       : offline
         ? 'Server requests are paused. Pending changes await acknowledgement after reconnecting.'
         : snapshot.conflicts
@@ -149,7 +162,7 @@ export function OnlineOfflineBanner({ snapshot, onSync }: BannerProps) {
 }
 /**
  * @description Connects the reusable banner to the app-wide controller, updating across all staff routes.
- * @returns Shared live connection and sync status UI; unconfigured previews never claim a synced queue.
+ * @returns Shared live connection and sync status UI; unconfigured workspaces never claim a synced queue.
  */
 export function GlobalSyncStatus() {
   const controller = useContext(SyncContext);
@@ -158,9 +171,28 @@ export function GlobalSyncStatus() {
     controller.getSnapshot,
     controller.getSnapshot
   );
+  const readLocal = () => {
+    try {
+      const session = readDemoSession(sessionStorage.getItem(DEMO_SESSION_KEY));
+      if (!session) return null;
+      return localQueueStatus(session.department);
+    } catch {
+      return null;
+    }
+  };
+  const [local, setLocal] = useState(readLocal);
+  useEffect(() => {
+    const refresh = () => setLocal(readLocal());
+    window.addEventListener('staff-journal-change', refresh);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener('staff-journal-change', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, []);
   return (
     <OnlineOfflineBanner
-      snapshot={snapshot}
+      snapshot={!snapshot.configured && local ? { ...snapshot, ...local } : snapshot}
       onSync={() => {
         void controller.syncNow();
       }}

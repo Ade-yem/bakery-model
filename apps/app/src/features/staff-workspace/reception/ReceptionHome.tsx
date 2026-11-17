@@ -1,3 +1,6 @@
+import { ShiftBadge } from '../ShiftBadge';
+import { Allowed } from '../Allowed';
+import { loadRepayments } from './repayments';
 /** @file Shift-focused Reception overview, following the existing staff visual system. */
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Banknote, ClipboardList, Send, CreditCard } from 'lucide-react';
@@ -11,18 +14,30 @@ interface Props {
 }
 /**
  * @description Prioritizes orders awaiting manual dispatch and keeps cash distinct from transfers and debt.
- * @param props Reception-only sample records and preview route base.
+ * @param props Reception-only sample records and workspace route base.
  * @returns Staff overview with source-linked order activity.
  */
 export function ReceptionHome({ orders, base }: Props) {
-  const cash = orders
-    .flatMap((order) => order.payments)
-    .filter((payment) => payment.method === 'CASH')
-    .reduce((sum, payment) => sum + payment.amount, 0);
-  const debt = orders
-    .flatMap((order) => order.payments)
-    .filter((payment) => payment.method === 'DEBT')
-    .reduce((sum, payment) => sum + payment.amount, 0);
+  const ledger = loadRepayments(orders);
+  if (ledger.error)
+    return (
+      <section className="sw-panel sw-detail">
+        <h1>Repayment evidence needs attention</h1>
+        <p role="alert">{ledger.error}</p>
+      </section>
+    );
+  const cash =
+    orders
+      .flatMap((order) => order.payments)
+      .filter((payment) => payment.method === 'CASH')
+      .reduce((sum, payment) => sum + payment.amount, 0) +
+    ledger.entries.filter((e) => e.method === 'CASH').reduce((sum, e) => sum + e.amount, 0);
+  const debt =
+    orders
+      .flatMap((order) => order.payments)
+      .filter((payment) => payment.method === 'DEBT')
+      .reduce((sum, payment) => sum + payment.amount, 0) -
+    ledger.entries.reduce((sum, e) => sum + e.amount, 0);
   const pending = orders.filter((order) =>
     ['PAID_PENDING_DISPATCH', 'CREDIT_APPROVED_PENDING_DISPATCH'].includes(order.status)
   );
@@ -30,16 +45,18 @@ export function ReceptionHome({ orders, base }: Props) {
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Wednesday, 04 November 2026 · Sample shift</p>
+          <p className="sw-eyebrow">Wednesday, 04 November 2026</p>
           <h1>Good morning, Fatima.</h1>
           <p>A clear record, from the counter to Disbursement.</p>
         </div>
-        <Button to={`${base}/orders/new`} icon={<ArrowUpRight size={16} />}>
-          New order
-        </Button>
+        <Allowed action="orders:create">
+          <Button to={`${base}/orders/new`} icon={<ArrowUpRight size={16} />}>
+            New order
+          </Button>
+        </Allowed>
       </header>
       <section className="sw-shift-banner" aria-label="Current shift">
-        <span className="sw-state sw-open">Open shift</span>
+        <ShiftBadge department="reception" />
         <strong>Morning · 06:00–14:00</strong>
         <span>Reception / Ikeja branch</span>
         <Link to={`${base}/schedule`}>
@@ -51,7 +68,7 @@ export function ReceptionHome({ orders, base }: Props) {
           {
             label: 'Orders recorded',
             value: String(orders.length),
-            note: 'In this sample record set',
+            note: 'In the current record set',
             Icon: ClipboardList,
           },
           {
@@ -145,7 +162,7 @@ export function ReceptionHome({ orders, base }: Props) {
         </div>
         <OrderTable orders={orders.slice(0, 5)} base={base} />
         <div className="sw-panel-footer">
-          Sample data only · New entries and preview pushes stay on this browser.
+          New orders stay at Reception until explicitly pushed to Disbursement.
         </div>
       </section>
     </>

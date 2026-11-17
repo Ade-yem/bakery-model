@@ -13,7 +13,7 @@ describe('Shared visual identity', () => {
   it('uses the existing loaf logo in the staff workspace rather than a second brand mark', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
-        <StaffWorkspace preview />
+        <StaffWorkspace />
       </MemoryRouter>
     );
     expect(html).toContain('M4 15C4 10.5');
@@ -30,10 +30,10 @@ describe('Shared visual identity', () => {
   it('keeps the workspace brand link inside the workspace', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
-        <Logo to="/workspace-preview" />
+        <Logo to="/workspace/production" />
       </MemoryRouter>
     );
-    expect(html).toContain('href="/workspace-preview"');
+    expect(html).toContain('href="/workspace/production"');
   });
   it('matches the frontend branch Figtree typography', () => {
     expect(tokens).toContain("--font-family-base: 'Figtree'");

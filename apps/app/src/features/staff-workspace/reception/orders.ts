@@ -1,4 +1,4 @@
-/** @file Deterministic preview calculations, never authoritative financial posting. */
+/** @file Deterministic workspace calculations, never authoritative financial posting. */
 export type OrderStatus =
   'PENDING_SETTLEMENT' | 'PAID_PENDING_DISPATCH' | 'CREDIT_APPROVED_PENDING_DISPATCH' | 'PUSHED';
 export interface OrderLine {
@@ -55,8 +55,8 @@ export function orderTotal(lines: readonly OrderLine[]): number {
   return total;
 }
 /**
- * @description Validates preview order input and tender evidence without inventing a credit approval policy.
- * @param order Unposted Reception preview order.
+ * @description Validates workspace order input and tender evidence without inventing a credit approval policy.
+ * @param order Unposted Reception workspace order.
  * @returns Validation messages; empty means the input is well formed, not necessarily dispatchable.
  */
 export function validateOrder(order: ReceptionOrder): string[] {
@@ -87,7 +87,7 @@ export function validateOrder(order: ReceptionOrder): string[] {
 }
 /**
  * @description Resolves settlement from tender components; debt is never counted as received money.
- * @param order Existing unpaid preview order.
+ * @param order Existing unpaid workspace order.
  * @param payments Additional positive tender components.
  * @returns An immutable updated order waiting for explicit dispatch or further settlement.
  * @throws {Error} When input is invalid, overpaid or already dispatched.
@@ -111,7 +111,7 @@ export function recordPayment(order: ReceptionOrder, payments: readonly Tender[]
 }
 /**
  * @description Models the separate, explicit Reception dispatch action, with no fulfillment or inventory write.
- * @param order Settled or explicitly credit-authorized preview order.
+ * @param order Settled or explicitly credit-authorized workspace order.
  * @returns The same immutable record marked pushed; repeat requests are harmless.
  * @throws {Error} If tender allocation or credit authorization does not permit dispatch.
  */
@@ -123,7 +123,7 @@ export function pushOrder(order: ReceptionOrder): ReceptionOrder {
   return { ...settled, status: 'PUSHED' };
 }
 /**
- * @description Validates each saved preview record before exposing browser-controlled data to the UI.
+ * @description Validates each saved workspace record before exposing browser-controlled data to the UI.
  * @param raw Saved JSON, untrusted even when produced by this browser.
  * @returns Recovered records or null; invalid storage is retained for recovery rather than overwritten.
  */
