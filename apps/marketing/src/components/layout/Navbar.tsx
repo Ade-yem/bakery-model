@@ -146,10 +146,10 @@ export function Navbar(): React.ReactElement {
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/register"
+                to={import.meta.env.NEXT_PUBLIC_APP_URL || "/"}
                 className="w-full inline-flex items-center justify-center gap-1 px-5 py-3 rounded-full bg-verdigris text-sm font-semibold text-flour"
               >
-                <span>Get Started</span>
+                <span>Launch App</span>
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>
