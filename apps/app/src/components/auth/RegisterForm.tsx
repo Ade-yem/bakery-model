@@ -69,8 +69,8 @@ export function RegisterForm({ selectedPlan }: RegisterFormProps): React.ReactEl
         <div
           role={statusNotice.type === 'error' ? 'alert' : 'status'}
           className={`mb-5 p-4 rounded-r-xl rounded-l-md border-l-4 text-sm flex items-start gap-3 shadow-xs ${statusNotice.type === 'error'
-            ? 'bg-[#B3261E]/[0.08] border-[#B3261E] text-[#8C1D18]'
-            : 'bg-[#3F7A2A]/[0.08] border-[#3F7A2A] text-[#2C571D]'
+            ? 'bg-status-unbalanced/8 border-[#B3261E] text-[#8C1D18]'
+            : 'bg-status-balanced/8 border-[#3F7A2A] text-[#2C571D]'
             }`}
         >
           {statusNotice.type === 'error' ? (
