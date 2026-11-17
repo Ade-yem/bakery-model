@@ -1,10 +1,10 @@
-# @repo/marketing (TallyBakery Marketing Website)
+# @repo/marketing (Cadence Marketing Website)
 
-The public marketing website and landing pages for TallyBakery.
+The public marketing website and landing pages for Cadence.
 
 ## Overview
 
-This application serves as the public web presence and marketing portal for TallyBakery:
+This application serves as the public web presence and marketing portal for Cadence:
 
 - **Landing & Feature Showcases**: Highlighting offline-first shift reconciliation, inventory control, and bakery production tracking.
 - **Pricing & Subscription Plans**: Presenting tier comparisons and billing options powered by the subscription engine.
