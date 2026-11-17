@@ -146,7 +146,7 @@ export function Navbar(): React.ReactElement {
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
               <Link
-                to={import.meta.env.NEXT_PUBLIC_APP_URL || "/"}
+                to={import.meta.env.VITE_PUBLIC_APP_URL || "/"}
                 className="w-full inline-flex items-center justify-center gap-1 px-5 py-3 rounded-full bg-verdigris text-sm font-semibold text-flour"
               >
                 <span>Launch App</span>
