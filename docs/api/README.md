@@ -27,6 +27,7 @@ TallyBakery uses cookie-based session authentication powered by Better-Auth.
 - **Session Cookie**: `better-auth.session_token` (HTTP-only, Secure in production, SameSite=Lax/Strict).
 - State-changing endpoints require requests to originate from trusted origins (`TRUSTED_ORIGINS`).
 - When making cross-origin requests, include `credentials: 'include'` (browser fetch) or forward the `Cookie` header (mobile/server clients).
+- See [auth-endpoints.md](./auth-endpoints.md) for the full Better-Auth `/api/auth` endpoint reference.
 
 ---
 
