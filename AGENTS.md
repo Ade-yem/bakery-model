@@ -39,7 +39,7 @@ pnpm dev:marketing
 pnpm --filter @repo/api start:dev
 ```
 
-The frontend apps also support `pnpm --filter @repo/app dev` and `pnpm --filter @repo/marketing dev`. The root `dev:api` script currently calls the API package's `dev` script, which is not defined; use `start:dev` directly for API watch mode.
+The frontend apps also support `pnpm --filter @repo/app dev` and `pnpm --filter marketing dev`. The root `dev:api` script currently calls the API package's `dev` script, which is not defined; use `start:dev` directly for API watch mode.
 
 ### Build and preview
 
@@ -65,7 +65,7 @@ pnpm --filter @repo/api test:cov
 pnpm --filter @repo/api test:e2e
 pnpm --filter @repo/api lint
 pnpm --filter @repo/app lint
-pnpm --filter @repo/marketing lint
+pnpm --filter marketing lint
 pnpm --filter @repo/shared lint
 pnpm lint
 pnpm format:check
