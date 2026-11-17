@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, Link } from 'react-router-dom';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
-import { Logo } from '../shared/Logo';
+import { Logo } from '@repo/shared/component/Logo';
 
 /**
  * Navigation item structure for public links.
