@@ -2,86 +2,10 @@
 trigger: always_on
 ---
 
-# BIM-KMS AI Agent Implementation Rules
-
-## 1. Architecture & Rendering
-
-* Default to React Server Components. Use `"use client"` only for state, effects, browser APIs, or required interactivity.
-* Keep client boundaries as low as possible.
-* Use App Router conventions: `layout.tsx`, `loading.tsx`, `error.tsx`, and `not-found.tsx`.
-* Keep UI, business logic, database access, AI services, and infrastructure separate.
-* Do not put database queries or business rules directly inside UI components.
-
-## 2. Performance
-
-* Use `next/image`, `next/link`, and `next/font` where appropriate.
-* Fetch server-side data directly on the server.
-* Run independent async operations in parallel with `Promise.all()`.
-* Dynamically import heavy client components and libraries.
-* Paginate or virtualize large BIM, document, knowledge, and search result sets.
-* Never load an entire BIM model when only a subset is required.
-
-## 3. Security
-
-* Treat Server Actions and oRPC procedures as public API boundaries.
-* Authenticate and authorize every server-side operation.
-* Never trust client-provided IDs, permissions, roles, or ownership.
-* Enforce project/organization access on every protected resource.
-* Validate all external input at the server boundary.
-* Never expose secrets through `NEXT_PUBLIC_*`.
-* Never send unauthorized project data, documents, or BIM data to OpenAI.
-* Never log secrets, tokens, or sensitive project data.
-
-## 4. Database & Prisma
-
-* Use Prisma as the database access layer.
-* Keep database queries inside repositories/services, not UI components.
-* Use transactions for related mutations that must succeed or fail together.
-* Enforce important integrity rules with PostgreSQL constraints and indexes.
-* Avoid unbounded queries.
-* Preserve project and organization ownership relationships.
-* Use migrations for all schema changes.
-* Never bypass Prisma migrations to modify production data.
-
-## 5. BIM Data
-
-* Preserve stable BIM identifiers such as IFC GUIDs where available.
-* Never use element names as unique identifiers.
-* Track BIM model/file versions; never silently overwrite previous versions.
-* Preserve the relationship between BIM elements, models, projects, documents, and knowledge objects.
-* Keep BIM geometry separate from BIM metadata.
-* Never assume imported BIM data is complete or valid.
-
-## 6. Knowledge Management
-
-* Treat requirements, decisions, problems, risks, lessons, issues, and solutions as explicit domain objects.
-* Record provenance: author, timestamp, source, project, and relevant BIM/document context.
-* Distinguish AI-generated content from human-authored or human-approved content.
-* Preserve important knowledge history and avoid silent overwrites.
-* Respect permissions during keyword, vector, and AI retrieval.
-* Use explicit relationships between knowledge objects and BIM elements where applicable.
-
-## 7. AI & OpenAI
-
-* AI output is not automatically trusted or authoritative.
-* Use structured outputs and validate all AI-generated data before persistence.
-* Never allow AI to bypass authorization, validation, or domain rules.
-* Ground responses in project documents, BIM data, and approved knowledge where applicable.
-* Never invent BIM element IDs, measurements, decisions, requirements, or project facts.
-* Use human approval for critical project actions.
-* Record relevant AI provenance when required: model, sources, timestamp, and operation.
-* Keep AI orchestration separate from core business logic.
-
-## 8. Files & Cloudinary
-
-* Store large files in Cloudinary and metadata/references in PostgreSQL.
-* Validate file type, size, ownership, and purpose server-side.
-* Preserve document version and provenance information.
-* Never expose private files without authorization.
+# Implementation Rules
 
 ## 9. API & Type Safety
 
-* Use oRPC and zod as the typed API boundary.
 * Keep API procedures thin and delegate business logic to services.
 * Validate inputs at API boundaries.
 * Do not expose Prisma models directly to clients.
@@ -111,7 +35,7 @@ trigger: always_on
 
 ## 12. Error Handling
 
-* Use a centralized error-handling strategy for server and oRPC operations.
+* Use a centralized error-handling strategy for server.
 * Define typed application errors with stable error codes.
 * Validate and map Prisma, OpenAI, Cloudinary, authentication, and validation errors to safe application errors.
 * Never expose raw database, API, stack-trace, or infrastructure errors to clients.
