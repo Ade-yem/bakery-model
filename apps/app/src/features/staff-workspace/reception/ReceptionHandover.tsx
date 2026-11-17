@@ -14,7 +14,7 @@ export function ReceptionHandover({ orders }: { orders: ReceptionOrder[] }) {
   const summary = cashSummary(orders, 1000000, 150000);
   const [recovered] = useState(() => {
     try {
-      return parseOutgoingDraft(localStorage.getItem('tallybakery:reception-handover-preview'));
+      return parseOutgoingDraft(localStorage.getItem('Cadence:reception-handover-preview'));
     } catch {
       return null;
     }
@@ -65,7 +65,7 @@ export function ReceptionHandover({ orders }: { orders: ReceptionOrder[] }) {
             try {
               const draft = prepareHandover(summary.expected, physical, note);
               localStorage.setItem(
-                'tallybakery:reception-handover-preview',
+                'Cadence:reception-handover-preview',
                 JSON.stringify({
                   ...draft,
                   physical,

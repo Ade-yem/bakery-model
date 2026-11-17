@@ -22,7 +22,7 @@ export function PageHeaderBanner({
   subtitle,
 }: PageHeaderBannerProps): React.ReactElement {
   return (
-    <section className="relative bg-[#0C1716] text-[#E9E4D2] pt-14 pb-16 sm:py-20 border-b border-[#0F7480]/30 overflow-hidden">
+    <section className="relative bg-[#0C1716] text-[#E9E4D2] pt-14 pb-16 sm:py-20 border-b border-verdigris-lift/30 overflow-hidden">
       {/* Subtle background glow */}
       <div
         className="pointer-events-none absolute -top-24 right-0 w-96 h-96 rounded-full bg-[#52C2C9]/10 blur-3xl"
@@ -55,7 +55,7 @@ export function PageHeaderBanner({
         </div>
 
         {/* Right: Floating Vector Illustration in Dark Pill Badge matching Finview */}
-        <div className="shrink-0 w-48 sm:w-56 h-36 sm:h-40 rounded-3xl bg-[#10201F] border border-[#52C2C9]/20 p-4 flex items-center justify-center relative shadow-lg">
+        <div className="shrink-0 w-48 sm:w-56 h-36 sm:h-40 rounded-3xl bg-oven-black border border-[#52C2C9]/20 p-4 flex items-center justify-center relative shadow-lg">
           <svg
             viewBox="0 0 200 140"
             fill="none"

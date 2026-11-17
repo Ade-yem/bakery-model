@@ -10,13 +10,13 @@ describe('Formatting Utilities', () => {
     it('masks long email address preserving first char and last two chars of local part', () => {
       expect(maskEmail('gbenlekamolideen2020@gmail.com')).toBe('g***20@gmail.com');
       expect(maskEmail('john.doe@example.com')).toBe('j***oe@example.com');
-      expect(maskEmail('support@tallybakery.com')).toBe('s***rt@tallybakery.com');
+      expect(maskEmail('support@cadence.com')).toBe('s***rt@cadence.com');
     });
 
     it('masks short local parts gracefully', () => {
-      expect(maskEmail('al@tallybakery.com')).toBe('a***l@tallybakery.com');
-      expect(maskEmail('bob@tallybakery.com')).toBe('b***ob@tallybakery.com');
-      expect(maskEmail('x@tallybakery.com')).toBe('x***@tallybakery.com');
+      expect(maskEmail('al@cadence.com')).toBe('a***l@cadence.com');
+      expect(maskEmail('bob@cadence.com')).toBe('b***ob@cadence.com');
+      expect(maskEmail('x@cadence.com')).toBe('x***@cadence.com');
     });
 
     it('returns empty string or unformatted string for empty/malformed inputs', () => {

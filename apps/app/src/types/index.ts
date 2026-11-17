@@ -1,5 +1,5 @@
 /**
- * @file Type definitions for TallyBakery application and authentication flows.
+ * @file Type definitions for Cadence application and authentication flows.
  */
 
 /**

@@ -1,5 +1,5 @@
 /**
- * @file Feature module data for TallyBakery multi-industry business management platform.
+ * @file Feature module data for Cadence multi-industry business management platform.
  */
 
 export interface FeatureModule {

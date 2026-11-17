@@ -1,5 +1,5 @@
 /**
- * @file Brand Logo component for TallyBakery matching Finview dual-tone logo.
+ * @file Brand Logo component for Cadence matching Finview dual-tone logo.
  */
 
 import React from 'react';
@@ -13,7 +13,7 @@ export interface LogoProps {
 }
 
 /**
- * @description Official TallyBakery logo mark and wordmark styled like Finview brand header.
+ * @description Official Cadence logo mark and wordmark styled like Finview brand header.
  * @param {LogoProps} props - Logo display properties.
  * @returns {React.ReactElement} Clickable brand logo linking to home.
  */
@@ -28,11 +28,11 @@ export function Logo({
   return (
     <Link
       to={to}
-      className={`inline-flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B5C63] rounded-md ${className}`}
-      aria-label="TallyBakery Home"
+      className={`inline-flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris rounded-md ${className}`}
+      aria-label="Cadence Home"
     >
       {/* Finview-style balance/oven mark */}
-      <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-[#0B5C63] text-[#F6F3EA] shadow-xs transition-transform group-hover:scale-105">
+      <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-verdigris text-flour shadow-xs transition-transform group-hover:scale-105">
         <svg
           className="w-5 h-5"
           viewBox="0 0 24 24"
@@ -54,21 +54,20 @@ export function Logo({
           />
         </svg>
         <span
-          className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#A9501A] border-2 border-[#F6F3EA]"
+          className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#A9501A] border-2 border-flour"
           aria-hidden="true"
         />
       </div>
 
       <div className="flex flex-col leading-none">
         <div className="flex items-center tracking-tight font-extrabold text-xl font-sans uppercase">
-          <span className={isDark ? 'text-[#E9E4D2]' : 'text-[#0B5C63]'}>TALLY</span>
+          <span className={isDark ? 'text-[#E9E4D2]' : 'text-verdigris'}>TALLY</span>
           <span className="text-[#A9501A] ml-0.5">BAKERY</span>
         </div>
         {showTagline && (
           <span
-            className={`text-[9px] tracking-widest uppercase font-semibold mt-0.5 ${
-              isDark ? 'text-[#E9E4D2]/60' : 'text-[#10201F]/60'
-            }`}
+            className={`text-[9px] tracking-widest uppercase font-semibold mt-0.5 ${isDark ? 'text-[#E9E4D2]/60' : 'text-oven-black/60'
+              }`}
           >
             Connected Operations
           </span>

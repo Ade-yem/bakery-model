@@ -19,7 +19,7 @@ const APP_FEATURES = [
  */
 export function AppDownloadBanner(): React.ReactElement {
   return (
-    <section className="relative py-20 sm:py-28 bg-[#F6F3EA] border-b border-[#D9D3C0] overflow-hidden">
+    <section className="relative py-20 sm:py-28 bg-flour border-b border-rule overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left: Device illustration (5 cols) */}
@@ -72,16 +72,16 @@ export function AppDownloadBanner(): React.ReactElement {
                 <circle cx="8" cy="14" r="1.5" fill="#A9501A" />
                 <circle cx="2" cy="8" r="1.5" fill="#0B5C63" />
               </svg>
-              <span className="text-sm font-semibold text-[#0B5C63] tracking-wide">
+              <span className="text-sm font-semibold text-verdigris tracking-wide">
                 Terminal & Handheld Apps
               </span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-extrabold text-[#10201F] tracking-tight leading-[1.2]">
+            <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-extrabold text-oven-black tracking-tight leading-[1.2]">
               Get Our Apps for Rapid Shift & Operations Management
             </h2>
 
-            <p className="text-base sm:text-lg text-[#10201F]/75 leading-relaxed font-normal max-w-2xl">
+            <p className="text-base sm:text-lg text-oven-black/75 leading-relaxed font-normal max-w-2xl">
               Turn any tablet or smartphone into an offline-first workstation. Operational crews track production runs while sales teams process customer orders without missing a beat.
             </p>
 
@@ -89,21 +89,21 @@ export function AppDownloadBanner(): React.ReactElement {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6 pt-2">
               {APP_FEATURES.map((feat) => (
                 <div key={feat} className="flex items-center gap-2.5">
-                  <span className="inline-flex items-center text-[#0B5C63]">
+                  <span className="inline-flex items-center text-verdigris">
                     <Check className="w-4 h-4 -mr-2" strokeWidth={2.5} />
                     <Check className="w-4 h-4" strokeWidth={2.5} />
                   </span>
-                  <span className="text-sm font-semibold text-[#10201F]/90">{feat}</span>
+                  <span className="text-sm font-semibold text-oven-black/90">{feat}</span>
                 </div>
               ))}
             </div>
 
             {/* App download pills matching Finview */}
             <div className="pt-4 flex flex-wrap gap-4">
-              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#10201F] text-[#F6F3EA] text-xs font-semibold hover:bg-[#10201F]/90 transition-colors cursor-pointer">
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-oven-black text-flour text-xs font-semibold hover:bg-oven-black/90 transition-colors cursor-pointer">
                 <span>Google Play</span>
               </div>
-              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[#0B5C63] text-[#F6F3EA] text-xs font-semibold hover:bg-[#0F7480] transition-colors cursor-pointer">
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-verdigris text-flour text-xs font-semibold hover:bg-verdigris-lift transition-colors cursor-pointer">
                 <span>App Store</span>
               </div>
             </div>

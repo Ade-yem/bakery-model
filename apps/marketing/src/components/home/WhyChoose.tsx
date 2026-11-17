@@ -20,10 +20,10 @@ const VALUE_PROPOSITIONS = [
  */
 export function HomeWhyChoose(): React.ReactElement {
   return (
-    <section className="relative py-24 sm:py-32 bg-[#F6F3EA] border-b border-[#D9D3C0] overflow-hidden">
+    <section className="relative py-24 sm:py-32 bg-flour border-b border-rule overflow-hidden">
       {/* Subtle globe watermark in the upper right matching template */}
       <div
-        className="hidden xl:flex absolute top-12 right-12 w-14 h-14 rounded-full border border-[#D9D3C0]/70 items-center justify-center text-[#10201F]/20 select-none pointer-events-none"
+        className="hidden xl:flex absolute top-12 right-12 w-14 h-14 rounded-full border border-rule/70 items-center justify-center text-oven-black/20 select-none pointer-events-none"
         aria-hidden="true"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-8 h-8" strokeWidth="1">
@@ -61,30 +61,30 @@ export function HomeWhyChoose(): React.ReactElement {
                 <circle cx="8" cy="14" r="1.5" fill="#A9501A" />
                 <circle cx="2" cy="8" r="1.5" fill="#0B5C63" />
               </svg>
-              <span className="text-sm font-semibold text-[#0B5C63] tracking-wide">
+              <span className="text-sm font-semibold text-verdigris tracking-wide">
                 Why Choose Us
               </span>
             </div>
 
             {/* Headline */}
-            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-[#10201F] tracking-tight leading-[1.18]">
+            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-oven-black tracking-tight leading-[1.18]">
               Smarter Business Operations. Complete Control.
             </h2>
 
             {/* Description Paragraph */}
-            <p className="text-base sm:text-lg text-[#10201F]/75 leading-relaxed font-normal max-w-2xl">
-             Manage your departments, inventory, sales, staff, and finances from one connected platform designed to simplify daily business operations.
+            <p className="text-base sm:text-lg text-oven-black/75 leading-relaxed font-normal max-w-2xl">
+              Manage your departments, inventory, sales, staff, and finances from one connected platform designed to simplify daily business operations.
             </p>
 
             {/* 4 Feature Checklist Items with double-check motif */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-6 pt-2">
               {VALUE_PROPOSITIONS.map((prop) => (
                 <div key={prop.label} className="flex items-center gap-2.5">
-                  <span className="inline-flex items-center text-[#0B5C63]">
+                  <span className="inline-flex items-center text-verdigris">
                     <Check className="w-4 h-4 -mr-2" strokeWidth={2.5} />
                     <Check className="w-4 h-4" strokeWidth={2.5} />
                   </span>
-                  <span className="text-sm sm:text-[15px] font-semibold text-[#10201F]/90">
+                  <span className="text-sm sm:text-[15px] font-semibold text-oven-black/90">
                     {prop.label}
                   </span>
                 </div>
@@ -95,7 +95,7 @@ export function HomeWhyChoose(): React.ReactElement {
             <div className="pt-4">
               <Link
                 to="/about"
-                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#0B5C63] text-[#F6F3EA] text-sm font-bold hover:bg-[#0F7480] transition-colors shadow-xs"
+                className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-verdigris text-flour text-sm font-bold hover:bg-verdigris-lift transition-colors shadow-xs"
               >
                 Read On
               </Link>

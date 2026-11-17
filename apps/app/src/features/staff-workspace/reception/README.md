@@ -19,7 +19,7 @@ Shared `StaffShell`, Logo, Button, Figtree fonts and staff styles keep Reception
 
 Money input is parsed as integer kobo. No fractional currency arithmetic is used to calculate order totals or cash balances. Currency division is used only for display. Order status is separate from tender entries; debt never counts as money received, and bank transfers never count as drawer cash.
 
-Sample order/payment/push changes persist under `tallybakery:reception-preview:v1`. Browser records are validated on recovery; corrupt storage is not overwritten with fixtures. Storage failures keep the form open with an error. A local outgoing cash draft can be restored and warns when the expected balance has changed.
+Sample order/payment/push changes persist under `cadence:reception-preview:v1`. Browser records are validated on recovery; corrupt storage is not overwritten with fixtures. Storage failures keep the form open with an error. A local outgoing cash draft can be restored and warns when the expected balance has changed.
 
 This browser storage is not the PRD's authenticated IndexedDB repository or append-only server ledger. No live payment, bank verification, stock write, server dispatch, notification, dual signoff, or sync acknowledgement is reported. Avoid real customer data in the preview.
 

@@ -1,5 +1,5 @@
 /**
- * @file Master Homepage for TallyBakery public website.
+ * @file Master Homepage for Cadence public website.
  * Implements Finview layout structure, editorial illustrations, and interactive widgets.
  */
 
@@ -17,7 +17,7 @@ import { HomeWorkingProcess } from '../components/home/WorkingProcess';
  */
 export function Home(): React.ReactElement {
   return (
-    <div className="bg-[#F6F3EA] text-[#10201F] font-sans selection:bg-[#0B5C63] selection:text-[#F6F3EA]">
+    <div className="bg-flour text-oven-black font-sans selection:bg-verdigris selection:text-flour">
       {/* SECTION 2: HERO WITH DASHBOARD PREVIEW */}
       <HomeHero />
 
@@ -31,15 +31,15 @@ export function Home(): React.ReactElement {
       <HomeWorkingProcess />
 
       {/* FINAL CALL TO ACTION */}
-      <section className="py-20 sm:py-24 bg-[#0B5C63] text-[#F6F3EA] border-b border-[#0F7480]">
+      <section className="py-20 sm:py-24 bg-verdigris text-flour border-b border-verdigris-lift">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#F6F3EA] mb-6">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-flour mb-6">
             Bring Your Entire Business Together
           </h2>
 
-          <p className="text-base sm:text-lg text-[#F6F3EA]/90 max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-base sm:text-lg text-flour/90 max-w-2xl mx-auto leading-relaxed mb-8">
             Manage inventory, sales, staff, finances, and daily operations from one platform.
-            Simplify workflows, improve accountability, and stay in control with TallyBakery.
+            Simplify workflows, improve accountability, and stay in control with Cadence.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -55,7 +55,7 @@ export function Home(): React.ReactElement {
               to="/contact"
               variant="secondary"
               size="lg"
-              className="bg-[#F6F3EA] text-[#0B5C63] hover:bg-[#EFEBDB]"
+              className="bg-flour text-verdigris hover:bg-ledger"
             >
               Contact Us
             </Button>

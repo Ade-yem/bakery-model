@@ -24,11 +24,11 @@ import { ArrowRight } from 'lucide-react';
  */
 export function About(): React.ReactElement {
   return (
-    <div className="bg-[#F6F3EA] text-[#10201F] font-sans">
+    <div className="bg-flour text-oven-black font-sans">
       {/* 1. Cinematic Full-Width Photographic Hero */}
       <InnerPageHero
         heading="Better Operations. Better Business Management."
-        description="Learn how TallyBakery connects business operations, departments, teams, and records in one centralized platform."
+        description="Learn how Cadence connects business operations, departments, teams, and records in one centralized platform."
         backgroundImage="/images/magnific_flatdesignbusinesscommunicationconcept5268376243_lJoFq9sgv9.png"
         primaryCta={{
           text: 'Get Started Free',
@@ -50,12 +50,12 @@ export function About(): React.ReactElement {
       <HomeWorkingProcess />
 
       {/* 7. Final Call to Action */}
-      <section className="py-20 sm:py-24 bg-[#0B5C63] text-[#F6F3EA]">
+      <section className="py-20 sm:py-24 bg-verdigris text-flour">
         <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
             Ready to Connect Your Business Operations?
           </h2>
-          <p className="text-base sm:text-lg text-[#F6F3EA]/90 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-flour/90 max-w-xl mx-auto leading-relaxed">
             Join growing businesses across retail, manufacturing, and commerce that maintain clarity
             across inventory intake, daily production, and sales.
           </p>
@@ -72,7 +72,7 @@ export function About(): React.ReactElement {
               to="/contact"
               variant="secondary"
               size="lg"
-              className="bg-[#F6F3EA] text-[#0B5C63] hover:bg-[#EFEBDB]"
+              className="bg-flour text-verdigris hover:bg-ledger"
             >
               Contact Us
             </Button>

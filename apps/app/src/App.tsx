@@ -1,5 +1,5 @@
 /**
- * @file Application router root for TallyBakery app & authentication portal.
+ * @file Application router root for Cadence app & authentication portal.
  */
 
 import React from 'react';
@@ -20,7 +20,7 @@ export function App({ syncAdapter }: { syncAdapter?: SyncAdapter } = {}): React.
   return (
     <SyncProvider adapter={syncAdapter}>
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col bg-[#F6F3EA] text-[#10201F] selection:bg-[#0B5C63] selection:text-[#F6F3EA] font-sans antialiased">
+        <div className="min-h-screen flex flex-col bg-flour text-oven-black selection:bg-verdigris selection:text-flour font-sans antialiased">
           <main className="flex-1">
             <Routes>
               <Route path="/login" element={<Login />} />

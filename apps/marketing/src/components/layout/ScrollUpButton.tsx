@@ -42,7 +42,7 @@ export function ScrollUpButton(): React.ReactElement | null {
       type="button"
       onClick={scrollToTop}
       aria-label="Scroll to top of page"
-      className="fixed bottom-6 right-6 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#0B5C63] hover:bg-[#0F7480] text-[#F6F3EA] shadow-xl hover:shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#0B5C63] focus:ring-offset-2 border border-[#0F7480]/40"
+      className="fixed bottom-6 right-6 z-50 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-verdigris hover:bg-verdigris-lift text-flour shadow-xl hover:shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-verdigris focus:ring-offset-2 border border-verdigris-lift/40"
     >
       <ChevronsUp className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
     </button>

@@ -13,7 +13,7 @@ export interface LoginFormProps {
 }
 
 /**
- * @description Accessible form inputs for logging into TallyBakery with reference styling.
+ * @description Accessible form inputs for logging into Cadence with reference styling.
  * @param {LoginFormProps} props - Callbacks.
  * @returns {React.ReactElement} Login form element.
  */
@@ -66,11 +66,10 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
       {statusNotice && (
         <div
           role={statusNotice.type === 'error' ? 'alert' : 'status'}
-          className={`mb-5 p-4 rounded-r-xl rounded-l-md border-l-4 text-sm flex items-start gap-3 shadow-xs ${
-            statusNotice.type === 'error'
-              ? 'bg-[#B3261E]/[0.08] border-[#B3261E] text-[#8C1D18]'
-              : 'bg-[#3F7A2A]/[0.08] border-[#3F7A2A] text-[#2C571D]'
-          }`}
+          className={`mb-5 p-4 rounded-r-xl rounded-l-md border-l-4 text-sm flex items-start gap-3 shadow-xs ${statusNotice.type === 'error'
+            ? 'bg-status-unbalanced/8 border-status-unbalanced text-[#8C1D18]'
+            : 'bg-status-balanced/8 border-[#3F7A2A] text-[#2C571D]'
+            }`}
         >
           {statusNotice.type === 'error' ? (
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#B3261E]" />
@@ -85,11 +84,10 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
         {/* Email Address Field */}
         <div>
           <div
-            className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-[#0B5C63] ${
-              errors.identifier ? 'border-[#B3261E]' : 'border-[#D9D3C0]'
-            }`}
+            className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-verdigris ${errors.identifier ? 'border-[#B3261E]' : 'border-rule'
+              }`}
           >
-            <div className="flex items-center justify-center px-3.5 py-2.5 text-[#0B5C63] border-r border-[#E5E0D0] bg-[#F9F7F1]/60">
+            <div className="flex items-center justify-center px-3.5 py-2.5 text-verdigris border-r border-[#E5E0D0] bg-[#F9F7F1]/60">
               <Mail className="w-4 h-4" />
             </div>
             <input
@@ -103,7 +101,7 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
               aria-label="e-Mail Address"
               aria-invalid={!!errors.identifier}
               aria-describedby={errors.identifier ? 'login-id-err' : undefined}
-              className="w-full px-3.5 py-2.5 text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none bg-transparent"
+              className="w-full px-3.5 py-2.5 text-sm text-oven-black placeholder-oven-black/40 focus:outline-none bg-transparent"
             />
           </div>
           {errors.identifier && (
@@ -116,11 +114,10 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
         {/* Password Field */}
         <div>
           <div
-            className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-[#0B5C63] ${
-              errors.password ? 'border-[#B3261E]' : 'border-[#D9D3C0]'
-            }`}
+            className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-verdigris ${errors.password ? 'border-[#B3261E]' : 'border-rule'
+              }`}
           >
-            <div className="flex items-center justify-center px-3.5 py-2.5 text-[#0B5C63] border-r border-[#E5E0D0] bg-[#F9F7F1]/60">
+            <div className="flex items-center justify-center px-3.5 py-2.5 text-verdigris border-r border-[#E5E0D0] bg-[#F9F7F1]/60">
               <Lock className="w-4 h-4" />
             </div>
             <input
@@ -134,13 +131,13 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
               aria-label="Password"
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? 'login-pw-err' : undefined}
-              className="w-full px-3.5 py-2.5 text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none bg-transparent"
+              className="w-full px-3.5 py-2.5 text-sm text-oven-black placeholder-oven-black/40 focus:outline-none bg-transparent"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="px-3 text-[#10201F]/50 hover:text-[#10201F] cursor-pointer"
+              className="px-3 text-oven-black/50 hover:text-oven-black cursor-pointer"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -164,23 +161,23 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
               type="checkbox"
               checked={values.rememberMe || false}
               onChange={handleChange}
-              className="w-4 h-4 rounded border-[#D9D3C0] text-[#0B5C63] focus:ring-[#0B5C63] focus:ring-offset-0 cursor-pointer accent-[#0B5C63]"
+              className="w-4 h-4 rounded border-rule text-verdigris focus:ring-verdigris focus:ring-offset-0 cursor-pointer accent-verdigris"
             />
-            <span className="text-xs text-[#10201F]/80 hover:text-[#10201F]">Remember me</span>
+            <span className="text-xs text-oven-black/80 hover:text-oven-black">Remember me</span>
           </label>
         </div>
 
         {/* Primary Login Button */}
         <button
           type="submit"
-          className="w-full mt-2 py-2.5 px-4 rounded-md bg-[#0B5C63] hover:bg-[#08484E] text-white font-medium text-sm transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B5C63] cursor-pointer"
+          className="w-full mt-2 py-2.5 px-4 rounded-md bg-verdigris hover:bg-[#08484E] text-white font-medium text-sm transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-verdigris cursor-pointer"
         >
           Login
         </button>
 
         {/* Forgot Password Link */}
         <div className="text-center pt-2">
-          <Link to="/forgot-password" className="text-xs text-[#0B5C63] hover:underline">
+          <Link to="/forgot-password" className="text-xs text-verdigris hover:underline">
             Forgot your Password? Click here to reset it.
           </Link>
         </div>

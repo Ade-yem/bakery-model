@@ -1,6 +1,6 @@
-# @repo/app (TallyBakery Main Application)
+# @repo/app (Cadence Main Application)
 
-The main operational web application for TallyBakery — a multi-tenant, offline-first operations and reconciliation platform for commercial bakeries and shift-based food manufacturing facilities.
+The main operational web application for Cadence — a multi-tenant, offline-first operations and reconciliation platform for commercial bakeries and shift-based food manufacturing facilities.
 
 ## Overview
 

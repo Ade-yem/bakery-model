@@ -64,7 +64,7 @@ export function HomeHero(): React.ReactElement {
   const currentColor = TYPING_COLORS[colorIndex];
 
   return (
-    <section className="relative flex items-center py-16 sm:py-20 overflow-hidden h-screen bg-[#F6F3EA]">
+    <section className="relative flex items-center py-16 sm:py-20 overflow-hidden h-[80vh] bg-flour">
       {/* Background Video Layer */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <video
@@ -83,7 +83,7 @@ export function HomeHero(): React.ReactElement {
       </div>
 
       {/* Decorative floating dots matching Finview */}
-      <div className="absolute top-24 left-8 text-[#A9501A] select-none pointer-events-none hidden sm:block z-10">
+      <div className="absolute top-24 left-8 text-copper select-none pointer-events-none hidden sm:block z-10">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="4" r="2" />
           <circle cx="20" cy="12" r="2" />
@@ -97,7 +97,7 @@ export function HomeHero(): React.ReactElement {
         {/* Finview 4-dot diamond cluster + Eyebrow */}
 
         {/* Headline with multi-color typewriter animation on "Perfect Control" */}
-        <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold text-[#10201F] tracking-tight leading-[1.15] mb-6">
+        <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold text-oven-black tracking-tight leading-[1.15] mb-6">
           Find the{' '}
           <span
             style={{ color: currentColor }}
@@ -113,7 +113,7 @@ export function HomeHero(): React.ReactElement {
         </h1>
 
         {/* Description */}
-        <p className="text-base sm:text-lg text-[#10201F]/85 leading-relaxed max-w-2xl mb-8">
+        <p className="text-base sm:text-lg text-oven-black/85 leading-relaxed max-w-2xl mb-8">
           Your all-in-one platform for managing business operations,
           inventory, sales, staff, and finances with better control and accountability.
         </p>
@@ -122,14 +122,14 @@ export function HomeHero(): React.ReactElement {
         <div className="flex flex-wrap items-center justify-center gap-4">
           <Link
             to="/register"
-            className="inline-flex items-center gap-1.5 px-7 py-3.5 rounded-full bg-[#0B5C63] text-[#F6F3EA] text-sm font-semibold hover:bg-[#0F7480] transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-7 py-3.5 rounded-full bg-verdigris text-flour text-sm font-semibold hover:bg-verdigris-lift transition-colors shadow-xs"
           >
             <span>Get Started</span>
             <ArrowUpRight className="w-4 h-4" />
           </Link>
           <Link
             to="/about"
-            className="inline-flex items-center gap-1.5 px-7 py-3.5 rounded-full bg-[#F6F3EA]/80 backdrop-blur-xs border border-[#10201F]/30 text-[#10201F] text-sm font-semibold hover:bg-[#EFEBDB] transition-colors"
+            className="inline-flex items-center gap-1.5 px-7 py-3.5 rounded-full bg-flour/80 backdrop-blur-xs border border-oven-black/30 text-oven-black text-sm font-semibold hover:bg-ledger transition-colors"
           >
             <span>About us</span>
             <ArrowUpRight className="w-4 h-4" />

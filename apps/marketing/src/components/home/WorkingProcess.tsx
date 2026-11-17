@@ -126,10 +126,10 @@ export function HomeWorkingProcess(): React.ReactElement {
   const [activeStep, setActiveStep] = useState('01');
 
   return (
-    <section className="relative pt-24 sm:pt-32 pb-28 sm:pb-36 bg-[#F6F3EA] border-b border-[#D9D3C0] overflow-hidden">
+    <section className="relative pt-24 sm:pt-32 pb-28 sm:pb-36 bg-flour border-b border-rule overflow-hidden">
       {/* Background */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 sm:h-52 bg-[#EFEBDB]/50 border-t border-[#D9D3C0]/40"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 sm:h-52 bg-ledger/50 border-t border-rule/40"
         aria-hidden="true"
       />
 
@@ -149,16 +149,16 @@ export function HomeWorkingProcess(): React.ReactElement {
               <circle cx="2" cy="8" r="1.5" fill="#0B5C63" />
             </svg>
 
-            <span className="text-sm sm:text-base font-semibold text-[#0B5C63] tracking-wide">
+            <span className="text-sm sm:text-base font-semibold text-verdigris tracking-wide">
               Our Working Process
             </span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#10201F] tracking-tight leading-[1.18]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-oven-black tracking-tight leading-[1.18]">
             Everything Your Business Needs to Stay Organized
           </h2>
 
-          <p className="mt-4 text-base sm:text-lg text-[#10201F]/70 leading-relaxed max-w-2xl mx-auto">
+          <p className="mt-4 text-base sm:text-lg text-oven-black/70 leading-relaxed max-w-2xl mx-auto">
             Manage daily activities, coordinate departments, track transactions, and maintain
             complete control of your business from one connected platform.
           </p>
@@ -174,9 +174,9 @@ export function HomeWorkingProcess(): React.ReactElement {
             className="hidden lg:block pointer-events-none absolute inset-0 z-20"
             aria-hidden="true"
           >
-            <div className="absolute top-14.75 left-full w-8 h-[calc(50%-59px)] border-t-2 border-r-2 border-b-2 border-[#0B5C63]/55 rounded-r-3xl" />
-            <div className="absolute top-1/2 -translate-y-px inset-x-0 h-[2px] bg-gradient-to-l from-[#0B5C63]/55 via-[#A9501A]/60 to-[#0B5C63]/55" />
-            <div className="absolute top-1/2 -left-8 w-8 h-[84px] border-t-2 border-l-2 border-b-2 border-[#0B5C63]/55 rounded-l-3xl">
+            <div className="absolute top-14.75 left-full w-8 h-[calc(50%-59px)] border-t-2 border-r-2 border-b-2 border-verdigris/55 rounded-r-3xl" />
+            <div className="absolute top-1/2 -translate-y-px inset-x-0 h-[2px] bg-gradient-to-l from-verdigris/55 via-[#A9501A]/60 to-verdigris/55" />
+            <div className="absolute top-1/2 -left-8 w-8 h-[84px] border-t-2 border-l-2 border-b-2 border-verdigris/55 rounded-l-3xl">
               <span className="absolute -bottom-[5px] right-0 translate-x-1 w-2 h-2 rounded-full bg-[#A9501A] shadow-xs" />
             </div>
           </div>
@@ -192,12 +192,11 @@ export function HomeWorkingProcess(): React.ReactElement {
                 {/* Horizontal Transmission Line between adjacent cards in the same row */}
                 {isNotLast && (
                   <div
-                    className={`hidden ${isNotLastInSmRow ? 'sm:flex' : ''} ${
-                      isNotLastInLgRow ? 'lg:flex' : 'lg:hidden'
-                    } items-center absolute top-[52px] -right-5 w-5 h-4 z-20 pointer-events-none`}
+                    className={`hidden ${isNotLastInSmRow ? 'sm:flex' : ''} ${isNotLastInLgRow ? 'lg:flex' : 'lg:hidden'
+                      } items-center absolute top-[52px] -right-5 w-5 h-4 z-20 pointer-events-none`}
                     aria-hidden="true"
                   >
-                    <div className="w-full h-[2px] bg-gradient-to-r from-[#0B5C63]/60 via-[#A9501A]/60 to-[#0B5C63]/60 relative flex items-center justify-end">
+                    <div className="w-full h-[2px] bg-gradient-to-r from-verdigris/60 via-[#A9501A]/60 to-verdigris/60 relative flex items-center justify-end">
                       <span className="w-2 h-2 rounded-full bg-[#A9501A] shadow-xs translate-x-1" />
                     </div>
                   </div>
@@ -209,9 +208,9 @@ export function HomeWorkingProcess(): React.ReactElement {
                     className="sm:hidden pointer-events-none absolute inset-0 z-20"
                     aria-hidden="true"
                   >
-                    <div className="absolute top-[59px] -bottom-[20px] left-full w-5 border-t-2 border-r-2 border-b-2 border-[#0B5C63]/55 rounded-r-2xl" />
-                    <div className="absolute -bottom-[20px] inset-x-0 h-[2px] bg-gradient-to-l from-[#0B5C63]/55 via-[#A9501A]/60 to-[#0B5C63]/55" />
-                    <div className="absolute top-[calc(100%+18px)] -left-5 w-5 h-[82px] border-t-2 border-l-2 border-b-2 border-[#0B5C63]/55 rounded-l-2xl">
+                    <div className="absolute top-[59px] -bottom-[20px] left-full w-5 border-t-2 border-r-2 border-b-2 border-verdigris/55 rounded-r-2xl" />
+                    <div className="absolute -bottom-[20px] inset-x-0 h-[2px] bg-gradient-to-l from-verdigris/55 via-[#A9501A]/60 to-verdigris/55" />
+                    <div className="absolute top-[calc(100%+18px)] -left-5 w-5 h-[82px] border-t-2 border-l-2 border-b-2 border-verdigris/55 rounded-l-2xl">
                       <span className="absolute -bottom-[5px] right-0 translate-x-1 w-2 h-2 rounded-full bg-[#A9501A] shadow-xs" />
                     </div>
                   </div>
@@ -223,9 +222,9 @@ export function HomeWorkingProcess(): React.ReactElement {
                     className="hidden sm:block lg:hidden pointer-events-none absolute top-0 bottom-0 right-0 w-[calc(200%+1.25rem)] z-20"
                     aria-hidden="true"
                   >
-                    <div className="absolute top-[59px] -bottom-[20px] left-full w-6 border-t-2 border-r-2 border-b-2 border-[#0B5C63]/55 rounded-r-3xl" />
-                    <div className="absolute -bottom-[20px] inset-x-0 h-[2px] bg-gradient-to-l from-[#0B5C63]/55 via-[#A9501A]/60 to-[#0B5C63]/55" />
-                    <div className="absolute top-[calc(100%+18px)] -left-6 w-6 h-[82px] border-t-2 border-l-2 border-b-2 border-[#0B5C63]/55 rounded-l-3xl">
+                    <div className="absolute top-[59px] -bottom-[20px] left-full w-6 border-t-2 border-r-2 border-b-2 border-verdigris/55 rounded-r-3xl" />
+                    <div className="absolute -bottom-[20px] inset-x-0 h-[2px] bg-gradient-to-l from-verdigris/55 via-[#A9501A]/60 to-verdigris/55" />
+                    <div className="absolute top-[calc(100%+18px)] -left-6 w-6 h-[82px] border-t-2 border-l-2 border-b-2 border-verdigris/55 rounded-l-3xl">
                       <span className="absolute -bottom-[5px] right-0 translate-x-1 w-2 h-2 rounded-full bg-[#A9501A] shadow-xs" />
                     </div>
                   </div>
@@ -236,21 +235,20 @@ export function HomeWorkingProcess(): React.ReactElement {
                     type="button"
                     onClick={() => setActiveStep(item.step)}
                     aria-pressed={isActive}
-                    className={`group w-full h-full rounded-3xl p-6 sm:p-7 transition-all duration-300 flex flex-col items-center text-center relative shadow-sm min-h-[290px] ${
-                      isActive
-                        ? 'bg-[#F6F3EA] border-2 border-[#10201F] ring-1 ring-[#10201F]/10 -translate-y-1'
-                        : 'bg-[#F6F3EA]/95 border border-[#D9D3C0] hover:border-[#10201F]/50 hover:bg-[#F6F3EA]'
-                    }`}
+                    className={`group w-full h-full rounded-3xl p-6 sm:p-7 transition-all duration-300 flex flex-col items-center text-center relative shadow-sm min-h-[290px] ${isActive
+                      ? 'bg-flour border-2 border-oven-black ring-1 ring-oven-black/10 -translate-y-1'
+                      : 'bg-flour/95 border border-rule hover:border-oven-black/50 hover:bg-flour'
+                      }`}
                   >
                     {/* Icon */}
                     <div className="relative mb-7 mt-2">
-                      <div className="w-[88px] h-[88px] rounded-full border-2 border-dashed border-[#D9D3C0] group-hover:border-[#0B5C63]/60 p-2 flex items-center justify-center bg-[#EFEBDB]/70 transition-transform duration-300 group-hover:scale-105">
-                        <div className="w-16 h-16 rounded-full bg-[#F6F3EA] border border-[#D9D3C0]/60 flex items-center justify-center shadow-sm">
+                      <div className="w-[88px] h-[88px] rounded-full border-2 border-dashed border-rule group-hover:border-verdigris/60 p-2 flex items-center justify-center bg-ledger/70 transition-transform duration-300 group-hover:scale-105">
+                        <div className="w-16 h-16 rounded-full bg-flour border border-rule/60 flex items-center justify-center shadow-sm">
                           <svg
                             viewBox="0 0 36 36"
                             fill="none"
                             stroke="currentColor"
-                            className="w-7 h-7 text-[#0B5C63]"
+                            className="w-7 h-7 text-verdigris"
                             strokeWidth="1.8"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -262,26 +260,25 @@ export function HomeWorkingProcess(): React.ReactElement {
                       </div>
 
                       {/* Number */}
-                      <span className="absolute top-0 right-0 w-6 h-6 rounded-full bg-[#0B5C63] text-[#F6F3EA] text-[11px] font-bold flex items-center justify-center shadow-sm">
+                      <span className="absolute top-0 right-0 w-6 h-6 rounded-full bg-verdigris text-flour text-[11px] font-bold flex items-center justify-center shadow-sm">
                         {item.step}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-lg font-bold text-[#10201F] tracking-tight group-hover:text-[#0B5C63] transition-colors mb-3">
+                    <h3 className="text-lg font-bold text-oven-black tracking-tight group-hover:text-verdigris transition-colors mb-3">
                       {item.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-xs sm:text-[13px] text-[#10201F]/70 leading-relaxed">
+                    <p className="text-xs sm:text-[13px] text-oven-black/70 leading-relaxed">
                       {item.description}
                     </p>
 
                     {/* Active Indicator */}
                     <span
-                      className={`mt-auto pt-5 text-xs font-semibold transition-colors ${
-                        isActive ? 'text-[#0B5C63]' : 'text-[#10201F]/40 group-hover:text-[#0B5C63]'
-                      }`}
+                      className={`mt-auto pt-5 text-xs font-semibold transition-colors ${isActive ? 'text-verdigris' : 'text-oven-black/40 group-hover:text-verdigris'
+                        }`}
                     ></span>
                   </button>
                 </TiltCard>

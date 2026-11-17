@@ -1,5 +1,5 @@
 /**
- * @file Lenis smooth momentum scroll integration for TallyBakery.
+ * @file Lenis smooth momentum scroll integration for Cadence.
  * Integrates @studio-freight/lenis / lenis with standard requestAnimationFrame loop and GSAP ScrollTrigger sync.
  */
 

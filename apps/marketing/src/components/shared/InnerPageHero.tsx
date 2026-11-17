@@ -71,7 +71,7 @@ export function InnerPageHero({
           {/* Breadcrumb Navigation */}
 
           {/* Large Bold Left-Aligned Heading */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-[#F6F3EA] tracking-tight leading-[1.12]">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-flour tracking-tight leading-[1.12]">
             {heading}
           </h1>
 
@@ -86,16 +86,16 @@ export function InnerPageHero({
               {primaryCta && (
                 <Link
                   to={primaryCta.href}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white text-[#10201F] text-sm font-semibold hover:bg-[#F6F3EA] hover:shadow-lg transition-all shadow-md group"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white text-oven-black text-sm font-semibold hover:bg-flour hover:shadow-lg transition-all shadow-md group"
                 >
                   <span>{primaryCta.text}</span>
-                  <ArrowRight className="w-4 h-4 text-[#10201F] transition-transform group-hover:translate-x-0.5" />
+                  <ArrowRight className="w-4 h-4 text-oven-black transition-transform group-hover:translate-x-0.5" />
                 </Link>
               )}
               {secondaryCta && (
                 <Link
                   to={secondaryCta.href}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#10201F]/60 hover:bg-[#10201F]/80 text-[#F6F3EA] border border-white/20 text-sm font-semibold backdrop-blur-md transition-all shadow-sm"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-oven-black/60 hover:bg-oven-black/80 text-flour border border-white/20 text-sm font-semibold backdrop-blur-md transition-all shadow-sm"
                 >
                   <span>{secondaryCta.text}</span>
                 </Link>

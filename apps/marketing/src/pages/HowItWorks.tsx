@@ -1,5 +1,5 @@
 /**
- * @file Finview-styled How It Works page for TallyBakery.
+ * @file Finview-styled How It Works page for Cadence.
  * Features Dark Header Banner, 4-Step Working Process, App Terminals Banner, and CTA.
  */
 
@@ -15,7 +15,7 @@ import { ArrowRight } from 'lucide-react';
  */
 export function HowItWorks(): React.ReactElement {
   return (
-    <div className="bg-[#F6F3EA] text-[#10201F] font-sans">
+    <div className="bg-flour text-oven-black font-sans">
       {/* 1. Cinematic Full-Width Photographic Hero */}
       <InnerPageHero
         heading="From Business Setup to Daily Operations, Made Simple."
@@ -35,12 +35,12 @@ export function HowItWorks(): React.ReactElement {
       <HomeWorkingProcess />
 
       {/* 5. Call to Action */}
-      <section className="py-20 sm:py-24 bg-[#0B5C63] text-[#F6F3EA]">
+      <section className="py-20 sm:py-24 bg-verdigris text-flour">
         <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
             Ready to Streamline Your Daily Business Operations?
           </h2>
-          <p className="text-base sm:text-lg text-[#F6F3EA]/90 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-flour/90 max-w-xl mx-auto leading-relaxed">
             Set up your organization, invite your team, and begin managing your operations in
             minutes.
           </p>
@@ -57,7 +57,7 @@ export function HowItWorks(): React.ReactElement {
               to="/about"
               variant="secondary"
               size="lg"
-              className="bg-[#F6F3EA] text-[#0B5C63] hover:bg-[#EFEBDB]"
+              className="bg-flour text-verdigris hover:bg-ledger"
             >
               Learn More
             </Button>

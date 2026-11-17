@@ -16,7 +16,7 @@ interface Props {
 export function BatchDraftDialog({ onClose, onSaved }: Props) {
   const [recovered] = useState(() => {
     try {
-      return parseBatchDraft(localStorage.getItem('tallybakery:production-preview-draft'));
+      return parseBatchDraft(localStorage.getItem('cadence:production-preview-draft'));
     } catch {
       return null;
     }
@@ -64,7 +64,7 @@ export function BatchDraftDialog({ onClose, onSaved }: Props) {
           if (Object.keys(nextErrors).length) return;
           try {
             localStorage.setItem(
-              'tallybakery:production-preview-draft',
+              'Cadence:production-preview-draft',
               JSON.stringify({
                 ...values,
                 product: String(form.get('product')),

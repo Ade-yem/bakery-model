@@ -29,14 +29,14 @@ export function OverviewIllustrationBadge({
 }: OverviewIllustrationProps): React.ReactElement {
   return (
     <div
-      className={`w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-[#EFEBDB]/80 border-2 border-[#D9D3C0] flex items-center justify-center p-3.5 mx-auto transition-transform duration-300 group-hover:scale-105 group-hover:border-[#0B5C63]/50 ${className}`}
+      className={`w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-ledger/80 border-2 border-rule flex items-center justify-center p-3.5 mx-auto transition-transform duration-300 group-hover:scale-105 group-hover:border-verdigris/50 ${className}`}
     >
       {type === 'operations' && (
         <svg
           viewBox="0 0 48 48"
           fill="none"
           stroke="currentColor"
-          className="w-full h-full text-[#0B5C63]"
+          className="w-full h-full text-verdigris"
           strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -60,7 +60,7 @@ export function OverviewIllustrationBadge({
           viewBox="0 0 48 48"
           fill="none"
           stroke="currentColor"
-          className="w-full h-full text-[#0B5C63]"
+          className="w-full h-full text-verdigris"
           strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -83,7 +83,7 @@ export function OverviewIllustrationBadge({
           viewBox="0 0 48 48"
           fill="none"
           stroke="currentColor"
-          className="w-full h-full text-[#0B5C63]"
+          className="w-full h-full text-verdigris"
           strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -104,7 +104,7 @@ export function OverviewIllustrationBadge({
           viewBox="0 0 48 48"
           fill="none"
           stroke="currentColor"
-          className="w-full h-full text-[#0B5C63]"
+          className="w-full h-full text-verdigris"
           strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -125,7 +125,7 @@ export function OverviewIllustrationBadge({
           viewBox="0 0 48 48"
           fill="none"
           stroke="currentColor"
-          className="w-full h-full text-[#0B5C63]"
+          className="w-full h-full text-verdigris"
           strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -147,7 +147,7 @@ export function OverviewIllustrationBadge({
           viewBox="0 0 48 48"
           fill="none"
           stroke="currentColor"
-          className="w-full h-full text-[#0B5C63]"
+          className="w-full h-full text-verdigris"
           strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"

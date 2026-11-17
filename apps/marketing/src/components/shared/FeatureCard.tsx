@@ -46,7 +46,7 @@ export interface FeatureCardProps {
 }
 
 /**
- * @description Card representing a specific TallyBakery module with Finview card aesthetics.
+ * @description Card representing a specific Cadence module with Finview card aesthetics.
  * @param {FeatureCardProps} props - Module data.
  * @returns {React.ReactElement} Feature card element.
  */
@@ -63,22 +63,22 @@ export function FeatureCard({
 
   return (
     <div
-      className={`group bg-[#EFEBDB]/70 rounded-3xl p-6 sm:p-7 border border-[#D9D3C0] hover:border-[#0B5C63]/60 hover:bg-[#EFEBDB] transition-all duration-200 flex flex-col justify-between shadow-2xs ${className}`}
+      className={`group bg-ledger/70 rounded-3xl p-6 sm:p-7 border border-rule hover:border-verdigris/60 hover:bg-ledger transition-all duration-200 flex flex-col justify-between shadow-2xs ${className}`}
     >
       <div>
         {/* Top: Icon in circle and optional operational badge */}
         <div className="flex items-center justify-between gap-3 mb-5">
-          <div className="w-12 h-12 rounded-full bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center transition-transform group-hover:scale-105 border border-[#0B5C63]/20">
-            <IconComponent className="w-6 h-6 text-[#0B5C63]" aria-hidden="true" />
+          <div className="w-12 h-12 rounded-full bg-verdigris/10 text-verdigris flex items-center justify-center transition-transform group-hover:scale-105 border border-verdigris/20">
+            <IconComponent className="w-6 h-6 text-verdigris" aria-hidden="true" />
           </div>
           {operationalRole && (
-            <span className="px-3 py-1 text-[11px] font-semibold text-[#0B5C63] bg-[#F6F3EA] border border-[#0B5C63]/25 rounded-full">
+            <span className="px-3 py-1 text-[11px] font-semibold text-verdigris bg-flour border border-verdigris/25 rounded-full">
               {operationalRole}
             </span>
           )}
         </div>
 
-        <h3 className="text-xl font-bold text-[#10201F] tracking-tight mb-2">
+        <h3 className="text-xl font-bold text-oven-black tracking-tight mb-2">
           {title}
         </h3>
 
@@ -88,16 +88,16 @@ export function FeatureCard({
           </p>
         )}
 
-        <p className="text-xs text-[#10201F]/80 leading-relaxed mb-5">
+        <p className="text-xs text-oven-black/80 leading-relaxed mb-5">
           {description}
         </p>
 
         {items && items.length > 0 && (
-          <div className="pt-4 border-t border-[#D9D3C0]/60">
+          <div className="pt-4 border-t border-rule/60">
             <ul className="flex flex-col gap-2">
               {items.map((item) => (
-                <li key={item} className="flex items-start gap-2 text-xs text-[#10201F]/90">
-                  <span className="w-4 h-4 rounded-full bg-[#0B5C63]/15 text-[#0B5C63] flex items-center justify-center shrink-0 mt-0.5">
+                <li key={item} className="flex items-start gap-2 text-xs text-oven-black/90">
+                  <span className="w-4 h-4 rounded-full bg-verdigris/15 text-verdigris flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-2.5 h-2.5 stroke-[3]" />
                   </span>
                   <span>{item}</span>
@@ -109,11 +109,11 @@ export function FeatureCard({
       </div>
 
       {/* Bottom circular link button */}
-      <div className="mt-5 pt-3 border-t border-[#D9D3C0]/40 flex items-center justify-between">
-        <span className="text-[11px] font-semibold text-[#0B5C63] group-hover:underline">
+      <div className="mt-5 pt-3 border-t border-rule/40 flex items-center justify-between">
+        <span className="text-[11px] font-semibold text-verdigris group-hover:underline">
           Explore Module
         </span>
-        <div className="w-8 h-8 rounded-full bg-[#F6F3EA] border border-[#D9D3C0] text-[#0B5C63] flex items-center justify-center group-hover:bg-[#0B5C63] group-hover:text-[#F6F3EA] transition-colors">
+        <div className="w-8 h-8 rounded-full bg-flour border border-rule text-verdigris flex items-center justify-center group-hover:bg-verdigris group-hover:text-flour transition-colors">
           <ArrowUpRight className="w-4 h-4" />
         </div>
       </div>
