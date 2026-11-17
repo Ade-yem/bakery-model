@@ -15,7 +15,7 @@ Cadence is a multi-tenant, offline-first Software-as-a-Service (SaaS) platform e
 Small-to-medium manufacturing and retail businesses (SMEs) face high rates of revenue leakage, internal theft, and unrecorded inventory shrinkage. Key operational pain points include:
 
 > * **The "Shift Blame" Loop:** When closing inventory is short, outgoing and incoming shift workers dispute when the shortage occurred.  
-> * **Disbursement Mismatches:** Bread or packaged products leave the stock room before or without payment verification.  
+> * **Dispatch Mismatches:** Bread or packaged products leave the stock room before or without payment verification.  
 > * **Owner Blindness:** Business owners cannot monitor operational integrity without physically sitting at the facility.  
 > * **Network Vulnerability:** Typical cloud point-of-sale (POS) systems break down during frequent local internet blackouts.
 
@@ -23,7 +23,7 @@ Small-to-medium manufacturing and retail businesses (SMEs) face high rates of re
 
 ### **2.1 Core Goals**
 
-> * **Enforce Departmental Parity:** Formally interlock Production, Disbursement, Reception, and Procurement logs at each shift change.  
+> * **Enforce Departmental Parity:** Formally interlock Production, Dispatch, Reception, and Procurement logs at each shift change.  
 > * **Offline Floor Continuity:** Guarantee 100% operational uptime for order logging, baking entrieshi, and handovers on local devices regardless of internet availability.  
 > * **Noise-Free Executive Monitoring:** Restrict active push alerts strictly to discrepancies and critical exceptions while aggregating holistic analytics for executive review on demand.
 
@@ -51,25 +51,66 @@ The system enforces strict boundary isolation. A user logged into one department
         `▼                           ▼                            ▼`  
 `┌──────────────┐            ┌──────────────┐             ┌───────────────┐`  
 `│  Reception   │            │  Production  │             │ Packaging &   │`  
-`│   (Cashier)  │            │ (Bakehouse)  │             │ Disbursement  │`  
+`│   (Cashier)  │            │ (Bakehouse)  │             │ Dispatch  │`  
 `└──────────────┘            └──────────────┘             └───────────────┘`
 
 | Role | Default Access Permissions | Restrictions |
 | :---- | :---- | :---- |
 | **Super Admin (Owner)** | Organization-wide visibility, multi-branch analytics, audit logs, subscription billing, threshold configs. | None. |
 | **Shift / Branch Manager** | Procurement logging, expense approval, employee onboarding/scheduling, discrepancy resolution, handover co-sign. | Cannot alter finalized audit trails or delete historic shifts. |
-| **Receptionist (Cashier)** | Customer order entry, multi-method payment receipt, credit/debt ledger, manual order push to disbursement. | Blocked from production sheets, raw material balances, and disbursement fulfillment screens. |
-| **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Blocked from sales figures, cash totals, customer data, and disbursement inventories. |
-| **Packaging & Disbursement Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
+| **Receptionist (Cashier)** | Customer order entry, multi-method payment receipt, credit/debt ledger, manual order push to dispatch. | Blocked from production sheets, raw material balances, and dispatch fulfillment screens. |
+| **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Blocked from sales figures, cash totals, customer data, and dispatch inventories. |
+| **Packaging & Dispatch Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
+
+### **3.1 Dynamic Factory Role and Department Architecture**
+
+The platform does not enforce a rigid or hardcoded department and role taxonomy. Instead, each factory tenant operates an entirely configurable organizational model:
+
+1. **Configurable Departments**: Factory owners can create, configure, rename, reorganize, and deactivate departments per branch without code deployments. Departments represent distinct physical or logical floor areas (e.g., *Mixing, Baking/Oven Bay, Quality Assurance, Packaging, Cold Storage, Maintenance, Raw Materials Warehouse, Reception, Dispatch*).
+2. **First-Class Dynamic Roles**: Roles are tenant-owned, first-class records. Factory owners can define new roles, update existing role titles, descriptions, and active statuses, and customize the granular permission bundles assigned to each role from the verified platform capability catalog. (Only the primary `OWNER` role is system-protected against deletion or self-lockout).
+3. **Role-to-Department Association**: Roles maintain explicit relationships with departments. A role can be defined as:
+   - **Department-Scoped**: Tied to one or more specific departments (e.g., a *Mixing Operator* role is bound to the *Mixing Department*; an *Inventory Clerk* is bound to the *Store/Warehouse*). Staff assigned this role are automatically constrained to those departments.
+   - **Cross-Departmental / Global**: Permitted across all departments within a branch or organization (e.g., *Owner*, *General Manager*, *Facility Maintenance Lead*).
+4. **Default Seed Templates on Tenant Creation**:
+   The baseline bakery workflow described below (Departments: *Reception, Production, Dispatch, Store*; Roles: *Owner, Manager, Receptionist, Production Supervisor, Dispatch Officer*) is provisioned as an out-of-the-box **Starter Seed Template** when an organization registers. Once created, every seeded department and non-Owner role can be edited, renamed, customized, or extended to match any factory's specific workflow.
+
+### **3.2 Default Starter Roles (Seeded Baseline)**
+
+The following initial role profiles are seeded by default to support immediate onboarding:
+
+| Seeded Role | Default Access Permissions | Default Department Association | Key Operational Boundary |
+| :--- | :--- | :--- | :--- |
+| **Super Admin (Owner)** | Organization-wide visibility, multi-branch analytics, audit logs, subscription billing, threshold configs, role & department management. | Global (All Departments) | None (System protected against deletion). |
+| **Shift / Branch Manager** | Procurement logging, expense approval, employee onboarding/scheduling, discrepancy resolution, handover co-sign. | Global / Multi-Department | Cannot alter finalized audit trails or delete historic shifts. |
+| **Receptionist (Cashier)** | Customer order entry, multi-method payment receipt, credit/debt ledger, manual order push to dispatch. | Scoped to Reception | Blocked from production sheets, raw material balances, and dispatch fulfillment screens. |
+| **Production Supervisor** | Raw material draw-downs (e.g., bags of flour, sugar), finished batch logging (units/sizes), scrap/waste logging. | Scoped to Production | Blocked from sales figures, cash totals, customer data, and dispatch inventories. |
+| **Packaging & Dispatch Officer** | Production batch acceptance, live queue of pushed customer orders, order fulfillment, physical closing counts. | Scoped to Dispatch / Store | Blocked from monetary values, cash drawer tallies, and raw material procurement logs. |
 
 ## **4\. Functional Specifications**
+
+### **4.0 Module 0: Factory Structure & Access Management (Departments & Roles)**
+
+#### **A. Department Configuration & Floor Modeling**
+> * **Department Lifecycle:** Factory owners and administrators can create, update, rename, and deactivate departments per branch.
+> * **Attributes:** Each department includes a name, unique branch code, operational category/type (e.g., `PRODUCTION`, `STORE`, `DISPATCH`, `RECEPTION`, `PACKAGING`, `MAINTENANCE`, `CUSTOM`), optional description, and active status.
+> * **Flexible Floor Layouts:** The system does not limit factories to four departments; facilities can model multiple production lines, specialized storage units (e.g., cold room, raw store), or packaging zones.
+> * **Operational Status:** Inactive departments cannot be assigned to new staff or selected as active operation destinations.
+
+#### **B. Dynamic Role Definition & Department Scoping**
+> * **Role Management:** Factory owners can create custom roles, edit role titles and descriptions, and configure their permission sets.
+> * **Department Association:** Roles can be scoped to specific department(s) or configured as cross-departmental. Staff assigned to a department-scoped role inherit that department boundary for operational logging and shift signoffs.
+> * **System Safeguards:** The primary `OWNER` role cannot be deleted, deactivated, or stripped of administrative permissions. Role updates are validated against the approved system capability set.
+
+#### **C. Baseline Template Seeding**
+> * **Automated Starter Baseline:** When an organization/tenant is created, a default baseline (Reception, Production, Dispatch, Store departments, along with default Owner, Manager, Cashier, Supervisor, and Dispatch roles) is seeded into the database.
+> * **Full Post-Onboarding Customization:** All seeded entities (except Owner immutability) are standard editable database records, allowing the business to immediately rename, reconfigure, or expand them.
 
 ### **4.1 Module 1: Departmental Operational Workflows**
 
 #### **A. Procurement & Management**
 
 > * **Material Acquisition:** The Manager records raw material arrivals (Vendor, Item, Quantity, Unit Cost, Invoice/Receipt Reference). This automatically increments the central raw material balance.  
-> * **Ad-Hoc Cash Outflow:** Petty cash disbursements (e.g., fuel for generator, minor repairs) must be logged with an attached reason and category.
+> * **Ad-Hoc Cash Outflow:** Petty cash dispatchs (e.g., fuel for generator, minor repairs) must be logged with an attached reason and category.
 
 #### **B. Production (Bakehouse)**
 
@@ -77,11 +118,11 @@ The system enforces strict boundary isolation. A user logged into one department
   * Materials consumed: e.g., N bags of flour, M kg of sugar, X units of yeast.  
   * Finished goods output: Quantity and SKU/size (e.g., 250 units of 500g family loaf, 100 units of 1kg sandwich bread).  
 > * **Yield Decoupling:** Yield variations (e.g., flour producing 48 loaves instead of 50\) are logged transparently for analytics but do not halt the operational flow.  
-> * **Batch Transfer:** Submitting a batch creates a pending **Incoming Stock Transfer** queued for Disbursement acceptance.
+> * **Batch Transfer:** Submitting a batch creates a pending **Incoming Stock Transfer** queued for Dispatch acceptance.
 
-#### **C. Packaging & Disbursement**
+#### **C. Packaging & Dispatch**
 
-> * **Batch Acceptance:** The Disbursement Officer inspects the transfer from Production, confirms the actual physical count received, and accepts it into available stock. Any count difference at this step is recorded as an intake discrepancy.  
+> * **Batch Acceptance:** The Dispatch Officer inspects the transfer from Production, confirms the actual physical count received, and accepts it into available stock. Any count difference at this step is recorded as an intake discrepancy.  
 > * **Live Fulfillment Board:** Displays orders manually dispatched by Reception.  
 > * **Order Handover:** Staff packages the requested units and taps **\[Mark Fulfilled\]**, immediately decrementing physical inventory.
 
@@ -92,7 +133,7 @@ The system enforces strict boundary isolation. A user logged into one department
   * **Cash** (increments calculated cash drawer balance).  
   * **Direct Bank Transfer** (requires bank reference / transaction note).  
   * **Customer Debt / Credit** (requires customer identity and contact; tracks receivables).  
-> * **Manual Dispatch Protocol:** Orders remain in a PAID\_PENDING\_DISPATCH state until Reception explicitly clicks **\[Push to Disbursement\]**. Orders are not visible on the disbursement fulfillment screen until this action is taken.
+> * **Manual Dispatch Protocol:** Orders remain in a PAID\_PENDING\_DISPATCH state until Reception explicitly clicks **\[Push to Dispatch\]**. Orders are not visible on the dispatch fulfillment screen until this action is taken.
 
 ### **4.2 Module 2: The Shift Handover & Reconciliation Engine**
 
@@ -116,7 +157,7 @@ The system enforces an interlocking, dual-signoff shift rollover. Morning shift 
 
 #### **Mathematical Reconciliation Formulas**
 
-> 1. **Disbursement Stock Reconciliation:** \\text{Expected Stock} \= \\text{Opening Stock} \+ \\sum \\text{Accepted Production} \- \\sum \\text{Fulfilled Orders} \\Delta\_{\\text{Stock}} \= \\text{Physical Count} \- \\text{Expected Stock}  
+> 1. **Dispatch Stock Reconciliation:** \\text{Expected Stock} \= \\text{Opening Stock} \+ \\sum \\text{Accepted Production} \- \\sum \\text{Fulfilled Orders} \\Delta\_{\\text{Stock}} \= \\text{Physical Count} \- \\text{Expected Stock}  
 > 2. **Reception Cash Drawer Reconciliation:** \\text{Expected Cash} \= \\text{Opening Drawer Float} \+ \\sum \\text{Cash Tendered} \- \\sum \\text{Approved Petty Cash} \\Delta\_{\\text{Cash}} \= \\text{Counted Cash} \- \\text{Expected Cash}
 
 #### **Handover Resolution Rules**
@@ -150,7 +191,7 @@ To eliminate notification fatigue, the platform maintains complete silence for a
 | **Stock Shrinkage** | \\Delta\_{\\text{Stock}} \< 0 at Shift Seal | Critical | Web Push \+ SMS/WhatsApp |
 | **Unaccounted Stock Surplus** | \\Delta\_{\\text{Stock}} \> 0 at Shift Seal | High | Web Push |
 | **Cash Drawer Deficit** | \\Delta\_{\\text{Cash}} \< 0 at Shift Seal | Critical | Web Push \+ SMS/WhatsApp |
-| **Production Transfer Dispute** | Disbursement accepts count \< Production submitted count | High | In-App Alert to Manager |
+| **Production Transfer Dispute** | Dispatch accepts count \< Production submitted count | High | In-App Alert to Manager |
 | **Debt Ceiling Breach** | Single customer unpaid balance exceeds preset limit | Medium | Web Push to Manager **WhatsApp Executive Summary** Automated daily AI shift summary generated and dispatched to Director Low WhatsApp  |
 
 ### **4.4 Module 4: Owner Analytics & AI Insights Engine**
@@ -220,7 +261,7 @@ An automated analysis engine evaluates shift data, production logs, and sales re
 ### **Core Entity Definitions**
 
 > * **tenants**: Enterprise account records (id, name, subscription\_tier, created\_at).  
-> * **departments**: Functional units (id, tenant\_id, name, type \[RECEPTION, PRODUCTION, DISBURSEMENT, STORE\]).  
+> * **departments**: Functional units (id, tenant\_id, name, type \[RECEPTION, PRODUCTION, DISPATCH, STORE\]).  
 > * **users**: Staff accounts (id, tenant\_id, department\_id, role, pin\_hash, is\_active).  
 > * **shifts**: Shift ledger instances (id, tenant\_id, department\_id, shift\_type, outgoing\_lead\_id, incoming\_lead\_id, status \[OPEN, BALANCED, UNBALANCED\], variance\_data, opened\_at, closed\_at).  
 > * **production\_batches**: Output batches (id, tenant\_id, shift\_id, product\_id, units\_produced, raw\_materials\_summary).  
@@ -240,12 +281,12 @@ An automated analysis engine evaluates shift data, production logs, and sales re
 > * Multi-tenant data isolation and RBAC setup.  
 > * Production batch recording and Raw Material logs.  
 > * Reception order screen with Cash, Transfer, and Debt support.  
-> * Manual "Push to Disbursement" queue and one-tap fulfillment.
+> * Manual "Push to Dispatch" queue and one-tap fulfillment.
 
 ### **Phase 2: Reconciliation & PWA Engine (Weeks 7–12)**
 
 > * Local IndexedDB client storage with background sync outbox.  
-> * Dual-signoff Shift Handover state machine for Disbursement and Reception.  
+> * Dual-signoff Shift Handover state machine for Dispatch and Reception.  
 > * Discrepancy math engine and asynchronous owner alert pipeline (Web Push / SMS).
 
 ### **Phase 3: Analytics & Advanced Features (Weeks 13–16)**

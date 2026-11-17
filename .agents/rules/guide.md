@@ -8,7 +8,7 @@ trigger: always_on
 
 * Keep API procedures thin and delegate business logic to services.
 * Validate inputs at API boundaries.
-* Do not expose Prisma models directly to clients.
+* Do not expose Drizzle models directly to clients.
 * Use strict TypeScript. Avoid `any`, `@ts-ignore`, and unsafe type casts.
 
 ## 10. Code Quality
@@ -37,7 +37,7 @@ trigger: always_on
 
 * Use a centralized error-handling strategy for server.
 * Define typed application errors with stable error codes.
-* Validate and map Prisma, OpenAI, Cloudinary, authentication, and validation errors to safe application errors.
+* Validate and map Drizzle, OpenAI, Cloudinary, authentication, and validation errors to safe application errors.
 * Never expose raw database, API, stack-trace, or infrastructure errors to clients.
 * Log unexpected errors server-side with sufficient context for debugging, without logging secrets or sensitive data.
 * Do not catch errors unless they can be handled, transformed, or enriched.
