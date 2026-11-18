@@ -21,6 +21,8 @@ export function UserAccountDropdown({
   onProfileClick,
   profilePath = '/workspace/profile',
   isOpen: controlledIsOpen,
+  showEmail = false,
+  showChevron = true,
 }: UserAccountDropdownProps): React.ReactElement {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -30,13 +32,9 @@ export function UserAccountDropdown({
   // Dismiss on Escape key press
   useEffect(() => {
     if (!isDropdownOpen) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setInternalIsOpen(false);
-      }
+      if (e.key === 'Escape') setInternalIsOpen(false);
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isDropdownOpen]);
@@ -44,42 +42,29 @@ export function UserAccountDropdown({
   // Dismiss on outside click
   useEffect(() => {
     if (!isDropdownOpen) return;
-
     const handleOutsideClick = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setInternalIsOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [isDropdownOpen]);
 
   const initials =
     actor.initials ||
-    actor.fullName
-      .split(' ')
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
+    actor.fullName.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
 
   const handleSignOutClick = () => {
     setInternalIsOpen(false);
-    if (onSignOut) {
-      onSignOut();
-    } else if (typeof window !== 'undefined') {
-      window.location.href = '/login';
-    }
+    if (onSignOut) onSignOut();
+    else if (typeof window !== 'undefined') window.location.href = '/login';
   };
 
   const handleProfileClick = () => {
     setInternalIsOpen(false);
-    if (onProfileClick) {
-      onProfileClick();
-    } else if (profilePath && typeof window !== 'undefined') {
-      window.location.href = profilePath;
-    }
+    if (onProfileClick) onProfileClick();
+    else if (profilePath && typeof window !== 'undefined') window.location.href = profilePath;
   };
 
   return (
@@ -93,34 +78,47 @@ export function UserAccountDropdown({
         onClick={() => setInternalIsOpen((prev) => !prev)}
         className="flex items-center gap-2.5 p-1 rounded-full sm:rounded-lg hover:bg-[#F6F3EA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0B5C63] cursor-pointer"
       >
-        {/* Avatar circle */}
-        {actor.avatarUrl ? (
-          <img
-            src={actor.avatarUrl}
-            alt={actor.fullName}
-            className="w-9 h-9 rounded-full object-cover ring-2 ring-[#0B5C63]/20 shadow-xs"
-          />
-        ) : (
-          <div className="w-9 h-9 rounded-full bg-[#0B5C63] text-[#F6F3EA] flex items-center justify-center text-sm font-bold ring-2 ring-[#0B5C63]/20 shadow-xs">
-            {initials}
-          </div>
-        )}
-
-        {/* Actor Info (Hidden on small mobile) */}
-        <div className="hidden sm:flex flex-col text-left">
-          <span className="text-sm font-bold text-[#10201F] leading-tight">
-            {actor.fullName}
-          </span>
-          <span className="text-xs text-[#0B5C63] font-semibold leading-tight mt-0.5">
-            {actor.designation}
-          </span>
+        {/* Avatar circle with online status indicator */}
+        <div className="relative shrink-0">
+          {actor.avatarUrl ? (
+            <img
+              src={actor.avatarUrl}
+              alt={actor.fullName}
+              className="w-8 h-8 rounded-full object-cover ring-1 ring-[#0B5C63]/25 shadow-xs"
+            />
+          ) : showEmail ? (
+            <div className="w-8 h-8 rounded-full bg-[#E5E7EB] text-[#4B5563] flex items-center justify-center text-xs font-semibold shadow-xs">
+              <User className="w-4.5 h-4.5 text-[#9CA3AF]" />
+              <span className="sr-only">{initials}</span>
+            </div>
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-[#0B5C63] text-[#F6F3EA] flex items-center justify-center text-xs font-bold ring-1 ring-[#0B5C63]/25 shadow-xs">
+              {initials}
+            </div>
+          )}
+          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#22C55E] ring-2 ring-white" />
         </div>
 
-        <ChevronDown
-          className={`w-4 h-4 text-[#10201F]/50 transition-transform duration-150 hidden sm:block ${
-            isDropdownOpen ? 'rotate-180 text-[#0B5C63]' : ''
-          }`}
-        />
+        {/* Actor Info (Hidden on small mobile) */}
+        <div className="hidden sm:flex flex-col text-left max-w-[180px] md:max-w-[220px]">
+          <span className="text-xs sm:text-sm font-semibold text-[#10201F] leading-tight truncate">
+            {actor.fullName}
+          </span>
+          <span className="text-[11px] text-[#10201F]/60 font-medium leading-tight mt-0.5 truncate">
+            {showEmail && actor.email ? actor.email : actor.designation}
+          </span>
+          {showEmail && actor.email && actor.designation && (
+            <span className="sr-only">{actor.designation}</span>
+          )}
+        </div>
+
+        {showChevron && (
+          <ChevronDown
+            className={`w-4 h-4 text-[#10201F]/50 transition-transform duration-150 hidden sm:block ${
+              isDropdownOpen ? 'rotate-180 text-[#0B5C63]' : ''
+            }`}
+          />
+        )}
       </button>
 
       {/* Dropdown Menu Panel */}

@@ -12,6 +12,7 @@ import {
   STAFF_NAV_GROUPS,
 } from './role-nav-configs';
 import type { AuthenticatedActor } from './types';
+import { PLATFORM_PERMISSIONS } from '../../features/platform-admin/permissions';
 
 const DEFAULT_ADMIN_ACTOR: AuthenticatedActor = {
   id: 'admin-default',
@@ -20,18 +21,7 @@ const DEFAULT_ADMIN_ACTOR: AuthenticatedActor = {
   designation: 'Platform Super Admin',
   roleBadge: 'Super Admin',
   initials: 'AO',
-  permissions: [
-    'admin:dashboard:view',
-    'admin:businesses:view',
-    'admin:users:view',
-    'admin:plans:view',
-    'admin:subscriptions:view',
-    'admin:transactions:view',
-    'admin:support:view',
-    'admin:notifications:view',
-    'admin:analytics:view',
-    'admin:settings:view',
-  ],
+  permissions: Object.values(PLATFORM_PERMISSIONS),
 };
 
 const DEFAULT_OWNER_ACTOR: AuthenticatedActor = {

@@ -3,85 +3,72 @@
  */
 
 import type { LayoutNavGroup } from './types';
+import { PLATFORM_PERMISSIONS } from '../../features/platform-admin/permissions';
 
 /**
- * Platform Administrator navigation structure.
+ * Platform Administrator navigation structure aligned with the official modules and access specification.
  */
 export const PLATFORM_ADMIN_NAV_GROUPS: LayoutNavGroup[] = [
   {
-    groupTitle: 'Core Platform',
+    groupTitle: 'Overview',
     items: [
       {
         label: 'Dashboard',
         path: '/admin/dashboard',
         icon: 'LayoutDashboard',
-        requiredPermissions: ['admin:dashboard:view'],
-      },
-      {
-        label: 'Analytics',
-        path: '/admin/analytics',
-        icon: 'TrendingUp',
-        requiredPermissions: ['admin:analytics:view'],
+        requiredPermissions: [PLATFORM_PERMISSIONS.DASHBOARD_VIEW],
       },
     ],
   },
   {
-    groupTitle: 'Tenant Management',
+    groupTitle: 'Platform Management',
     items: [
       {
         label: 'Businesses',
         path: '/admin/businesses',
         icon: 'Building2',
         badge: '48',
-        requiredPermissions: ['admin:businesses:view'],
+        requiredPermissions: [PLATFORM_PERMISSIONS.BUSINESSES_VIEW],
+      },
+      {
+        label: 'Client Admin Accounts',
+        path: '/admin/client-admins',
+        icon: 'Users',
+        requiredPermissions: [PLATFORM_PERMISSIONS.CLIENT_ADMINS_VIEW],
+      },
+    ],
+  },
+  {
+    groupTitle: 'Billing Management',
+    items: [
+      {
+        label: 'Subscription Plans',
+        path: '/admin/plans',
+        icon: 'Layers',
+        requiredPermissions: [PLATFORM_PERMISSIONS.PLANS_VIEW],
       },
       {
         label: 'Subscriptions',
         path: '/admin/subscriptions',
         icon: 'CreditCard',
-        requiredPermissions: ['admin:subscriptions:view'],
-      },
-      {
-        label: 'Plans',
-        path: '/admin/plans',
-        icon: 'Layers',
-        requiredPermissions: ['admin:plans:view'],
-      },
-      {
-        label: 'Transactions',
-        path: '/admin/transactions',
-        icon: 'Receipt',
-        requiredPermissions: ['admin:transactions:view'],
+        requiredPermissions: [PLATFORM_PERMISSIONS.SUBSCRIPTIONS_VIEW],
       },
     ],
   },
   {
-    groupTitle: 'Administration & Ops',
+    groupTitle: 'System',
     items: [
       {
-        label: 'Platform Users',
-        path: '/admin/users',
-        icon: 'Users',
-        requiredPermissions: ['admin:users:view'],
+        label: 'Audit and Activity',
+        path: '/admin/audit',
+        icon: 'ShieldAlert',
+        requiredPermissions: [PLATFORM_PERMISSIONS.AUDIT_VIEW],
       },
       {
-        label: 'Support',
-        path: '/admin/support',
-        icon: 'LifeBuoy',
-        badge: '3',
-        requiredPermissions: ['admin:support:view'],
-      },
-      {
-        label: 'Notifications',
-        path: '/admin/notifications',
-        icon: 'Bell',
-        requiredPermissions: ['admin:notifications:view'],
-      },
-      {
-        label: 'Settings',
+        label: 'Platform Settings',
         path: '/admin/settings',
         icon: 'Settings',
-        requiredPermissions: ['admin:settings:view'],
+        requiredPermissions: [PLATFORM_PERMISSIONS.SETTINGS_VIEW],
       },
     ],
   },

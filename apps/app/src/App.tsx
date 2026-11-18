@@ -5,12 +5,8 @@
 import React from 'react';
 import { SyncProvider } from './features/sync/SyncProvider';
 import type { SyncAdapter } from './features/sync/types';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { ReceptionWorkspace } from './features/staff-workspace/reception/ReceptionWorkspace';
-import { StaffWorkspace } from './features/staff-workspace/StaffWorkspace';
-import { ForgotPassword } from './pages/ForgotPassword';
+import { BrowserRouter } from 'react-router-dom';
+import { AppRoutes } from './AppRoutes';
 
 /**
  * @description Main app router hosting authentication and authenticated portal.
@@ -22,16 +18,7 @@ export function App({ syncAdapter }: { syncAdapter?: SyncAdapter } = {}): React.
       <BrowserRouter>
         <div className="min-h-screen flex flex-col bg-flour text-oven-black selection:bg-verdigris selection:text-flour font-sans antialiased">
           <main className="flex-1">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/workspace-preview/reception/*" element={<ReceptionWorkspace />} />
-              <Route path="/workspace-preview/*" element={<StaffWorkspace preview />} />
-              <Route path="/workspace/*" element={<StaffWorkspace />} />
-              {/* Fallback to Login */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
+            <AppRoutes />
           </main>
         </div>
       </BrowserRouter>
