@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Logo } from '@repo/shared/component/Logo';
+import { Logo } from '../../../../packages/ui/src/component/Logo.js';
 import { RegisterForm } from '../components/auth/RegisterForm';
 
 /**

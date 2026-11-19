@@ -21,7 +21,7 @@ export function Contact(): React.ReactElement {
         backgroundImage="/images/4880311.jpg"
         primaryCta={{
           text: 'Get Started Free',
-          href: '/register',
+          href: import.meta.env.VITE_PUBLIC_APP_URL || "",
         }}
         secondaryCta={{
           text: 'Explore Features',

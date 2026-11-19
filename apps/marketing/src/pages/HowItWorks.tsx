@@ -23,7 +23,7 @@ export function HowItWorks(): React.ReactElement {
         backgroundImage="/images/8576717.jpg"
         primaryCta={{
           text: 'Get Started Free',
-          href: '/register',
+          href: import.meta.env.VITE_PUBLIC_APP_URL || "",
         }}
         secondaryCta={{
           text: 'Explore Features',
@@ -46,7 +46,7 @@ export function HowItWorks(): React.ReactElement {
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-2">
             <Button
-              to="/register"
+              to={import.meta.env.VITE_PUBLIC_APP_URL || ""}
               variant="copper"
               size="lg"
               icon={<ArrowRight className="w-4 h-4" />}

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Logo } from '@repo/shared/component/Logo';
+import { Logo } from '../../../../../packages/ui/src/component/Logo.js';
 import { FOOTER_SECTIONS } from '../../data/navigation';
 
 const CURRENT_YEAR = 2026;

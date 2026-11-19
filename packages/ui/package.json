@@ -1,0 +1,29 @@
+{
+  "name": "@repo/ui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    "./styles/variables.css": "./src/styles/variables.css",
+    "./component/Logo": "./src/component/Logo.tsx"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .tsx"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "react": "^19.3.1"
+  }
+}

@@ -32,7 +32,7 @@ export function About(): React.ReactElement {
         backgroundImage="/images/magnific_flatdesignbusinesscommunicationconcept5268376243_lJoFq9sgv9.png"
         primaryCta={{
           text: 'Get Started Free',
-          href: '/register',
+          href: import.meta.env.VITE_PUBLIC_APP_URL || "",
         }}
         secondaryCta={{
           text: 'Explore Features',
@@ -61,7 +61,7 @@ export function About(): React.ReactElement {
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-2">
             <Button
-              to="/register"
+              to={import.meta.env.VITE_PUBLIC_APP_URL || ""}
               variant="copper"
               size="lg"
               icon={<ArrowRight className="w-4 h-4" />}

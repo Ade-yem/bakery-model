@@ -121,7 +121,7 @@ export function HomeHero(): React.ReactElement {
         {/* Finview Two Pill Buttons with Angled Arrow ↗ */}
         <div className="flex flex-wrap items-center justify-center gap-4">
           <Link
-            to="/register"
+            to={import.meta.env.VITE_PUBLIC_APP_URL || ""}
             className="inline-flex items-center gap-1.5 px-7 py-3.5 rounded-full bg-verdigris text-flour text-sm font-semibold hover:bg-verdigris-lift transition-colors shadow-xs"
           >
             <span>Get Started</span>

@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import { Logo } from '@repo/shared/component/Logo';
+import { Logo } from '../../../../../../packages/ui/src/component/Logo.js';
 import { StaffWorkspace } from '../StaffWorkspace';
 import { readFileSync } from 'node:fs';
 const tokens = readFileSync(new URL('../../../../../../packages/shared/src/styles/variables.css', import.meta.url), 'utf8');

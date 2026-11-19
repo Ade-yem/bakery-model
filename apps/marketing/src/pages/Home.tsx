@@ -44,7 +44,7 @@ export function Home(): React.ReactElement {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
-              to="/register"
+              to={import.meta.env.VITE_PUBLIC_APP_URL || ""}
               variant="copper"
               size="lg"
               icon={<ArrowRight className="w-4 h-4" />}
