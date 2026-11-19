@@ -3,7 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export function configureApp(app: INestApplication): void {
   app.setGlobalPrefix('api/v1', {
-    exclude: ['api/auth/(.*)', 'docs/(.*)', 'health/(.*)'],
+    exclude: ['api/auth/{*path}', 'docs/{*path}', 'health/{*path}'],
   });
 
   const swaggerConfig = new DocumentBuilder()
