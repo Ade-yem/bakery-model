@@ -27,6 +27,11 @@ const AdminRoutes = lazy(() =>
     default: m.AdminRoutes,
   }))
 );
+const BusinessAdminRoutes = lazy(() =>
+  import('./features/client-admin/BusinessAdminRoutes').then((m) => ({
+    default: m.BusinessAdminRoutes,
+  }))
+);
 
 /**
  * Component used to simulate an intentional render crash for testing ErrorBoundary.
@@ -122,6 +127,16 @@ export function AppRoutes(): React.ReactElement {
             element={
               <Suspense fallback={<RouteSkeleton variant="dashboard" />}>
                 <AdminRoutes />
+              </Suspense>
+            }
+          />
+
+          {/* Client Business Admin Sub-Tree */}
+          <Route
+            path="/business/*"
+            element={
+              <Suspense fallback={<RouteSkeleton variant="dashboard" />}>
+                <BusinessAdminRoutes />
               </Suspense>
             }
           />
