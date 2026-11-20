@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { ReceptionWorkspace } from './features/staff-workspace/reception/ReceptionWorkspace';
+import { ProcurementWorkspace } from './features/staff-workspace/procurement/ProcurementWorkspace';
 import { StaffWorkspace } from './features/staff-workspace/StaffWorkspace';
 import { ForgotPassword } from './pages/ForgotPassword';
 
@@ -27,6 +28,7 @@ export function App({ syncAdapter }: { syncAdapter?: SyncAdapter } = {}): React.
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/workspace-preview/reception/*" element={<ReceptionWorkspace />} />
+              <Route path="/workspace-preview/procurement/*" element={<ProcurementWorkspace />} />
               <Route path="/workspace-preview/*" element={<StaffWorkspace preview />} />
               <Route path="/workspace/*" element={<StaffWorkspace />} />
               {/* Fallback to Login */}

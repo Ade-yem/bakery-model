@@ -27,6 +27,9 @@ interface Props {
   dialog?: ReactNode;
   extraLinks?: { path: string; label: string }[];
   navigationLabels?: Record<string, string>;
+  hiddenNavigationPaths?: string[];
+  navigationPathOverrides?: Record<string, string>;
+  showSyncStatus?: boolean;
 }
 const navigationIcons = [LayoutDashboard, ClipboardList, Files, History, CalendarDays, UserRound];
 /**
@@ -45,6 +48,9 @@ export function StaffShell({
   dialog,
   extraLinks = [],
   navigationLabels = {},
+  hiddenNavigationPaths = [],
+  navigationPathOverrides = {},
+  showSyncStatus = true,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
@@ -77,19 +83,21 @@ export function StaffShell({
         </div>
         <p className="sw-nav-caption">My workspace</p>
         <nav aria-label="Staff navigation" onClick={() => setMenuOpen(false)}>
-          {getStaffNavigation(access).map((item, index) => {
-            const Icon = navigationIcons[index];
-            return (
-              <NavLink
-                end={item.path === '/workspace'}
-                key={item.path}
-                to={item.path.replace('/workspace', base)}
-              >
-                <Icon size={18} strokeWidth={1.6} />
-                <span>{navigationLabels[item.path] ?? item.label}</span>
-              </NavLink>
-            );
-          })}
+          {getStaffNavigation(access)
+            .filter((item) => !hiddenNavigationPaths.includes(item.path))
+            .map((item, index) => {
+              const Icon = navigationIcons[index];
+              return (
+                <NavLink
+                  end={item.path === '/workspace'}
+                  key={item.path}
+                  to={navigationPathOverrides[item.path] ?? item.path.replace('/workspace', base)}
+                >
+                  <Icon size={18} strokeWidth={1.6} />
+                  <span>{navigationLabels[item.path] ?? item.label}</span>
+                </NavLink>
+              );
+            })}
           {extraLinks.map((item) => (
             <NavLink key={item.path} to={item.path}>
               <UserRound size={18} strokeWidth={1.6} />
@@ -132,7 +140,7 @@ export function StaffShell({
           </div>
           <span className="sw-preview-badge">Sample data · UI preview</span>
         </header>
-        <GlobalSyncStatus />
+        {showSyncStatus && <GlobalSyncStatus />}
         <div className="sw-preview-notice">
           Preview only. No live shift, stock or server connection. <span>{department} role</span>
         </div>

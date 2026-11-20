@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { Logo } from '../../../../../../packages/ui/src/component/Logo.js';
 import { StaffWorkspace } from '../StaffWorkspace';
 import { readFileSync } from 'node:fs';
-const tokens = readFileSync(new URL('../../../../../../packages/shared/src/styles/variables.css', import.meta.url), 'utf8');
+const tokens = readFileSync(new URL('../../../../../../packages/ui/src/styles/variables.css', import.meta.url), 'utf8');
 const globalStyles = readFileSync(new URL('../../../styles/global.css', import.meta.url), 'utf8');
 
 describe('Shared visual identity', () => {
