@@ -26,7 +26,7 @@ export function Pricing(): React.ReactElement {
         backgroundImage="/images/4880311.jpg"
         primaryCta={{
           text: 'Get Started',
-          href: '/register',
+          href: import.meta.env.VITE_PUBLIC_APP_URL || "",
         }}
         secondaryCta={{
           text: 'Contact Sales',
@@ -87,7 +87,7 @@ export function Pricing(): React.ReactElement {
             Choose the plan that suits your operational volume and start gaining clarity across all shifts.
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-2">
-            <Button to="/register" variant="copper" size="lg" icon={<ArrowRight className="w-4 h-4" />}>
+            <Button to={import.meta.env.VITE_PUBLIC_APP_URL || ""} variant="copper" size="lg" icon={<ArrowRight className="w-4 h-4" />}>
               Get Started Now
             </Button>
             <Button

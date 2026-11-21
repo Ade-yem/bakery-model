@@ -4,6 +4,7 @@ import { StaffState } from './features/staff-workspace/StaffState';
  */
 
 import React from 'react';
+import type { ApiClient } from './features/api/http';
 import type { WorkspaceAdapter } from './features/integration/workspace';
 import type { AuthClient } from './features/integration/auth';
 import { AuthProvider } from './features/integration/AuthProvider';
@@ -23,10 +24,12 @@ export function App({
   syncAdapter,
   authClient,
   workspaceAdapter,
+  api,
 }: {
   syncAdapter?: SyncAdapter;
   authClient?: AuthClient;
   workspaceAdapter?: WorkspaceAdapter;
+  api?: ApiClient;
 } = {}): React.ReactElement {
   return (
     <AuthProvider client={authClient}>
@@ -40,7 +43,7 @@ export function App({
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route
                   path="/workspace/*"
-                  element={<WorkspaceRoute adapter={workspaceAdapter} />}
+                  element={<WorkspaceRoute adapter={workspaceAdapter} api={api} />}
                 />
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route

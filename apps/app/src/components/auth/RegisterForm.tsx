@@ -3,6 +3,7 @@
  */
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { requireAuthClient, useAuth } from '../../features/integration/auth';
 import { Building2, User, Mail, Lock, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { validateRegisterForm } from '../../utils/validation';
@@ -19,12 +20,12 @@ export interface RegisterFormProps {
  */
 export function RegisterForm({ selectedPlan }: RegisterFormProps): React.ReactElement {
   const auth = useAuth();
+  const navigate = useNavigate();
   const [pending, setPending] = useState(false);
   const [values, setValues] = useState<RegisterFormValues>({
     businessName: '',
     fullName: '',
     email: '',
-    username: '',
     password: '',
     confirmPassword: '',
     agreeToTerms: false,
@@ -64,6 +65,8 @@ export function RegisterForm({ selectedPlan }: RegisterFormProps): React.ReactEl
     setPending(true);
     try {
       await requireAuthClient(auth.client).register(values, selectedPlan);
+      await auth.refresh();
+      navigate('/workspace', { state: { businessName: values.businessName } });
       setValues((current) => ({ ...current, password: '', confirmPassword: '' }));
       setStatusNotice({
         type: 'success',
@@ -136,8 +139,8 @@ export function RegisterForm({ selectedPlan }: RegisterFormProps): React.ReactEl
             )}
           </div>
 
-          {/* Full Name & Username in 2 columns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Full name */}
+          <div className="grid grid-cols-1 gap-3">
             <div>
               <div
                 className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-verdigris ${
@@ -163,35 +166,6 @@ export function RegisterForm({ selectedPlan }: RegisterFormProps): React.ReactEl
               {errors.fullName && (
                 <p id="reg-fname-err" className="text-xs text-[#B3261E] mt-1 pl-1">
                   {errors.fullName}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <div
-                className={`flex items-center rounded-md border bg-white overflow-hidden transition-all focus-within:ring-2 focus-within:ring-verdigris ${
-                  errors.username ? 'border-[#B3261E]' : 'border-rule'
-                }`}
-              >
-                <div className="flex items-center justify-center px-3 py-2.5 text-verdigris border-r border-[#E5E0D0] bg-[#F9F7F1]/60">
-                  <span className="text-xs font-bold text-verdigris">@</span>
-                </div>
-                <input
-                  id="reg-username"
-                  name="username"
-                  type="text"
-                  value={values.username}
-                  onChange={handleChange}
-                  placeholder="Username"
-                  aria-label="Username"
-                  aria-invalid={!!errors.username}
-                  aria-describedby={errors.username ? 'reg-uname-err' : undefined}
-                  className="w-full px-3 py-2.5 text-sm text-oven-black placeholder-oven-black/40 focus:outline-none bg-transparent"
-                />
-              </div>
-              {errors.username && (
-                <p id="reg-uname-err" className="text-xs text-[#B3261E] mt-1 pl-1">
-                  {errors.username}
                 </p>
               )}
             </div>

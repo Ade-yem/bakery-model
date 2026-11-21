@@ -1,3 +1,6 @@
+import type { ApiClient } from '../api/http';
+import { WorkspaceSetup } from '../api/WorkspaceSetup';
+import { LiveWorkspace } from '../api/LiveWorkspace';
 import { JournalPage } from './journal/JournalPage';
 import { StaffShell } from './StaffShell';
 import { AssignedAccess, canOpenStaffPath, isKnownStaffPath } from './policy';
@@ -13,7 +16,10 @@ import { WorkspaceProvider } from '../integration/WorkspaceProvider';
 import { useAuth } from '../integration/auth';
 
 /** Staff route boundary. Requires a verified session and explicit backend-resolved assignments. */
-export function WorkspaceRoute({ adapter }: { adapter?: WorkspaceAdapter } = {}) {
+export function WorkspaceRoute({
+  adapter,
+  api,
+}: { adapter?: WorkspaceAdapter; api?: ApiClient } = {}) {
   const { pathname } = useLocation();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -67,6 +73,17 @@ export function WorkspaceRoute({ adapter }: { adapter?: WorkspaceAdapter } = {})
         title="Business subscription expired"
         description="Your business administrator must restore the subscription before operational access can continue. Your saved work has been retained."
       />
+    );
+  if (!session.department) return <WorkspaceSetup />;
+  if (api)
+    return (
+      <AssignedAccess.Provider value={session}>
+        <LiveWorkspace
+          key={`${session.userId}:${session.tenantId}:${session.branchId}:${session.departmentId}`}
+          api={api}
+          session={session}
+        />
+      </AssignedAccess.Provider>
     );
   const base = `/workspace/${session.department}`;
   if (pathname === '/workspace' || pathname === '/workspace/')

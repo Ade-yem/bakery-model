@@ -1,10 +1,10 @@
 # Live workflow integration boundary
 
-The application contains no development login, runtime seed records, preview routes or fabricated mutation success. With no adapters supplied, authentication and protected workspaces show unavailable states. There is no fallback to old browser sessions or device records.
+The application contains no development login, runtime seed records, preview routes or fabricated mutation success. The normal bootstrap connects cookie authentication, workspace selection and supported reference-data workflows to the supplied Cadence API. See [API integration](../api/README.md) for current coverage and verified limits. There is no fallback to old browser sessions or device records.
 
 ## Team handoff
 
-`App` accepts `authClient`, `workspaceAdapter` and the existing `syncAdapter`. Supply these from the application bootstrap when the team approves the deployed API and authentication contract. No provider, endpoint URL or new dependency has been selected by this cleanup.
+`App` accepts `authClient`, `api`, `workspaceAdapter` and the existing `syncAdapter`. The bootstrap supplies the live auth client and API transport. The contracts below preserve transactional workflow UI for later integration; operational and synchronization adapters remain unconfigured because the corresponding endpoints are unavailable. No new dependency is required.
 
 - `auth.ts`: the session identity, assignments, plan/module grants and asynchronous sign-in, registration, reset and logout contract. An adapter must use server-authenticated sessions, map failures to safe messages and handle cookie/CSRF policy. Browser-supplied identity is never server authorization.
 - `workspace.ts`: a discriminated snapshot per department. Map and validate API responses in the adapter; do not fetch all departments and hide sensitive fields in presentation code. Scope includes tenant, branch, user and department. Scope mismatch or missing record collections blocks rendering.

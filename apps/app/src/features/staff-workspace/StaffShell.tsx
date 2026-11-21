@@ -16,7 +16,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { GlobalSyncStatus } from '../sync/SyncStatus';
-import { Logo } from '../../components/shared/Logo';
+import { Logo } from '@repo/ui/component/Logo';
 import { getStaffNavigation, type StaffAccess } from './access';
 interface Props {
   base: string;
@@ -25,6 +25,7 @@ interface Props {
   dialog?: ReactNode;
   extraLinks?: { path: string; label: string }[];
   navigationLabels?: Record<string, string>;
+  navigationLinks?: { path: string; label: string }[];
 }
 const navigationIcons = {
   '/workspace': LayoutDashboard,
@@ -46,6 +47,7 @@ export function StaffShell({
   dialog,
   extraLinks = [],
   navigationLabels = {},
+  navigationLinks,
 }: Props) {
   const auth = useAuth();
   const [logoutError, setLogoutError] = useState('');
@@ -84,34 +86,41 @@ export function StaffShell({
           </span>
           <div>
             <strong>{department}</strong>
-            <p>{auth.session?.tenantName}</p>
+            <p>{auth.session?.tenantName ?? 'Business workspace'}</p>
           </div>
         </div>
         <p className="sw-nav-caption">My workspace</p>
         <nav aria-label="Staff navigation" onClick={() => setMenuOpen(false)}>
-          {getStaffNavigation(effectiveAccess)
-            .filter(
-              (item) =>
-                !assigned ||
-                canOpenStaffPath(
-                  department.toLowerCase() as Department,
-                  item.path.replace('/workspace', ''),
-                  effectiveAccess
-                )
-            )
-            .map((item) => {
-              const Icon = navigationIcons[item.path as keyof typeof navigationIcons];
-              return (
-                <NavLink
-                  end={item.path === '/workspace'}
-                  key={item.path}
-                  to={item.path.replace('/workspace', base)}
-                >
-                  <Icon size={18} strokeWidth={1.6} />
-                  <span>{navigationLabels[item.path] ?? item.label}</span>
+          {navigationLinks
+            ? navigationLinks.map((item) => (
+                <NavLink end={item.path === base} key={item.path} to={item.path}>
+                  <Files size={18} strokeWidth={1.6} />
+                  <span>{item.label}</span>
                 </NavLink>
-              );
-            })}
+              ))
+            : getStaffNavigation(effectiveAccess)
+                .filter(
+                  (item) =>
+                    !assigned ||
+                    canOpenStaffPath(
+                      department.toLowerCase() as Department,
+                      item.path.replace('/workspace', ''),
+                      effectiveAccess
+                    )
+                )
+                .map((item) => {
+                  const Icon = navigationIcons[item.path as keyof typeof navigationIcons];
+                  return (
+                    <NavLink
+                      end={item.path === '/workspace'}
+                      key={item.path}
+                      to={item.path.replace('/workspace', base)}
+                    >
+                      <Icon size={18} strokeWidth={1.6} />
+                      <span>{navigationLabels[item.path] ?? item.label}</span>
+                    </NavLink>
+                  );
+                })}
           {effectiveAccess.enabledModules.length > 0 && (
             <NavLink to={`${base}/sync`}>
               <ShieldCheck size={18} />

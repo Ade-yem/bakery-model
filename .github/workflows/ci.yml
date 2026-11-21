@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main, BE-Adeyemi]
+  pull_request:
+    branches: [main, BE-Adeyemi]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tallybakery
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Run builds
+        run: pnpm build
+
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tallybakery
+        run: cd apps/api && pnpm drizzle-kit migrate
+
+      - name: Run unit & integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tallybakery
+          BETTER_AUTH_SECRET: testing-secret-must-be-at-least-32-characters-long
+          PORT: 3000
+        run: pnpm test
+
+      - name: Run E2E tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tallybakery
+          BETTER_AUTH_SECRET: testing-secret-must-be-at-least-32-characters-long
+          PORT: 3000
+        run: pnpm test:e2e

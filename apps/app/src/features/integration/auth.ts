@@ -8,21 +8,35 @@ export interface StaffSession {
   displayName: string;
   role: string;
   tenantId: string;
-  tenantName: string;
+  tenantName: string | null;
   branchId: string;
   branchName: string;
   department: Department;
   expiresAt: number;
   accountStatus: 'ACTIVE' | 'SUSPENDED' | 'INACTIVE';
-  subscriptionStatus: 'ACTIVE' | 'PAST_DUE' | 'EXPIRED';
+  subscriptionStatus: 'ACTIVE' | 'PAST_DUE' | 'EXPIRED' | 'UNKNOWN';
+  departmentId?: string;
+  departmentName?: string;
   enabledModules: string[];
   planModules: string[];
   permissions: string[];
 }
+export type AccountSession = Omit<StaffSession, 'department'> & { department: null };
+export type AuthenticatedSession = StaffSession | AccountSession;
+export interface WorkspaceChoice {
+  branchId: string;
+  branchName: string;
+  departments: { id: string; name: string; department: Department }[];
+}
 /** Implement with the team's authenticated transport; never persist a session token here. */
 export interface AuthClient {
-  getSession(): Promise<StaffSession | null>;
-  signIn(identifier: string, password: string): Promise<StaffSession>;
+  getSession(): Promise<AuthenticatedSession | null>;
+  signIn(identifier: string, password: string): Promise<AuthenticatedSession>;
+  passwordResetAvailable?: boolean;
+  clearWorkspace?: () => void;
+  workspaces?(): Promise<WorkspaceChoice[]>;
+  selectWorkspace?(branchId: string, departmentId: string): Promise<StaffSession>;
+  onboardBusiness?(name: string): Promise<AuthenticatedSession>;
   signOut(): Promise<void>;
   register(values: RegisterFormValues, plan: string): Promise<void>;
   requestPasswordReset(email: string): Promise<void>;
@@ -31,29 +45,23 @@ export function requireAuthClient(client: AuthClient | null): AuthClient {
   if (!client) throw new Error('Sign-in is currently unavailable. Please try again later.');
   return client;
 }
-export function validateSession(value: unknown): StaffSession | null {
+export function validateSession(value: unknown): AuthenticatedSession | null {
   if (value === null) return null;
   if (!value || typeof value !== 'object') throw new Error('The session could not be verified.');
-  const session = value as StaffSession;
+  const session = value as AuthenticatedSession;
   if (
-    !['production', 'reception', 'disbursement', 'procurement'].includes(session.department) ||
-    [
-      'userId',
-      'email',
-      'displayName',
-      'role',
-      'tenantId',
-      'tenantName',
-      'branchId',
-      'branchName',
-    ].some(
+    (session.department !== null &&
+      !['production', 'reception', 'disbursement', 'procurement'].includes(session.department)) ||
+    ['userId', 'email', 'displayName', 'role', 'tenantId', 'branchId', 'branchName'].some(
       (key) =>
         typeof session[key as keyof StaffSession] !== 'string' ||
-        !String(session[key as keyof StaffSession]).trim()
+        ((['userId', 'email', 'displayName'].includes(key) || session.department !== null) &&
+          !String(session[key as keyof StaffSession]).trim())
     ) ||
+    (session.tenantName !== null && typeof session.tenantName !== 'string') ||
     !Number.isFinite(session.expiresAt) ||
     !['ACTIVE', 'SUSPENDED', 'INACTIVE'].includes(session.accountStatus) ||
-    !['ACTIVE', 'PAST_DUE', 'EXPIRED'].includes(session.subscriptionStatus) ||
+    !['ACTIVE', 'PAST_DUE', 'EXPIRED', 'UNKNOWN'].includes(session.subscriptionStatus) ||
     ['enabledModules', 'planModules', 'permissions'].some((key) => {
       const entries = session[key as 'permissions'];
       return !Array.isArray(entries) || !entries.every((entry) => typeof entry === 'string');
@@ -64,11 +72,13 @@ export function validateSession(value: unknown): StaffSession | null {
 }
 export interface AuthState {
   status: 'unavailable' | 'loading' | 'ready' | 'error';
-  session: StaffSession | null;
+  session: AuthenticatedSession | null;
   client: AuthClient | null;
   error?: string;
   refresh: () => Promise<void>;
-  signIn: (identifier: string, password: string) => Promise<StaffSession>;
+  signIn: (identifier: string, password: string) => Promise<AuthenticatedSession>;
+  selectWorkspace?: (branchId: string, departmentId: string) => Promise<void>;
+  onboardBusiness?: (name: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 const unavailable = async (): Promise<never> => {

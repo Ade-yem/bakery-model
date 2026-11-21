@@ -38,7 +38,7 @@ export function WorkspaceProvider({
     const request = ++revision.current;
     currentSession.current = session;
     queue.current = new MutationQueue();
-    if (session && adapter)
+    if (session?.department && adapter)
       void adapter
         .load(session)
         .then((data) => {
@@ -72,7 +72,7 @@ export function WorkspaceProvider({
         description="Your workspace is currently unavailable. Please try again later."
       />
     );
-  if (!session) return null;
+  if (!session || !session.department) return null;
   if (error && error.owner === session && error.adapter === adapter && error.attempt === attempt)
     return (
       <section className="sw-root sw-session">

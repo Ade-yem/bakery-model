@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Logo } from '../components/shared/Logo';
+import { Logo } from '@repo/ui/component/Logo';
 import { LoginForm } from '../components/auth/LoginForm';
 
 /**
@@ -14,25 +14,11 @@ import { LoginForm } from '../components/auth/LoginForm';
 export function Login(): React.ReactElement {
   return (
     <div className="relative min-h-screen flex flex-col justify-between items-center py-10 px-4 sm:px-6 overflow-hidden font-sans">
-      {/* Background Video Layer */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
-      >
-        <source src="/videos/hero-background.mp4" type="video/mp4" />
-      </video>
-
-      {/* Translucent Soft Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-flour/85 via-flour/75 to-oven-black/80 backdrop-blur-[2px] z-0 pointer-events-none" />
-
       {/* Spacer to push card towards optical center */}
       <div className="w-full h-2 z-10" />
 
       {/* Floating Center Card (Matching Reference Layout) */}
-      <div className="relative z-10 w-full max-w-[420px] bg-white rounded-xl shadow-2xl border border-white/60 overflow-hidden my-auto animate-fade-in">
+      <div className="relative z-10 w-full max-w-120 bg-white rounded-xl shadow-2xl border border-white/60 overflow-hidden my-auto animate-fade-in">
         {/* Top Logo Badge Matching Brand Header */}
         <div className="pt-8 pb-3 px-8 text-center flex flex-col items-center">
           <Logo showTagline={true} />
@@ -45,7 +31,7 @@ export function Login(): React.ReactElement {
             <h1 className="text-xl font-bold text-oven-black tracking-tight">
               Login to your account
             </h1>
-            <div className="w-10 h-1 bg-[#A9501A] mt-1.5 rounded-full" />
+            <div className="w-10 h-1 bg-copper mt-1.5 rounded-full" />
           </div>
 
           {/* Form */}

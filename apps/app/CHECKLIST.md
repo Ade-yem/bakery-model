@@ -1,3 +1,25 @@
+# Live API integration — current work
+
+Implementation remains inside `apps/app`; no integration-authored changes affect dependencies, API, shared packages or marketing source. The working branch is `frontend`, with the tested integration and its updated-main baseline merged while preserving branch history. Earlier cleanup and the colleague's Procurement components are reconciled.
+
+- [x] Read `docs/api` and compare with deployed OpenAPI and public health/session endpoints.
+- [x] Cookie credential transport, safe errors, timeout/cancellation and explicit scope headers.
+- [x] Same-origin Vite and Vercel proxy to the supplied Render API.
+- [x] Real sign-in/session discovery, `/me`, logout, signup and separate business onboarding.
+- [x] Server-validated workspace selection without client-created grants or auth tokens.
+- [x] Authorized catalogue, supplier and customer directories and supported supplier/customer entry.
+- [x] Preserve shared UI and Procurement components; exclude legacy fixtures from runtime.
+- [x] Final contract, browser, typecheck, lint and production-build verification.
+- [ ] Authenticated acceptance with a real test account and deployed frontend origin — no account provided.
+- [ ] Team: transactional endpoints for batches, orders/payments, purchase orders, receipts, stock movements, shifts, handovers and sync.
+- [ ] Team: full effective selected-tenant context, plan entitlements and password-reset delivery.
+
+Verified on 2026-11-21: 222 tests across 32 files passed; TypeScript, Oxlint, production build, scoped formatting and whitespace checks passed. Isolated Chromium checks passed for sign-in/logout, server-validated selection, all four department directories, supplier/customer entry, failed writes with retained input, onboarding recovery without duplicate submission, and authentication layouts at 320/768/1024/1440 pixels. No uncaught page errors occurred. Public checks confirmed API readiness, anonymous session `null` and `/me` returning `401 AUTH_REQUIRED`. No live writes were made; authenticated acceptance remains unverified without a real test account.
+
+See `src/features/api/README.md` for coverage, limits and sources.
+
+## Previous cleanup record
+
 # Cadence frontend checklist
 
 All implementation changes stay inside `apps/app`. Marketing, dependency declarations and the root lockfile are unchanged.
@@ -31,7 +53,7 @@ All implementation changes stay inside `apps/app`. Marketing, dependency declara
 - [x] Pending-work/conflict views accept actual scoped metadata; unknown status is not reported as zero.
 - [x] Static app-shell offline caching retained; no operational/offline synchronization success is assumed.
 
-## Live integration — awaiting team contracts
+## Live integration — status at previous cleanup
 
 - [ ] Authenticated session, sign-in, registration, password reset and logout adapter.
 - [ ] Server-enforced tenant, branch, department, role and field-level authorization.
@@ -43,7 +65,7 @@ All implementation changes stay inside `apps/app`. Marketing, dependency declara
 - [ ] Approved migration/archive policy for legacy unscoped browser evidence.
 - [ ] End-to-end acceptance against actual team services.
 
-There are no development credentials. Until adapters are supplied, sign-in and protected workspaces show unavailable states. This is integration-ready frontend code, not a claim that live operations are complete. See `src/features/integration/README.md` for the handoff.
+There are no development credentials. At the time of cleanup, sign-in and protected workspaces were unavailable pending adapters. The current integration status is recorded at the top of this file; live transactional operations remain pending team contracts. See `src/features/integration/README.md` for the handoff.
 
 ## 2. Super Admin
 

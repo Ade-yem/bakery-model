@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation, Link } from 'react-router-dom';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
-import { Logo } from '../shared/Logo';
+import { Logo } from '@repo/ui/component/Logo';
 
 /**
  * Navigation item structure for public links.
@@ -87,7 +87,7 @@ export function Navbar(): React.ReactElement {
           {/* Desktop Public Actions: Sign In & Get Started */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
-              to="/register"
+              to={import.meta.env.VITE_PUBLIC_APP_URL || ""}
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-verdigris text-flour text-sm font-semibold hover:bg-verdigris-lift transition-colors shadow-xs"
             >
               <span>Launch App</span>
@@ -146,10 +146,10 @@ export function Navbar(): React.ReactElement {
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/register"
+                to={import.meta.env.VITE_PUBLIC_APP_URL || "/"}
                 className="w-full inline-flex items-center justify-center gap-1 px-5 py-3 rounded-full bg-verdigris text-sm font-semibold text-flour"
               >
-                <span>Get Started</span>
+                <span>Launch App</span>
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
             </div>

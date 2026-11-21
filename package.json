@@ -7,20 +7,21 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev:api": "pnpm --filter @repo/api dev",
-    "dev:marketing": "pnpm --filter @repo/marketing dev",
+    "dev:api": "pnpm --filter @repo/api start:dev",
+    "dev:marketing": "pnpm --filter marketing dev",
     "dev:app": "pnpm --filter @repo/app dev",
     "build:api": "pnpm --filter @repo/api build",
-    "build:marketing": "pnpm --filter @repo/marketing build",
+    "build:marketing": "pnpm --filter marketing build",
     "build:app": "pnpm --filter @repo/app build",
     "build": "pnpm run build:api && pnpm run build:marketing && pnpm run build:app",
     "start:api": "pnpm --filter @repo/api start",
-    "start:marketing": "pnpm --filter @repo/marketing preview",
+    "start:marketing": "pnpm --filter marketing preview",
     "start:app": "pnpm --filter @repo/app preview",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prod": "vercel build --prod && vercel deploy --prod --prebuilt"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.0.0",

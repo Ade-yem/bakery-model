@@ -99,7 +99,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
 
   return (
     <div>
-      {!auth.client && (
+      {(!auth.client || auth.client.passwordResetAvailable === false) && (
         <p role="status" className="mb-4 text-sm">
           Password reset is currently unavailable. Please try again later.
         </p>
@@ -151,7 +151,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps): Reac
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={pending || !auth.client}
+              disabled={pending || !auth.client || auth.client.passwordResetAvailable === false}
               className="w-full mt-2 py-2.5 px-4 rounded-md bg-verdigris hover:bg-[#08484E] text-white font-medium text-sm transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-verdigris cursor-pointer"
             >
               Send Reset Link

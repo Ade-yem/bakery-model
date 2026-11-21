@@ -4,6 +4,8 @@ The main operational web application for Cadence — a multi-tenant, offline-fir
 
 ## Overview
 
+Current live coverage includes cookie authentication, business setup, verified workspace selection, department catalogues, supplier entry and customer entry through the supplied Render API. Transactional workflows below describe the product scope; their pages remain unavailable pending deployed endpoints. See [API integration](src/features/api/README.md) and [CHECKLIST.md](CHECKLIST.md) for verified implementation and remaining team dependencies.
+
 This application serves as the primary user interface for bakery staff and managers across all operational roles:
 
 - **Shift & Handover Management**: Shift start, cash float declaration, mid-shift transfers, and shift seals.

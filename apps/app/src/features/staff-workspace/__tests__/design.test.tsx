@@ -4,10 +4,13 @@ import { TestWorkspace } from './fixtures/workspace';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import { Logo } from '../../../components/shared/Logo';
+import { Logo } from '@repo/ui/component/Logo';
 import { StaffWorkspace } from '../StaffWorkspace';
 import { readFileSync } from 'node:fs';
-const tokens = readFileSync(new URL('../../../styles/variables.css', import.meta.url), 'utf8');
+const tokens = readFileSync(
+  new URL('../../../../../../packages/ui/src/styles/variables.css', import.meta.url),
+  'utf8'
+);
 const globalStyles = readFileSync(new URL('../../../styles/global.css', import.meta.url), 'utf8');
 
 describe('Shared visual identity', () => {

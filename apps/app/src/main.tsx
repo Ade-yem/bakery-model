@@ -2,10 +2,20 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/global.css';
 import App from './App.tsx';
+import { createApiClient } from './features/api/http';
+import { createAuthClient } from './features/api/auth-client';
+const api = createApiClient();
+let selectors: Storage | null = null;
+try {
+  selectors = sessionStorage;
+} catch {
+  /* Context can still be selected for this visit. */
+}
+const authClient = createAuthClient(api, selectors);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <App authClient={authClient} api={api} />
   </StrictMode>
 );
 

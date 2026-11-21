@@ -1,0 +1,139 @@
+import { TestWorkspace } from '../../__tests__/fixtures/workspace';
+/** @file Integration and rendering tests for the Procurement workspace preview. */
+import { describe, expect, it } from 'vitest';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { MemoryRouter } from 'react-router-dom';
+import { ProcurementWorkspace } from '../ProcurementWorkspace';
+import { CreatePoDialog } from '../CreatePoDialog';
+import { ProcurementOverview } from '../ProcurementOverview';
+import { PurchaseOrdersPage } from '../PurchaseOrdersPage';
+import { RawMaterialStockPage } from '../RawMaterialStockPage';
+import { ReceiptsLedgerPage } from '../ReceiptsLedgerPage';
+import { initialProcurementSnapshot } from './fixtures/data';
+import { addSupplier, createPurchaseOrder, formatMoney, receivePurchaseOrder } from '../domain';
+
+describe('Procurement workspace integration', () => {
+  it('TEST-PROC-011: retains the Procurement shell behind a verified scoped data provider', () => {
+    const html = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/workspace/procurement']}>
+        <TestWorkspace department="procurement">
+          <ProcurementWorkspace />
+        </TestWorkspace>
+      </MemoryRouter>
+    );
+    expect(html).toContain('Staff navigation');
+    expect(html).not.toContain('Sample data');
+    expect(html).not.toContain('Reset demo data');
+  });
+  it('TEST-PROC-012: pre-fills CreatePoDialog with low-stock material and its preferred supplier', () => {
+    const lowFlour = initialProcurementSnapshot.materials.find((m) => m.id === 'RM-001')!;
+    const overviewHtml = renderToStaticMarkup(
+      <MemoryRouter>
+        <ProcurementOverview snapshot={initialProcurementSnapshot} onReorder={() => {}} />
+      </MemoryRouter>
+    );
+    expect(overviewHtml).toContain('Bread Flour');
+    expect(overviewHtml).toContain('Reorder');
+
+    const dialogHtml = renderToStaticMarkup(
+      <CreatePoDialog
+        snapshot={initialProcurementSnapshot}
+        prefilledMaterial={lowFlour}
+        onClose={() => {}}
+        onSubmit={() => null}
+      />
+    );
+    expect(dialogHtml).toContain('Golden Penny Flour Mills');
+    expect(dialogHtml).toContain('Bread Flour · 50kg bag');
+    expect(dialogHtml).toContain('54500');
+  });
+
+  it('TEST-PROC-013: reflects the complete PO -> Receive Delivery -> Stock & Ledger loop in UI views', () => {
+    const afterPo = createPurchaseOrder(initialProcurementSnapshot, {
+      supplierId: 'SUP-001',
+      expectedDate: '2026-11-22',
+      notes: 'Demo flour restock',
+      lines: [{ materialId: 'RM-001', quantity: 10, unitCostKobo: 5450000 }],
+    });
+    const newPo = afterPo.purchaseOrders[0];
+    expect(newPo.poNumber).toBe('PO-0103');
+
+    const todayIso = new Date().toISOString();
+    const afterReceive = receivePurchaseOrder(
+      afterPo,
+      {
+        poId: newPo.id,
+        reference: 'INV-9981',
+        receivedBy: 'Kemi Adeyemi',
+      },
+      todayIso
+    );
+
+    const poHtml = renderToStaticMarkup(
+      <PurchaseOrdersPage
+        snapshot={afterReceive}
+        onCreate={() => {}}
+        onReceive={() => {}}
+        onDirectReceipt={() => {}}
+        onCancel={() => {}}
+      />
+    );
+    expect(poHtml).toContain('PO-0103');
+    expect(poHtml).toContain('RECEIVED');
+
+    const stockHtml = renderToStaticMarkup(
+      <RawMaterialStockPage
+        materials={afterReceive.materials}
+        suppliers={afterReceive.suppliers}
+        onReorder={() => {}}
+      />
+    );
+    expect(stockHtml).toContain('<strong>16</strong> 50kg bag');
+
+    const ledgerHtml = renderToStaticMarkup(
+      <ReceiptsLedgerPage
+        receipts={afterReceive.receipts}
+        movements={afterReceive.movements}
+        suppliers={afterReceive.suppliers}
+        onRecordDirectReceipt={() => {}}
+      />
+    );
+    expect(ledgerHtml).toContain('INV-9981');
+    expect(ledgerHtml).toContain(formatMoney(54500000));
+
+    const overviewHtml = renderToStaticMarkup(
+      <ProcurementOverview snapshot={afterReceive} onReorder={() => {}} />
+    );
+    expect(overviewHtml).toContain(formatMoney(54500000));
+  });
+
+  it('TEST-PROC-014: makes newly added suppliers selectable and renders fallback for unknown routes', () => {
+    const withNewSupplier = addSupplier(initialProcurementSnapshot, {
+      name: 'Olam Grains Nigeria',
+      category: 'Flour & Grains',
+      contactName: 'Seyi Balogun',
+      phone: '+234 802 111 2233',
+      email: 'supply@olam-sample.ng',
+      leadTimeDays: 2,
+    });
+    const dialogHtml = renderToStaticMarkup(
+      <CreatePoDialog
+        snapshot={withNewSupplier}
+        prefilledMaterial={null}
+        onClose={() => {}}
+        onSubmit={() => null}
+      />
+    );
+    expect(dialogHtml).toContain('Olam Grains Nigeria');
+
+    const notFoundHtml = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/workspace/procurement/unknown']}>
+        <TestWorkspace department="procurement">
+          <ProcurementWorkspace />
+        </TestWorkspace>
+      </MemoryRouter>
+    );
+    expect(notFoundHtml).toContain('Page not found');
+    expect(notFoundHtml).toContain('Return to overview');
+  });
+});

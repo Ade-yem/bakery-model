@@ -60,7 +60,9 @@ export function LoginForm({ onSuccess }: LoginFormProps): React.ReactElement {
     try {
       const session = await auth.signIn(values.identifier, values.password);
       onSuccess?.();
-      navigate(`/workspace/${session.department}`, { replace: true });
+      navigate(session.department ? `/workspace/${session.department}` : '/workspace', {
+        replace: true,
+      });
     } catch (error) {
       setStatusNotice(error instanceof Error ? error.message : 'Sign-in failed. Please retry.');
     } finally {

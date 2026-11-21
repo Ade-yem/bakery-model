@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 CHECKLIST.md
 screenshots/
+.vercel
+.env*

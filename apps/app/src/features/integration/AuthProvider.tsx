@@ -78,6 +78,26 @@ export function AuthProvider({
           setState({ owner: client, status: 'ready', session });
           return session;
         },
+        selectWorkspace: client?.selectWorkspace
+          ? async (branchId, departmentId) => {
+              const request = ++revision.current;
+              const session = validateSession(
+                await client.selectWorkspace!(branchId, departmentId)
+              );
+              if (!session || !session.department)
+                throw new Error('The workspace could not be verified.');
+              if (request === revision.current)
+                setState({ owner: client, status: 'ready', session });
+            }
+          : undefined,
+        onboardBusiness: client?.onboardBusiness
+          ? async (name) => {
+              const request = ++revision.current;
+              const session = validateSession(await client.onboardBusiness!(name));
+              if (request === revision.current)
+                setState({ owner: client, status: 'ready', session });
+            }
+          : undefined,
         signOut: async () => {
           const request = ++revision.current;
           await requireAuthClient(client).signOut();

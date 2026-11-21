@@ -1,4 +1,4 @@
-# @repo/marketing (Cadence Marketing Website)
+# marketing (Cadence Marketing Website)
 
 The public marketing website and landing pages for Cadence.
 
