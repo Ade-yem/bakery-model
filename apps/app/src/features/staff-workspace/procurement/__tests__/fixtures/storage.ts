@@ -1,6 +1,6 @@
 /** @file Validated browser localStorage persistence for the E-Procurement preview. */
 import { initialProcurementSnapshot } from './data';
-import type { ProcurementSnapshot } from './types';
+import type { ProcurementSnapshot } from '../../types';
 
 export const storageKey = 'cadence:procurement-preview:v1';
 
@@ -76,14 +76,12 @@ export function loadProcurementPreview(): ProcurementLoadResult {
     if (err instanceof SyntaxError) {
       return {
         snapshot: initialProcurementSnapshot,
-        error:
-          'Saved procurement preview data is corrupted and has not been overwritten.',
+        error: 'Saved procurement preview data is corrupted and has not been overwritten.',
       };
     }
     return {
       snapshot: initialProcurementSnapshot,
-      error:
-        'Browser storage is unavailable. Allow local storage and retry.',
+      error: 'Browser storage is unavailable. Allow local storage and retry.',
     };
   }
 }
@@ -114,4 +112,3 @@ export function resetProcurementPreview(): ProcurementLoadResult {
     error: error ?? '',
   };
 }
-

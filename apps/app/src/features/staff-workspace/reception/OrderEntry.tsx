@@ -1,9 +1,11 @@
-/** @file New-order preview; totals and split tenders are validated before local capture. */
+import { useWorkspace as useFormWorkspace } from '../../integration/workspace';
+/** @file New-order workspace; totals and split tenders are validated before local capture. */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Trash2, ArrowLeft } from 'lucide-react';
 import { Button } from '../../../components/shared/Button';
-import { receptionProducts, money } from './data';
+import { money } from './data';
+import { useDepartmentData } from '../../integration/workspace';
 import {
   orderTotal,
   recordPayment,
@@ -15,15 +17,19 @@ import {
 import { TenderFields } from './TenderFields';
 interface Props {
   base: string;
-  onSave: (order: ReceptionOrder) => string | null;
+  onSave: (order: ReceptionOrder) => Promise<string | null>;
 }
 /**
- * @description Captures customer order lines and cash/transfer/debt allocations as a local sample record.
- * @param props Preview route base and durable local-save callback; no server posting occurs here.
+ * @description Captures customer order lines and cash/transfer/debt allocations as an order submission.
+ * @param props Workspace route base and durable local-save callback; no server posting occurs here.
  * @returns Validated order-entry form with editable quantities, safe totals and recovery from errors.
  */
 export function OrderEntry({ base, onSave }: Props) {
-  const [lines, setLines] = useState<OrderLine[]>([{ ...receptionProducts[0], quantity: 1 }]);
+  const { busy } = useFormWorkspace();
+  const receptionProducts = useDepartmentData('reception').products;
+  const [createdAt] = useState(() => new Date().toISOString());
+  const [orderId] = useState(() => `ORD-${crypto.randomUUID()}`);
+  const [lines, setLines] = useState<OrderLine[]>([]);
   const [customer, setCustomer] = useState('');
   const [contact, setContact] = useState('');
   const [tender, setTender] = useState<TenderInput>({
@@ -58,22 +64,23 @@ export function OrderEntry({ base, onSave }: Props) {
       <form
         className="rc-form"
         noValidate
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
           setError('');
           try {
             const order: ReceptionOrder = {
-              id: `ORD-PREVIEW-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+              id: orderId,
               customer: customer.trim() || 'Walk-in customer',
               contact: contact.trim(),
-              createdAt: new Date().toISOString(),
+              createdAt,
               lines,
               payments: [],
               status: 'PENDING_SETTLEMENT',
               creditAuthorized: false,
             };
+            if (!lines.length) throw new Error('Add at least one listed product.');
             const settled = recordPayment(order, captureTenders(tender));
-            const failure = onSave(settled);
+            const failure = await onSave(settled);
             if (failure) setError(failure);
           } catch (failure) {
             setError(
@@ -84,107 +91,108 @@ export function OrderEntry({ base, onSave }: Props) {
           }
         }}
       >
-        <div className="rc-entry-grid">
-          <section className="sw-panel sw-detail">
-            <h2>Customer & order</h2>
-            <div className="rc-form-grid">
-              <label>
-                Customer name
-                <input
-                  value={customer}
-                  onChange={(event) => setCustomer(event.target.value)}
-                  placeholder="Leave blank for a walk-in sale"
-                />
-              </label>
-              <label>
-                Customer contact
-                <input
-                  value={contact}
-                  onChange={(event) => setContact(event.target.value)}
-                  placeholder="Required for customer credit"
-                />
-              </label>
-            </div>
-            <div className="rc-line-heading">
-              <h3>Products</h3>
-              <button
-                type="button"
-                className="sw-quiet"
-                disabled={!nextProduct}
-                onClick={() => {
-                  if (nextProduct) setLines([...lines, { ...nextProduct, quantity: 1 }]);
-                }}
-              >
-                <Plus size={14} />
-                Add product
-              </button>
-            </div>
-            {lines.map((line) => (
-              <div className="rc-order-line" key={line.sku}>
-                <div>
-                  <strong>{line.name}</strong>
-                  <p>{money.format(line.unitPrice / 100)} / unit</p>
-                </div>
+        <fieldset disabled={busy} className="sw-form-fields">
+          <div className="rc-entry-grid">
+            <section className="sw-panel sw-detail">
+              <h2>Customer & order</h2>
+              <div className="rc-form-grid">
                 <label>
-                  Quantity
+                  Customer name
                   <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    aria-label={`Quantity for ${line.name}`}
-                    value={Number.isNaN(line.quantity) ? '' : line.quantity}
-                    onChange={(event) =>
-                      setLines(
-                        lines.map((item) =>
-                          item.sku === line.sku
-                            ? {
-                                ...item,
-                                quantity:
-                                  event.target.value === '' ? NaN : Number(event.target.value),
-                              }
-                            : item
-                        )
-                      )
-                    }
+                    value={customer}
+                    onChange={(event) => setCustomer(event.target.value)}
+                    placeholder="Leave blank for a walk-in sale"
                   />
                 </label>
+                <label>
+                  Customer contact
+                  <input
+                    value={contact}
+                    onChange={(event) => setContact(event.target.value)}
+                    placeholder="Required for customer credit"
+                  />
+                </label>
+              </div>
+              <div className="rc-line-heading">
+                <h3>Products</h3>
                 <button
                   type="button"
-                  className="sw-icon-button"
-                  aria-label={`Remove ${line.name}`}
-                  onClick={() => setLines(lines.filter((item) => item.sku !== line.sku))}
+                  className="sw-quiet"
+                  disabled={!nextProduct}
+                  onClick={async () => {
+                    if (nextProduct) setLines([...lines, { ...nextProduct, quantity: 1 }]);
+                  }}
                 >
-                  <Trash2 size={16} />
+                  <Plus size={14} />
+                  Add product
                 </button>
               </div>
-            ))}
-            {!lines.length && (
-              <p className="sw-callout">Add a product before capturing the order.</p>
-            )}
-            <div className="rc-total">
-              <span>Order total</span>
-              <strong>{money.format(total / 100)}</strong>
-            </div>
-          </section>
-          <section className="sw-panel sw-detail">
-            <TenderFields value={tender} onChange={setTender} />
-            <p className="sw-callout">
-              This saves a sample order on this browser. It does not send the order to Disbursement
-              or change stock.
-            </p>
-            {error && (
-              <p className="sw-field-error" role="alert">
-                {error}
+              {lines.map((line) => (
+                <div className="rc-order-line" key={line.sku}>
+                  <div>
+                    <strong>{line.name}</strong>
+                    <p>{money.format(line.unitPrice / 100)} / unit</p>
+                  </div>
+                  <label>
+                    Quantity
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      aria-label={`Quantity for ${line.name}`}
+                      value={Number.isNaN(line.quantity) ? '' : line.quantity}
+                      onChange={(event) =>
+                        setLines(
+                          lines.map((item) =>
+                            item.sku === line.sku
+                              ? {
+                                  ...item,
+                                  quantity:
+                                    event.target.value === '' ? NaN : Number(event.target.value),
+                                }
+                              : item
+                          )
+                        )
+                      }
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="sw-icon-button"
+                    aria-label={`Remove ${line.name}`}
+                    onClick={() => setLines(lines.filter((item) => item.sku !== line.sku))}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+              {!lines.length && (
+                <p className="sw-callout">Add a product before capturing the order.</p>
+              )}
+              <div className="rc-total">
+                <span>Order total</span>
+                <strong>{money.format(total / 100)}</strong>
+              </div>
+            </section>
+            <section className="sw-panel sw-detail">
+              <TenderFields value={tender} onChange={setTender} />
+              <p className="sw-callout">
+                Saving an order does not send it to Disbursement or change stock.
               </p>
-            )}
-            <div className="rc-form-actions">
-              <Link className="sw-quiet" to={`${base}/records`}>
-                Cancel
-              </Link>
-              <Button type="submit">Capture preview order</Button>
-            </div>
-          </section>
-        </div>
+              {error && (
+                <p className="sw-field-error" role="alert">
+                  {error}
+                </p>
+              )}
+              <div className="rc-form-actions">
+                <Link className="sw-quiet" to={`${base}/records`}>
+                  Cancel
+                </Link>
+                <Button type="submit">Save order</Button>
+              </div>
+            </section>
+          </div>
+        </fieldset>
       </form>
     </>
   );

@@ -1,11 +1,12 @@
-/** @file Isolated Reception preview; no real session or operational mutation is fabricated. */
+import { useStaffActions } from '../policy';
+import { useDepartmentData, useWorkspace } from '../../integration/workspace';
+import { RepaymentPage } from './RepaymentPage';
+/** @file Reception application pages using the current local data implementation. */
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { StaffShell } from '../StaffShell';
-import { receptionAccess } from './data';
 import type { ReceptionOrder } from './orders';
-import { loadReceptionPreview, storageKey } from './storage';
 import { ReceptionHome } from './ReceptionHome';
 import {
   ReceptionHeading,
@@ -21,58 +22,59 @@ import '../workspace.css';
 import './reception.css';
 /**
  * @description Reuses the staff design with Reception-only customer, payment and dispatch content.
- * @returns Labeled local preview; live Reception remains behind the existing session integration boundary.
+ * @returns Reception pages rendered behind the shared staff route boundary.
  */
-export function ReceptionWorkspace() {
-  const [snapshot, setSnapshot] = useState(loadReceptionPreview);
+export function ReceptionWorkspace({ basePath }: { basePath?: string } = {}) {
+  const permissions = useStaffActions();
+  const data = useDepartmentData('reception');
+  const workspace = useWorkspace();
+  const snapshot = { orders: data.orders };
+  const [ledgerVersion, setLedgerVersion] = useState(0);
   const [message, setMessage] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
-  const base = '/workspace-preview/reception';
+  const base = basePath ?? '/workspace/reception';
   const page = location.pathname.slice(base.length).replace(/\/$/, '');
   /**
-   * @description Persists a validated preview change before exposing success, leaving inputs intact on storage failure.
+   * @description Persists a validated local change before exposing success, leaving inputs intact on storage failure.
    * @param order Captured order or validated payment/dispatch transition.
    * @returns Error text on failure, otherwise null; does not contact any server.
    */
-  function save(order: ReceptionOrder): string | null {
-    if (snapshot.error) return snapshot.error;
-    const exists = snapshot.orders.some((item) => item.id === order.id);
-    const next = exists
-      ? snapshot.orders.map((item) => (item.id === order.id ? order : item))
-      : [order, ...snapshot.orders];
+  async function save(order: ReceptionOrder): Promise<string | null> {
+    const previous = data.orders.find((item) => item.id === order.id);
     try {
-      localStorage.setItem(storageKey, JSON.stringify(next));
-      setSnapshot({ orders: next, error: '' });
-      setMessage(
-        order.status === 'PUSHED'
-          ? 'Preview push saved locally. No server dispatch or stock movement occurred.'
-          : 'Preview order/payment saved locally. Dispatch remains a separate action.'
-      );
+      if (!previous) {
+        permissions.require('orders:create');
+        if (order.creditAuthorized) return 'Credit approval must come from an authorized manager.';
+        await workspace.submit({ type: 'orders:create', order });
+      } else if (order.status === 'PUSHED' && previous.status !== 'PUSHED') {
+        permissions.require('orders:push');
+        await workspace.submit({ type: 'orders:push', orderId: order.id });
+      } else {
+        permissions.require('payments:create');
+        if (order.creditAuthorized !== previous.creditAuthorized)
+          return 'Credit approval must come from an authorized manager.';
+        await workspace.submit({
+          type: 'payments:create',
+          orderId: order.id,
+          payments: order.payments.slice(previous.payments.length),
+        });
+      }
+      setMessage('Change recorded. Review the record for its current status.');
       return null;
-    } catch {
-      return 'The browser could not save this change. Your input is still here; free storage or allow browser storage and try again.';
+    } catch (error) {
+      return error instanceof Error
+        ? error.message
+        : 'The change could not be saved. Your input is retained.';
     }
   }
   let content;
-  if (snapshot.error)
+  if (page === '')
+    content = <ReceptionHome key={ledgerVersion} orders={snapshot.orders} base={base} />;
+  else if (page === '/repayments')
     content = (
-      <>
-        <ReceptionHeading
-          title="Saved records need attention"
-          description="Your previous preview data has been preserved."
-        />
-        <div className="sw-panel sw-detail">
-          <p role="alert" className="sw-field-error">
-            {snapshot.error}
-          </p>
-          <button className="sw-quiet" onClick={() => setSnapshot(loadReceptionPreview())}>
-            Retry loading records
-          </button>
-        </div>
-      </>
+      <RepaymentPage orders={snapshot.orders} onChanged={() => setLedgerVersion((v) => v + 1)} />
     );
-  else if (page === '') content = <ReceptionHome orders={snapshot.orders} base={base} />;
   else if (page === '/handover') content = <ReceptionHandover orders={snapshot.orders} />;
   else if (page === '/tasks') content = <ReceptionTasks orders={snapshot.orders} base={base} />;
   else if (page === '/records') content = <ReceptionOrders orders={snapshot.orders} base={base} />;
@@ -80,8 +82,8 @@ export function ReceptionWorkspace() {
     content = (
       <OrderEntry
         base={base}
-        onSave={(order) => {
-          const error = save(order);
+        onSave={async (order) => {
+          const error = await save(order);
           if (!error) navigate(`${base}/records/${order.id}`);
           return error;
         }}
@@ -118,15 +120,13 @@ export function ReceptionWorkspace() {
     <StaffShell
       base={base}
       department="Reception"
-      name="Fatima Ahmed"
-      initials="FA"
-      role="Receptionist / Cashier"
-      access={receptionAccess}
+
       navigationLabels={{ '/workspace/records': 'Orders & payments' }}
       extraLinks={[
         { path: `${base}/handover`, label: 'Closing & handover' },
         { path: `${base}/customers`, label: 'Customers' },
         { path: `${base}/credits`, label: 'Customer credit' },
+        { path: `${base}/repayments`, label: 'Customer repayments' },
       ]}
     >
       {message && (

@@ -1,4 +1,4 @@
-/** @file Pure deterministic domain logic for the E-Procurement interactive preview. */
+/** @file Pure deterministic domain logic for E-Procurement workflows. */
 import type {
   CreatePoInput,
   CreateSupplierInput,
@@ -50,7 +50,7 @@ export function formatMoney(kobo: number): string {
  * @throws {Error} When any quantity is <= 0, non-integer, unitCostKobo < 0, or total overflows safe integers.
  */
 export function calculateLinesTotal(
-  lines: ReadonlyArray<{ quantity: number; unitCostKobo: number }>,
+  lines: ReadonlyArray<{ quantity: number; unitCostKobo: number }>
 ): number {
   let total = 0;
   for (const line of lines) {
@@ -96,7 +96,7 @@ function nextSequentialId(prefix: string, existingIds: readonly string[], startA
 
 function buildValidatedLines(
   materials: readonly RawMaterial[],
-  rawLines: ReadonlyArray<{ materialId: string; quantity: number; unitCostKobo: number }>,
+  rawLines: ReadonlyArray<{ materialId: string; quantity: number; unitCostKobo: number }>
 ): ProcurementLine[] {
   if (rawLines.length === 0) {
     throw new Error('Add at least one line item.');
@@ -128,7 +128,7 @@ function applyReceiptToSnapshot(
     notes: string;
     lines: ProcurementLine[];
     nowIso: string;
-  },
+  }
 ): ProcurementSnapshot {
   const reference = params.reference.trim();
   if (!reference) {
@@ -139,7 +139,7 @@ function applyReceiptToSnapshot(
   const receiptId = nextSequentialId(
     'REC',
     snapshot.receipts.map((r) => r.id),
-    201,
+    201
   );
 
   const receipt: ProcurementReceipt = {
@@ -180,7 +180,7 @@ function applyReceiptToSnapshot(
     const movementId = nextSequentialId(
       'MOV',
       [...existingMovementIds, ...newMovements.map((m) => m.id)],
-      301,
+      301
     );
     newMovements.push({
       id: movementId,
@@ -195,7 +195,7 @@ function applyReceiptToSnapshot(
 
   const nextPurchaseOrders = params.poId
     ? snapshot.purchaseOrders.map((po) =>
-        po.id === params.poId ? { ...po, status: 'RECEIVED' as const } : po,
+        po.id === params.poId ? { ...po, status: 'RECEIVED' as const } : po
       )
     : snapshot.purchaseOrders;
 
@@ -210,7 +210,7 @@ function applyReceiptToSnapshot(
 
 /**
  * @description Validates input and prepends a new OPEN Purchase Order to the snapshot.
- * @param snapshot Current procurement preview state.
+ * @param snapshot Current procurement state.
  * @param input Supplier, expected delivery date, notes, and line items.
  * @param nowIso Optional ISO timestamp override for deterministic testing.
  * @returns Updated snapshot containing the new Purchase Order.
@@ -219,7 +219,7 @@ function applyReceiptToSnapshot(
 export function createPurchaseOrder(
   snapshot: ProcurementSnapshot,
   input: CreatePoInput,
-  nowIso: string = new Date().toISOString(),
+  nowIso: string = new Date().toISOString()
 ): ProcurementSnapshot {
   const supplierExists = snapshot.suppliers.some((s) => s.id === input.supplierId);
   if (!supplierExists) {
@@ -233,7 +233,7 @@ export function createPurchaseOrder(
   const poNumber = nextSequentialId(
     'PO',
     snapshot.purchaseOrders.map((po) => po.id),
-    101,
+    101
   );
 
   const newPo: PurchaseOrder = {
@@ -256,14 +256,14 @@ export function createPurchaseOrder(
 
 /**
  * @description Transitions an OPEN Purchase Order to CANCELLED without altering stock or receipts.
- * @param snapshot Current procurement preview state.
+ * @param snapshot Current procurement state.
  * @param poId Identifier of the Purchase Order to cancel.
  * @returns Updated snapshot with the PO marked CANCELLED.
  * @throws {Error} When the PO does not exist or is not in OPEN status.
  */
 export function cancelPurchaseOrder(
   snapshot: ProcurementSnapshot,
-  poId: string,
+  poId: string
 ): ProcurementSnapshot {
   const target = snapshot.purchaseOrders.find((po) => po.id === poId);
   if (!target) {
@@ -276,14 +276,14 @@ export function cancelPurchaseOrder(
   return {
     ...snapshot,
     purchaseOrders: snapshot.purchaseOrders.map((po) =>
-      po.id === poId ? { ...po, status: 'CANCELLED' } : po,
+      po.id === poId ? { ...po, status: 'CANCELLED' } : po
     ),
   };
 }
 
 /**
  * @description Atomically receives an OPEN Purchase Order, incrementing stock and appending receipt & movements.
- * @param snapshot Current procurement preview state.
+ * @param snapshot Current procurement state.
  * @param input PO identifier, delivery reference, receiving actor, and optional quantity overrides.
  * @param nowIso Optional ISO timestamp override for deterministic testing.
  * @returns Updated snapshot with PO marked RECEIVED, incremented stock, and appended ledger records.
@@ -292,7 +292,7 @@ export function cancelPurchaseOrder(
 export function receivePurchaseOrder(
   snapshot: ProcurementSnapshot,
   input: ReceivePoInput,
-  nowIso: string = new Date().toISOString(),
+  nowIso: string = new Date().toISOString()
 ): ProcurementSnapshot {
   const po = snapshot.purchaseOrders.find((item) => item.id === input.poId);
   if (!po) {
@@ -323,7 +323,7 @@ export function receivePurchaseOrder(
 
 /**
  * @description Records a direct supplier delivery without a prior PO, updating stock and ledger atomically.
- * @param snapshot Current procurement preview state.
+ * @param snapshot Current procurement state.
  * @param input Supplier, delivery reference, receiving actor, and delivered lines.
  * @param nowIso Optional ISO timestamp override for deterministic testing.
  * @returns Updated snapshot with appended receipt, incremented stock, and inbound movements.
@@ -332,7 +332,7 @@ export function receivePurchaseOrder(
 export function recordDirectReceipt(
   snapshot: ProcurementSnapshot,
   input: DirectReceiptInput,
-  nowIso: string = new Date().toISOString(),
+  nowIso: string = new Date().toISOString()
 ): ProcurementSnapshot {
   const supplierExists = snapshot.suppliers.some((s) => s.id === input.supplierId);
   if (!supplierExists) {
@@ -352,14 +352,14 @@ export function recordDirectReceipt(
 
 /**
  * @description Validates and appends a new supplier to the procurement directory.
- * @param snapshot Current procurement preview state.
+ * @param snapshot Current procurement state.
  * @param input New supplier details.
  * @returns Updated snapshot with the new supplier appended.
  * @throws {Error} When required fields are blank or leadTimeDays is invalid.
  */
 export function addSupplier(
   snapshot: ProcurementSnapshot,
-  input: CreateSupplierInput,
+  input: CreateSupplierInput
 ): ProcurementSnapshot {
   const name = input.name.trim();
   const category = input.category.trim();
@@ -377,7 +377,7 @@ export function addSupplier(
   const id = nextSequentialId(
     'SUP',
     snapshot.suppliers.map((s) => s.id),
-    1,
+    1
   );
   const supplier: Supplier = {
     id,
@@ -397,20 +397,20 @@ export function addSupplier(
 
 /**
  * @description Derives Overview KPIs directly from the current procurement snapshot.
- * @param snapshot Current procurement preview state.
+ * @param snapshot Current procurement state.
  * @param todayPrefix ISO date prefix (YYYY-MM-DD) used to filter today's spend.
  * @returns Derived open PO count, today's spend in kobo, low-stock count, and posted receipts count.
  */
 export function deriveProcurementKpis(
   snapshot: ProcurementSnapshot,
-  todayPrefix: string = new Date().toISOString().slice(0, 10),
+  todayPrefix: string = new Date().toISOString().slice(0, 10)
 ): ProcurementKpis {
   const openPoCount = snapshot.purchaseOrders.filter((po) => po.status === 'OPEN').length;
   const todaySpendKobo = snapshot.receipts
     .filter((r) => r.receivedAt.startsWith(todayPrefix))
     .reduce((sum, r) => sum + r.totalAmountKobo, 0);
   const lowStockCount = snapshot.materials.filter(
-    (m) => getStockStatus(m.currentStock, m.minThreshold) !== 'OK',
+    (m) => getStockStatus(m.currentStock, m.minThreshold) !== 'OK'
   ).length;
   const postedReceiptsCount = snapshot.receipts.length;
 
@@ -421,4 +421,3 @@ export function deriveProcurementKpis(
     postedReceiptsCount,
   };
 }
-

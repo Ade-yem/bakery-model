@@ -1,4 +1,4 @@
-/** @file Domain types and data contracts for the E-Procurement preview workspace. */
+/** @file Domain types and data contracts for the E-Procurement workspace. */
 
 export type PurchaseOrderStatus = 'OPEN' | 'RECEIVED' | 'CANCELLED';
 
@@ -127,4 +127,3 @@ export interface CreateSupplierInput {
   email: string;
   leadTimeDays: number;
 }
-

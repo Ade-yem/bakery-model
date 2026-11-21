@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * @description Captures and validates a new supplier entry before persisting to preview state.
+ * @description Captures and validates a new supplier entry before passing to the submission callback.
  * @param props Close callback and save handler returning an error string on failure.
  * @returns Accessible modal dialog for registering a supplier.
  */
@@ -58,7 +58,12 @@ export function AddSupplierDialog({ onClose, onSave }: Props) {
           <p className="sw-eyebrow">Vendor directory</p>
           <h2 id="add-supplier-title">Add supplier</h2>
         </div>
-        <button className="sw-icon-button" type="button" onClick={onClose} aria-label="Close dialog">
+        <button
+          className="sw-icon-button"
+          type="button"
+          onClick={onClose}
+          aria-label="Close dialog"
+        >
           <X size={18} />
         </button>
       </div>
@@ -146,4 +151,3 @@ export function AddSupplierDialog({ onClose, onSave }: Props) {
     </dialog>
   );
 }
-

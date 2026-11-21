@@ -5,8 +5,11 @@ import { Button } from '../../../components/shared/Button';
 import type { Supplier } from './types';
 
 interface Props {
-  suppliers: readonly Supplier[];
-  onOpenAddSupplier: () => void;
+  suppliers: readonly (Omit<Supplier, 'category' | 'leadTimeDays'> & {
+    category: string | null;
+    leadTimeDays: number | null;
+  })[];
+  onOpenAddSupplier?: () => void;
 }
 
 /**
@@ -18,9 +21,9 @@ export function SuppliersPage({ suppliers, onOpenAddSupplier }: Props) {
   const [query, setQuery] = useState('');
 
   const filtered = suppliers.filter((supplier) =>
-    `${supplier.name} ${supplier.category} ${supplier.contactName} ${supplier.email}`
+    `${supplier.name} ${supplier.category ?? 'Category not provided'} ${supplier.contactName || 'Not provided'} ${supplier.email || 'Not provided'}`
       .toLowerCase()
-      .includes(query.trim().toLowerCase()),
+      .includes(query.trim().toLowerCase())
   );
 
   return (
@@ -29,11 +32,13 @@ export function SuppliersPage({ suppliers, onOpenAddSupplier }: Props) {
         <div>
           <p className="sw-eyebrow">Vendor directory</p>
           <h1 id="suppliers-heading">Suppliers</h1>
-          <p>Approved raw-material and packaging vendors available for purchase orders.</p>
+          <p>Active suppliers registered with your business.</p>
         </div>
-        <Button icon={<Building2 size={16} />} onClick={onOpenAddSupplier}>
-          Add supplier
-        </Button>
+        {onOpenAddSupplier && (
+          <Button icon={<Building2 size={16} />} onClick={onOpenAddSupplier}>
+            Add supplier
+          </Button>
+        )}
       </header>
 
       <div className="sw-panel pr-panel">
@@ -66,17 +71,19 @@ export function SuppliersPage({ suppliers, onOpenAddSupplier }: Props) {
                   <td>
                     <strong>{supplier.name}</strong>
                     <span>
-                      {supplier.id} · {supplier.category}
+                      {supplier.id} · {supplier.category ?? 'Category not provided'}
                     </span>
                   </td>
-                  <td>{supplier.contactName}</td>
+                  <td>{supplier.contactName || 'Not provided'}</td>
                   <td>
-                    <strong>{supplier.phone}</strong>
-                    <span>{supplier.email}</span>
+                    <strong>{supplier.phone || 'Not provided'}</strong>
+                    <span>{supplier.email || 'Not provided'}</span>
                   </td>
                   <td>
                     <span className="sw-label">
-                      {supplier.leadTimeDays} {supplier.leadTimeDays === 1 ? 'day' : 'days'}
+                      {supplier.leadTimeDays === null
+                        ? 'Not provided'
+                        : `${supplier.leadTimeDays} ${supplier.leadTimeDays === 1 ? 'day' : 'days'}`}
                     </span>
                   </td>
                 </tr>

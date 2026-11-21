@@ -19,9 +19,18 @@ export function SyncStatusPill({ snapshot }: { snapshot: SyncSnapshot }) {
     snapshot.pending === null
       ? 'Pending count unavailable'
       : snapshot.pending === 0
-        ? 'No pending changes'
+        ? snapshot.conflicts
+          ? 'Review required'
+          : 'No pending changes'
         : `${snapshot.pending} pending`;
-  const Icon = snapshot.phase === 'syncing' ? RefreshCw : snapshot.pending === 0 ? Check : Clock3;
+  const Icon =
+    snapshot.phase === 'syncing'
+      ? RefreshCw
+      : snapshot.conflicts
+        ? CircleAlert
+        : snapshot.pending === 0
+          ? Check
+          : Clock3;
   return (
     <span className="cs-pill" aria-label={label}>
       <Icon
@@ -66,7 +75,9 @@ export function OnlineOfflineBanner({ snapshot, onSync }: BannerProps) {
   const description =
     snapshot.error ??
     (!snapshot.configured
-      ? 'Sync queue not connected. Pending mutations cannot be counted yet.'
+      ? snapshot.pending === null
+        ? 'Sync queue not connected. Pending mutations cannot be counted yet.'
+        : 'Saved changes are retained on this device. Server synchronization is not connected yet.'
       : offline
         ? 'Server requests are paused. Pending changes await acknowledgement after reconnecting.'
         : snapshot.conflicts
@@ -149,7 +160,7 @@ export function OnlineOfflineBanner({ snapshot, onSync }: BannerProps) {
 }
 /**
  * @description Connects the reusable banner to the app-wide controller, updating across all staff routes.
- * @returns Shared live connection and sync status UI; unconfigured previews never claim a synced queue.
+ * @returns Shared live connection and sync status UI; unconfigured workspaces never claim a synced queue.
  */
 export function GlobalSyncStatus() {
   const controller = useContext(SyncContext);
