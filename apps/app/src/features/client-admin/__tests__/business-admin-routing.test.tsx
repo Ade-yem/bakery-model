@@ -5,9 +5,8 @@
 
 import { describe, it, expect } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { BusinessAdminRoutes } from '../BusinessAdminRoutes';
-import { TenantProvider, useTenant } from '../context/TenantContext';
 import { getClientAdminNavGroups } from '../layout/nav-config';
 import { MOCK_SUBSCRIPTION_GOLDEN_CRUST, MOCK_SUBSCRIPTION_IKEJA_ARTISAN } from '../data/mock-tenants';
 import { CLIENT_PERMISSIONS } from '../permissions';
@@ -16,7 +15,9 @@ describe('Client Admin Dashboard Integration & Routing', () => {
   it('renders Business Admin Layout with active business brand mark and overview', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/business/dashboard']}>
-        <BusinessAdminRoutes />
+        <Routes>
+          <Route path="/business/*" element={<BusinessAdminRoutes />} />
+        </Routes>
       </MemoryRouter>
     );
 
@@ -26,14 +27,15 @@ describe('Client Admin Dashboard Integration & Routing', () => {
 
     // Layout navigation & topbar
     expect(html).toContain('CADENCE');
-    expect(html).toContain('Client Admin');
-    expect(html).toContain('Workspace:');
+    expect(html).toContain('Dashboard Overview');
   });
 
   it('renders nested 404 within BusinessAdminLayout when navigating to an unknown workspace route', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/business/non-existent-module-route']}>
-        <BusinessAdminRoutes />
+        <Routes>
+          <Route path="/business/*" element={<BusinessAdminRoutes />} />
+        </Routes>
       </MemoryRouter>
     );
 

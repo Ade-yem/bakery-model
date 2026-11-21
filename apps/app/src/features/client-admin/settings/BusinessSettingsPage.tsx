@@ -4,11 +4,11 @@
  */
 
 import React, { useState } from 'react';
-import { Settings, Save, Globe, Shield, Bell, Building, CheckCircle2 } from 'lucide-react';
+import { Save, CheckCircle2 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
-import { Button } from '../../../components/shared/Button';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
 import { PermissionGate } from '../components/PermissionGate';
+import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
 
 export function BusinessSettingsPage(): React.ReactElement {
   const { settings, updateSettings, actor, currentBusiness } = useTenant();
@@ -32,33 +32,24 @@ export function BusinessSettingsPage(): React.ReactElement {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 font-sans">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-3xs font-extrabold uppercase tracking-wider text-[#0B5C63]">
-            Configuration Control
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#10201F] tracking-tight">
-            Business Workspace Settings
-          </h1>
-          <p className="text-xs sm:text-sm text-[#10201F]/70 mt-0.5">
-            Configure localization, operating hours, notification thresholds, and security policies for {currentBusiness.name}.
-          </p>
-        </div>
-
-        {canManage && (
-          <Button
-            variant="primary"
-            size="sm"
-            icon={<Save size={14} />}
-            iconPosition="left"
-            onClick={handleSave}
-          >
-            Save All Settings
-          </Button>
-        )}
-      </div>
+    <div className="max-w-4xl space-y-6 font-sans">
+      {/* 1. Standardized Platform Admin Page Header */}
+      <AdminPageHeader
+        title="Business Workspace Settings"
+        description={`Configure localization, operating hours, notification thresholds, and security policies for ${currentBusiness.name}.`}
+        action={
+          canManage ? (
+            <button
+              type="button"
+              onClick={handleSave}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verdigris hover:bg-verdigris-lift text-flour text-sm font-semibold shadow-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
+            >
+              <Save className="w-4 h-4" />
+              <span>Save All Settings</span>
+            </button>
+          ) : undefined
+        }
+      />
 
       {feedback && (
         <div className="p-3.5 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-2">
@@ -67,57 +58,26 @@ export function BusinessSettingsPage(): React.ReactElement {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-[#D9D3C0] pb-2">
-        <button
-          type="button"
-          onClick={() => setActiveTab('general')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'general' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70 hover:bg-[#F6F3EA]'
-          }`}
-        >
-          General
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('localization')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'localization' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70 hover:bg-[#F6F3EA]'
-          }`}
-        >
-          Localization
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('workspace')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'workspace' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70 hover:bg-[#F6F3EA]'
-          }`}
-        >
-          Workspace
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('notifications')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'notifications' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70 hover:bg-[#F6F3EA]'
-          }`}
-        >
-          Notifications
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('security')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-            activeTab === 'security' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70 hover:bg-[#F6F3EA]'
-          }`}
-        >
-          Security
-        </button>
+      {/* 2. Segmented Navigation Tabs */}
+      <div className="inline-flex flex-wrap p-1 rounded-xl bg-[#F6F3EA] border border-[#D9D3C0]">
+        {(['general', 'localization', 'workspace', 'notifications', 'security'] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer ${
+              activeTab === tab
+                ? 'bg-[#0B5C63] text-white shadow-2xs'
+                : 'text-[#10201F]/70 hover:text-[#10201F]'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {/* Settings Sections */}
-      <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-3xl border border-[#D9D3C0] shadow-xs space-y-6">
+      <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-2xl border border-[#D9D3C0] shadow-xs space-y-6">
         {activeTab === 'general' && (
           <div className="space-y-4">
             <h3 className="font-extrabold text-base text-[#10201F]">General Operational Preferences</h3>
@@ -415,9 +375,12 @@ export function BusinessSettingsPage(): React.ReactElement {
 
         {canManage && (
           <div className="flex items-center justify-end pt-4 border-t border-[#D9D3C0]/40">
-            <Button variant="primary" size="sm" type="submit">
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verdigris hover:bg-verdigris-lift text-flour text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+            >
               Save Settings
-            </Button>
+            </button>
           </div>
         )}
       </form>

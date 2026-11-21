@@ -1,5 +1,5 @@
 /**
- * @file Inventory and stock alerts card for business overview.
+ * @file Inventory and stock alerts card adopting Platform Admin card styling.
  */
 
 import React from 'react';
@@ -44,26 +44,27 @@ const ALERTS: StockAlertItem[] = [
 
 export function StockAlertsCard(): React.ReactElement {
   return (
-    <div className="bg-white rounded-3xl border border-[#D9D3C0] p-5 sm:p-6 shadow-2xs font-sans space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="p-5 sm:p-6 rounded-2xl bg-white border border-rule shadow-2xs font-sans space-y-4">
+      <div className="flex items-center justify-between pb-4 border-b border-[#E5E0D0]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#A9501A]/10 text-[#A9501A] flex items-center justify-center">
-            <AlertCircle size={18} />
+          <div className="p-2 rounded-xl bg-copper/10 text-copper border border-copper/20">
+            <AlertCircle className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-extrabold text-[#10201F]">
-              Stock & Replenishment Alerts
+            <h3 className="text-base font-bold text-oven-black">
+              Stock & Replenishment
             </h3>
-            <p className="text-2xs sm:text-xs text-[#10201F]/60">
-              Ingredients below minimum buffer threshold
+            <p className="text-xs text-oven-black/60">
+              Items below minimum buffer threshold
             </p>
           </div>
         </div>
         <Link
           to="/business/operations/inventory"
-          className="text-xs font-bold text-[#0B5C63] hover:underline flex items-center gap-1"
+          className="text-xs font-semibold text-verdigris hover:text-verdigris-lift transition-colors flex items-center gap-1 group"
         >
-          View Inventory <ArrowRight size={14} />
+          <span>Inventory</span>
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
 
@@ -71,23 +72,23 @@ export function StockAlertsCard(): React.ReactElement {
         {ALERTS.map((alert) => (
           <div
             key={alert.id}
-            className="p-3 rounded-2xl bg-[#F6F3EA] border border-[#D9D3C0]/60 flex items-center justify-between gap-3 text-xs"
+            className="p-3.5 rounded-xl bg-flour border border-rule flex items-center justify-between gap-3 text-xs"
           >
-            <div className="space-y-0.5">
-              <p className="font-extrabold text-[#10201F]">{alert.item}</p>
-              <p className="text-2xs text-[#10201F]/60">{alert.department}</p>
+            <div className="space-y-0.5 min-w-0">
+              <p className="font-bold text-oven-black truncate">{alert.item}</p>
+              <p className="text-[11px] text-oven-black/60">{alert.department}</p>
             </div>
             <div className="text-right shrink-0">
               <span
-                className={`inline-block px-2 py-0.5 rounded-full text-3xs font-extrabold uppercase ${
+                className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                   alert.urgency === 'high'
-                    ? 'bg-[#8C1D18]/10 text-[#8C1D18]'
-                    : 'bg-amber-500/10 text-amber-800'
+                    ? 'bg-status-unbalanced/10 text-[#8C1D18] border border-status-unbalanced/20'
+                    : 'bg-amber-50 text-amber-800 border border-amber-200'
                 }`}
               >
                 {alert.currentStock}
               </span>
-              <p className="text-3xs text-[#10201F]/50 mt-0.5">{alert.threshold}</p>
+              <p className="text-[10px] text-oven-black/50 mt-0.5">{alert.threshold}</p>
             </div>
           </div>
         ))}

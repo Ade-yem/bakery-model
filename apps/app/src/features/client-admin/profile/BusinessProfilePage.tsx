@@ -4,10 +4,11 @@
  */
 
 import React, { useState } from 'react';
-import { Building2, Save, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Save, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import { Button } from '../../../components/shared/Button';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
+import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
 
 export function BusinessProfilePage(): React.ReactElement {
   const { currentBusiness, updateBusinessProfile, actor } = useTenant();
@@ -64,27 +65,23 @@ export function BusinessProfilePage(): React.ReactElement {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 font-sans">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-3xs font-extrabold uppercase tracking-wider text-[#0B5C63]">
-            Organization Profile
-          </span>
-          <h1 className="text-2xl font-black text-[#10201F] tracking-tight">
-            Business Profile & Identity
-          </h1>
-          <p className="text-xs sm:text-sm text-[#10201F]/70 mt-0.5">
-            Configure your commercial bakery name, contact channels, and official registration.
-          </p>
-        </div>
-
-        {canEdit && !isEditing && (
-          <Button variant="primary" size="sm" onClick={() => setIsEditing(true)}>
-            Edit Business Profile
-          </Button>
-        )}
-      </div>
+    <div className="max-w-4xl space-y-6 font-sans">
+      {/* 1. Standardized Platform Admin Page Header */}
+      <AdminPageHeader
+        title="Business Profile & Identity"
+        description="Configure your commercial bakery name, contact channels, and official registration."
+        action={
+          canEdit && !isEditing ? (
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verdigris hover:bg-verdigris-lift text-flour text-sm font-semibold shadow-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
+            >
+              <span>Edit Business Profile</span>
+            </button>
+          ) : undefined
+        }
+      />
 
       {/* Feedback Alert */}
       {feedback && (
@@ -101,7 +98,7 @@ export function BusinessProfilePage(): React.ReactElement {
       )}
 
       {/* Main Profile Form */}
-      <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-3xl border border-[#D9D3C0] shadow-xs space-y-6">
+      <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-2xl border border-[#D9D3C0] shadow-xs space-y-6">
         {/* Brand Logo Upload / Avatar */}
         <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-[#D9D3C0]/40">
           <div className="relative">

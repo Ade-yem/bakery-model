@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Sparkles, ArrowRight, ShieldAlert } from 'lucide-react';
+import { Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '../../../components/shared/Button';
 
 export interface SubscriptionGateProps {

@@ -87,7 +87,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }): Rea
   const [allRoles, setAllRoles] = useState<ClientRole[]>(INITIAL_ROLES);
   const [allStaff, setAllStaff] = useState<ClientStaffMember[]>(INITIAL_STAFF);
   const [allShifts, setAllShifts] = useState<ClientShift[]>(INITIAL_SHIFTS);
-  const [activityRecords, setActivityRecords] = useState<BusinessActivityRecord[]>(INITIAL_ACTIVITY);
+  const [activityRecords] = useState<BusinessActivityRecord[]>(INITIAL_ACTIVITY);
   const [settings, setSettings] = useState<BusinessSettings>(INITIAL_SETTINGS);
 
   const currentBusiness = useMemo(

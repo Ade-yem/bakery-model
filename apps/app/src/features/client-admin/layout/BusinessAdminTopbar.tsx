@@ -1,143 +1,104 @@
 /**
- * @file Top navigation bar for the Cadence Client Admin Dashboard,
- * incorporating active business brand mark, plan tier indicator, tenant switcher, notifications, and profile.
+ * @file Client Admin top navigation bar matching the Platform Admin topbar layout,
+ * incorporating page title, business name, status pill, notifications, and profile.
  */
 
-import React, { useState } from 'react';
-import { Menu, Bell, Building, Check, Sparkles } from 'lucide-react';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { Menu, Bell, CheckCircle2 } from 'lucide-react';
 import { UserAccountDropdown } from '../../../components/layout/UserAccountDropdown';
 import { useTenant } from '../context/TenantContext';
 
 export interface BusinessAdminTopbarProps {
+  /** Callback to trigger mobile sidebar toggle. */
   onToggleSidebar: () => void;
 }
 
+const CLIENT_ROUTE_TITLES: Record<string, string> = {
+  '/business': 'Overview',
+  '/business/dashboard': 'Dashboard Overview',
+  '/business/profile': 'Business Profile',
+  '/business/branches': 'Branch Management',
+  '/business/departments': 'Department Builder',
+  '/business/departments/config': 'Department Configuration',
+  '/business/staff': 'Staff Management',
+  '/business/roles': 'Roles & Permissions',
+  '/business/shifts': 'Shift Scheduling',
+  '/business/operations/inventory': 'Central Inventory',
+  '/business/operations/sales': 'Sales & Cashiers',
+  '/business/operations/orders': 'Customer Orders',
+  '/business/operations/procurement': 'Procurement Requisitions',
+  '/business/operations/production': 'Baking Runs & Production',
+  '/business/operations/payments': 'Payments & Disbursement',
+  '/business/operations/credits': 'Customer Credits',
+  '/business/reports': 'Reports & History',
+  '/business/settings': 'Workspace Settings',
+};
+
+/**
+ * @description Topbar for the Client Business Admin dashboard displaying route context,
+ * current business branding, operational status pill, and user profile.
+ * Strictly scoped to the authenticated tenant (no cross-tenant data leaks).
+ * @param {BusinessAdminTopbarProps} props - Topbar properties.
+ * @returns {React.ReactElement} Business topbar element.
+ */
 export function BusinessAdminTopbar({ onToggleSidebar }: BusinessAdminTopbarProps): React.ReactElement {
-  const { currentBusiness, subscription, actor, availableBusinesses, switchTenant } = useTenant();
-  const [tenantMenuOpen, setTenantMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const location = useLocation();
+  const { currentBusiness, subscription, actor } = useTenant();
+
+  const displayTitle = CLIENT_ROUTE_TITLES[location.pathname] || 'Workspace';
+  const isHealthy = subscription.status === 'active';
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 sm:px-6 bg-[#F6F3EA]/90 backdrop-blur-md border-b border-[#D9D3C0] font-sans">
-      {/* Left: Mobile Toggle & Business Brand Info */}
+    <header className="sticky top-0 z-20 h-[52px] bg-white border-b border-[#E5E7EB] px-4 sm:px-6 md:px-8 flex items-center justify-between font-sans">
+      {/* Left: Mobile Trigger & Route Title */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onToggleSidebar}
-          aria-label="Open mobile navigation"
-          className="lg:hidden p-2 rounded-xl text-[#10201F] hover:bg-[#EFE9D9] transition-colors cursor-pointer"
+          aria-label="Open sidebar menu"
+          className="md:hidden p-1.5 rounded-md text-[#10201F]/70 hover:text-[#10201F] hover:bg-[#F6F3EA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0B5C63]"
         >
-          <Menu size={20} />
+          <Menu className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3">
-          {currentBusiness.logoUrl ? (
-            <img
-              src={currentBusiness.logoUrl}
-              alt={currentBusiness.name}
-              className="w-9 h-9 rounded-xl object-cover border border-[#D9D3C0] shadow-2xs"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-xl bg-[#0B5C63] text-[#F6F3EA] font-bold flex items-center justify-center text-sm shadow-2xs">
-              {currentBusiness.name.slice(0, 2).toUpperCase()}
-            </div>
-          )}
-
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-sm sm:text-base text-[#10201F] tracking-tight leading-tight">
-                {currentBusiness.name}
-              </span>
-              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-bold uppercase tracking-wider bg-[#0B5C63]/10 text-[#0B5C63] border border-[#0B5C63]/20">
-                {subscription.planName}
-              </span>
-            </div>
-            <p className="text-2xs text-[#10201F]/60 hidden sm:block">
-              {currentBusiness.businessType}
-            </p>
-          </div>
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm sm:text-base font-semibold text-[#DF1B22] tracking-tight">
+            {displayTitle}
+          </h2>
+          <span className="hidden sm:inline text-xs text-[#10201F]/40">•</span>
+          <span className="hidden sm:inline text-xs font-medium text-[#10201F]/70 truncate max-w-[200px]">
+            {currentBusiness.name}
+          </span>
         </div>
       </div>
 
-      {/* Right: Tenant Switcher, Notifications & User Account */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Tenant Switcher (For Multi-tenant Verification & Demos) */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setTenantMenuOpen(!tenantMenuOpen)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#D9D3C0] bg-white hover:bg-[#EFE9D9] text-[#10201F] text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
-            title="Switch demo business workspace to verify tenant isolation"
-          >
-            <Building size={14} className="text-[#0B5C63]" />
-            <span className="hidden md:inline">Workspace:</span>
-            <span className="max-w-[100px] truncate">{currentBusiness.name.split(' ')[0]}</span>
-          </button>
-
-          {tenantMenuOpen && (
-            <div
-              className="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-[#D9D3C0] shadow-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-100"
-              role="menu"
-            >
-              <div className="px-3 py-1.5 border-b border-[#D9D3C0]/60">
-                <p className="text-2xs font-bold uppercase tracking-wider text-[#10201F]/60">
-                  Select Business Workspace
-                </p>
-              </div>
-              {availableBusinesses.map((b) => (
-                <button
-                  key={b.id}
-                  type="button"
-                  onClick={() => {
-                    switchTenant(b.id);
-                    setTenantMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 flex items-center justify-between text-xs hover:bg-[#F6F3EA] transition-colors cursor-pointer ${
-                    b.id === currentBusiness.id ? 'font-bold text-[#0B5C63] bg-[#0B5C63]/5' : 'text-[#10201F]'
-                  }`}
-                >
-                  <div className="truncate">
-                    <p className="font-semibold truncate">{b.name}</p>
-                    <p className="text-2xs text-[#10201F]/60">{b.id}</p>
-                  </div>
-                  {b.id === currentBusiness.id && <Check size={14} className="text-[#0B5C63] shrink-0" />}
-                </button>
-              ))}
-            </div>
-          )}
+      {/* Right: Operational Status Pill, Notifications & Profile */}
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Status Pill */}
+        <div
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+            isHealthy
+              ? 'bg-[#EBF3E8] text-[#3F7A2A] border-[#CBE2C4]'
+              : 'bg-[#FEF6E7] text-[#D97706] border-[#FBD89C]'
+          }`}
+          title={`Account Status: ${isHealthy ? 'Active' : subscription.status} (${subscription.planName})`}
+        >
+          <CheckCircle2 className="w-3.5 h-3.5 text-current" />
+          <span className="capitalize">{isHealthy ? 'Active' : subscription.status}</span>
         </div>
 
-        {/* Notifications Indicator */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            aria-label="View notifications"
-            className="p-2 rounded-xl border border-[#D9D3C0] bg-white hover:bg-[#EFE9D9] text-[#10201F] transition-colors cursor-pointer relative shadow-2xs"
-          >
-            <Bell size={16} />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#A9501A]" />
-          </button>
-
-          {notificationsOpen && (
-            <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl border border-[#D9D3C0] shadow-lg p-3 z-50 animate-in fade-in zoom-in-95 duration-100 text-xs">
-              <div className="flex items-center justify-between pb-2 border-b border-[#D9D3C0]/60 mb-2">
-                <span className="font-bold text-xs text-[#10201F]">Notifications</span>
-                <span className="text-2xs text-[#0B5C63] font-semibold">2 New</span>
-              </div>
-              <div className="space-y-2">
-                <div className="p-2 rounded-xl bg-[#F6F3EA] text-2xs space-y-0.5">
-                  <p className="font-bold text-[#10201F]">Daily Shift Reconciled</p>
-                  <p className="text-[#10201F]/70">Lekki Main Branch evening register balanced with 0 variance.</p>
-                </div>
-                <div className="p-2 rounded-xl bg-[#A9501A]/10 text-2xs space-y-0.5 border border-[#A9501A]/20">
-                  <p className="font-bold text-[#A9501A]">Low Stock Warning</p>
-                  <p className="text-[#10201F]/70">Golden Penny All-Purpose Flour is below 15% reorder point.</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Notifications Icon Button */}
+        <button
+          type="button"
+          aria-label="View notifications"
+          className="relative p-1.5 rounded-lg text-[#10201F]/80 hover:text-[#10201F] hover:bg-[#F6F3EA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0B5C63] cursor-pointer"
+        >
+          <Bell className="w-5 h-5 text-[#10201F]/80" />
+          <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-[#A9501A] text-[10px] font-bold text-white shadow-xs">
+            2
+          </span>
+        </button>
 
         {/* User Account Profile */}
         <UserAccountDropdown

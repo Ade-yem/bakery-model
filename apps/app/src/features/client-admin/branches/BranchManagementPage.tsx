@@ -1,17 +1,17 @@
 /**
- * @file Branch Management page for managing bakery locations within subscription limits.
+ * @file Branch Management page adopting Platform Admin directory and table standards.
  */
 
 import React, { useState, useMemo } from 'react';
-import { Store, Plus, Edit2, Power, MapPin, Mail, Phone } from 'lucide-react';
+import { Plus, Edit2, Power, MapPin, Mail, Phone, Building2 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import type { ClientBranch } from '../types';
-import { Button } from '../../../components/shared/Button';
 import { SubscriptionGate } from '../components/SubscriptionGate';
 import { SearchFilterBar } from '../components/SearchFilterBar';
 import { StatusBadge } from '../components/StatusBadge';
 import { BranchModal } from './components/BranchModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
+import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
 
 export function BranchManagementPage(): React.ReactElement {
   const { branches, subscription, actor, createBranch, updateBranch, toggleBranchStatus } = useTenant();
@@ -68,179 +68,184 @@ export function BranchManagementPage(): React.ReactElement {
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Page Header */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-3xs font-extrabold uppercase tracking-wider text-[#0B5C63]">
-              Location Hierarchy
-            </span>
-            <span className="text-2xs text-[#10201F]/60">
-              Usage: {branches.length} of {subscription.maxBranches} branches
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#10201F] tracking-tight">
-            Branch Management
-          </h1>
-          <p className="text-xs sm:text-sm text-[#10201F]/70 mt-0.5">
-            Manage your retail counters, production facilities, and regional distribution outlets.
-          </p>
-        </div>
+      {/* 1. Header with AdminPageHeader */}
+      <AdminPageHeader
+        title="Branch Locations"
+        description="Directory of regional retail counters, production facilities, and distribution outlets."
+        action={
+          canManage ? (
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              disabled={branches.length >= subscription.maxBranches}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verdigris hover:bg-verdigris-lift text-flour text-sm font-semibold shadow-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Branch</span>
+            </button>
+          ) : undefined
+        }
+      />
 
-        {canManage && (
-          <Button
-            variant="primary"
-            size="sm"
-            icon={<Plus size={16} />}
-            iconPosition="left"
-            onClick={handleOpenCreate}
-            disabled={branches.length >= subscription.maxBranches}
-          >
-            Add Branch
-          </Button>
-        )}
-      </div>
-
-      {/* Filter Bar */}
+      {/* 2. Filter Bar */}
       <SearchFilterBar
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder="Search branches by name, code, or manager..."
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
-      />
+      >
+        <span className="text-xs text-oven-black/60 font-semibold px-2">
+          {branches.length} of {subscription.maxBranches} Branches
+        </span>
+      </SearchFilterBar>
 
-      {/* Desktop Table View */}
-      <div className="hidden md:block bg-white rounded-3xl border border-[#D9D3C0] shadow-xs overflow-hidden">
-        <table className="w-full text-left text-xs text-[#10201F]">
-          <thead className="bg-[#F6F3EA] border-b border-[#D9D3C0] text-3xs font-extrabold uppercase tracking-wider text-[#10201F]/70">
-            <tr>
-              <th className="py-3.5 px-5">Branch Name & Code</th>
-              <th className="py-3.5 px-4">Address</th>
-              <th className="py-3.5 px-4">Branch Manager</th>
-              <th className="py-3.5 px-4">Contact</th>
-              <th className="py-3.5 px-4">Status</th>
-              <th className="py-3.5 px-5 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#D9D3C0]/40">
-            {filteredBranches.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="py-12 text-center text-[#10201F]/50">
-                  No branch locations found matching your filter criteria.
-                </td>
-              </tr>
-            ) : (
-              filteredBranches.map((b) => (
-                <tr key={b.id} className="hover:bg-[#F6F3EA]/40 transition-colors">
-                  <td className="py-3.5 px-5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center font-bold shrink-0">
-                        <Store size={16} />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-sm text-[#10201F]">{b.name}</span>
+      {/* 3. Table matching Platform Admin BusinessTable */}
+      <div className="bg-white border border-[#D9D3C0] rounded-2xl shadow-xs overflow-hidden">
+        {filteredBranches.length === 0 ? (
+          <div className="p-12 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center mx-auto mb-3">
+              <Building2 className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-[#10201F]">No branches found</h3>
+            <p className="text-xs text-[#10201F]/60 mt-1 max-w-sm mx-auto">
+              No branch locations match your current search and filter criteria. Try adjusting your query or resetting filters.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile Card Layout */}
+            <div className="md:hidden divide-y divide-[#E5E0D0]">
+              {filteredBranches.map((b) => (
+                <div key={`mobile-${b.id}`} className="p-4 space-y-3 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-sm text-[#10201F]">{b.name}</h4>
+                      <span className="font-mono text-xs text-[#10201F]/60">{b.code}</span>
+                    </div>
+                    <StatusBadge status={b.status} />
+                  </div>
+
+                  <div className="space-y-1 text-xs text-[#10201F]/70 border-t border-[#E5E0D0] pt-2">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-verdigris" />
+                      <span className="truncate">{b.address}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-verdigris" />
+                      <span className="truncate">{b.contactEmail}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-verdigris" />
+                      <span>{b.contactPhone}</span>
+                    </div>
+                  </div>
+
+                  {canManage && (
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E0D0]">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(b)}
+                        className="px-3 py-1 rounded-lg text-xs font-semibold text-verdigris hover:bg-[#F6F3EA] cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleBranchStatus(b.id)}
+                        className="px-3 py-1 rounded-lg text-xs font-semibold text-[#10201F]/70 hover:bg-[#F6F3EA] cursor-pointer"
+                      >
+                        {b.status === 'active' ? 'Deactivate' : 'Activate'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Data Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#D9D3C0] bg-[#F6F3EA]/60 text-xs font-bold text-[#10201F]/80 uppercase tracking-wider">
+                    <th scope="col" className="py-3.5 px-4 sm:px-6">Branch Name & Code</th>
+                    <th scope="col" className="py-3.5 px-4">Address</th>
+                    <th scope="col" className="py-3.5 px-4">Manager</th>
+                    <th scope="col" className="py-3.5 px-4">Contact Info</th>
+                    <th scope="col" className="py-3.5 px-4">Status</th>
+                    <th scope="col" className="py-3.5 px-4 sm:px-6 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5E0D0] text-sm">
+                  {filteredBranches.map((b) => (
+                    <tr key={b.id} className="hover:bg-[#F9F7F1]/60 transition-colors group">
+                      <td className="py-3.5 px-4 sm:px-6">
+                        <div className="font-bold text-[#10201F] flex items-center gap-2">
+                          <span>{b.name}</span>
                           {b.isPrimary && (
-                            <span className="px-1.5 py-0.2 rounded-full text-3xs font-extrabold bg-[#0B5C63]/10 text-[#0B5C63]">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-verdigris/10 text-verdigris">
                               Primary
                             </span>
                           )}
                         </div>
-                        <code className="text-2xs font-mono text-[#10201F]/60">{b.code}</code>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 max-w-[220px] truncate text-[#10201F]/70">
-                    {b.address}
-                  </td>
-                  <td className="py-3.5 px-4 font-semibold text-[#10201F]">
-                    {b.managerName || 'Unassigned'}
-                  </td>
-                  <td className="py-3.5 px-4 text-2xs space-y-0.5 text-[#10201F]/70">
-                    <div>{b.contactEmail}</div>
-                    <div>{b.contactPhone}</div>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <StatusBadge status={b.status} />
-                  </td>
-                  <td className="py-3.5 px-5 text-right">
-                    <div className="inline-flex items-center gap-1">
-                      {canManage && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEdit(b)}
-                            className="p-1.5 rounded-lg text-[#10201F]/70 hover:text-[#0B5C63] hover:bg-[#F6F3EA] transition-colors"
-                            title="Edit branch"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => toggleBranchStatus(b.id)}
-                            className={`p-1.5 rounded-lg transition-colors ${
-                              b.status === 'active'
-                                ? 'text-amber-700 hover:bg-amber-50'
-                                : 'text-emerald-700 hover:bg-emerald-50'
-                            }`}
-                            title={b.status === 'active' ? 'Deactivate branch' : 'Activate branch'}
-                          >
-                            <Power size={14} />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                        <div className="text-xs text-[#10201F]/50 font-mono mt-0.5">
+                          {b.code}
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-xs text-[#10201F]/70 max-w-[200px] truncate">
+                        {b.address}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-xs font-semibold text-[#10201F]">
+                        {b.managerName || 'Unassigned'}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-xs text-[#10201F]/70 font-mono space-y-0.5">
+                        <div className="truncate max-w-[150px]">{b.contactEmail}</div>
+                        <div>{b.contactPhone}</div>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <StatusBadge status={b.status} />
+                      </td>
+
+                      <td className="py-3.5 px-4 sm:px-6 text-right">
+                        {canManage && (
+                          <div className="inline-flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(b)}
+                              className="p-1.5 rounded-lg text-oven-black/60 hover:text-verdigris hover:bg-flour transition-colors"
+                              title="Edit branch details"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleBranchStatus(b.id)}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                b.status === 'active'
+                                  ? 'text-status-open hover:bg-amber-50'
+                                  : 'text-status-balanced hover:bg-emerald-50'
+                              }`}
+                              title={b.status === 'active' ? 'Deactivate branch' : 'Activate branch'}
+                            >
+                              <Power className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Mobile Stacked Cards View */}
-      <div className="md:hidden space-y-3">
-        {filteredBranches.map((b) => (
-          <div key={b.id} className="bg-white p-4 rounded-2xl border border-[#D9D3C0] shadow-2xs space-y-3 text-xs">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-extrabold text-sm text-[#10201F]">{b.name}</h3>
-                <span className="font-mono text-2xs text-[#10201F]/60">{b.code}</span>
-              </div>
-              <StatusBadge status={b.status} />
-            </div>
-
-            <div className="space-y-1 text-2xs text-[#10201F]/70 border-t border-[#D9D3C0]/40 pt-2">
-              <div className="flex items-center gap-1.5">
-                <MapPin size={12} className="text-[#0B5C63]" />
-                <span className="truncate">{b.address}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Mail size={12} className="text-[#0B5C63]" />
-                <span className="truncate">{b.contactEmail}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Phone size={12} className="text-[#0B5C63]" />
-                <span>{b.contactPhone}</span>
-              </div>
-            </div>
-
-            {canManage && (
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#D9D3C0]/40">
-                <Button variant="ghost" size="sm" onClick={() => handleOpenEdit(b)}>
-                  Edit
-                </Button>
-                <Button variant="secondary" size="sm" onClick={() => toggleBranchStatus(b.id)}>
-                  {b.status === 'active' ? 'Deactivate' : 'Activate'}
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Create / Edit Modal */}
+      {/* Modal */}
       <BranchModal
         isOpen={isModalOpen}
         branch={editingBranch}

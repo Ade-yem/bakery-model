@@ -13,15 +13,14 @@ import {
   Trash2,
   Lock,
   Layers,
-  ShieldCheck,
   CheckCircle2,
-  FileText,
 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import type { ClientDepartmentConfig, DepartmentDuty, OperationalModuleKey } from '../types';
 import { Button } from '../../../components/shared/Button';
 import { DutyEditorModal } from './components/DutyEditorModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
+import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
 
 const ALL_POSSIBLE_ACTIONS: Array<'view' | 'create' | 'edit' | 'approve' | 'delete'> = [
   'view',
@@ -149,48 +148,39 @@ export function DepartmentConfigPage(): React.ReactElement {
   };
 
   return (
-    <div className="space-y-6 font-sans max-w-5xl mx-auto">
-      {/* Header with Department Selector */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-3xs font-extrabold uppercase tracking-wider text-[#0B5C63]">
-            Operational Rules
-          </span>
-          <h1 className="text-2xl font-black text-[#10201F] tracking-tight">
-            Department Configuration
-          </h1>
-          <p className="text-xs sm:text-sm text-[#10201F]/70 mt-0.5">
-            Configure duties, module access, record types, and action boundaries for {activeDepartment.name}.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <select
-            value={activeDepartment.id}
-            onChange={(e) => setSearchParams({ dept: e.target.value })}
-            className="px-3 py-2 rounded-xl border border-[#D9D3C0] bg-white text-xs font-bold text-[#10201F] focus:outline-none focus:border-[#0B5C63]"
-            aria-label="Select department to configure"
-          >
-            {departments.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
-            ))}
-          </select>
-
-          {canManage && (
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<Save size={14} />}
-              iconPosition="left"
-              onClick={handleSaveAll}
+    <div className="space-y-6 font-sans max-w-5xl">
+      {/* 1. Standardized Platform Admin Page Header */}
+      <AdminPageHeader
+        title="Department Configuration"
+        description={`Configure duties, module access, record types, and action boundaries for ${activeDepartment.name}.`}
+        action={
+          <div className="flex items-center gap-3">
+            <select
+              value={activeDepartment.id}
+              onChange={(e) => setSearchParams({ dept: e.target.value })}
+              className="px-3.5 py-2 rounded-xl border border-[#D9D3C0] bg-white text-xs font-bold text-[#10201F] focus:outline-none focus:border-[#0B5C63] cursor-pointer"
+              aria-label="Select department to configure"
             >
-              Save Configuration
-            </Button>
-          )}
-        </div>
-      </div>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+
+            {canManage && (
+              <button
+                type="button"
+                onClick={handleSaveAll}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verdigris hover:bg-verdigris-lift text-flour text-sm font-semibold shadow-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
+              >
+                <Save className="w-4 h-4" />
+                <span>Save Configuration</span>
+              </button>
+            )}
+          </div>
+        }
+      />
 
       {saveFeedback && (
         <div className="p-3.5 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-2">
@@ -200,7 +190,7 @@ export function DepartmentConfigPage(): React.ReactElement {
       )}
 
       {/* 1. Department Duties Section */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs space-y-4">
+      <div className="bg-white p-6 rounded-2xl border border-[#D9D3C0] shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center">
@@ -210,7 +200,7 @@ export function DepartmentConfigPage(): React.ReactElement {
               <h2 className="text-base font-extrabold text-[#10201F]">
                 Department Duties & Checklist
               </h2>
-              <p className="text-2xs text-[#10201F]/60">
+              <p className="text-xs text-[#10201F]/60">
                 Operational tasks assigned to staff working in this department
               </p>
             </div>
@@ -278,7 +268,7 @@ export function DepartmentConfigPage(): React.ReactElement {
       </div>
 
       {/* 2. Enabled Operational Modules (Subscription-bounded) */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs space-y-4">
+      <div className="bg-white p-6 rounded-2xl border border-[#D9D3C0] shadow-xs space-y-4">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center">
             <Layers size={16} />
@@ -315,7 +305,9 @@ export function DepartmentConfigPage(): React.ReactElement {
                 <div className="flex items-center justify-between">
                   <span className="font-extrabold text-xs capitalize">{mod}</span>
                   {!isSubscribed ? (
-                    <Lock size={12} className="text-[#10201F]/40" title="Upgrade required" />
+                    <span title="Upgrade required">
+                      <Lock size={12} className="text-[#10201F]/40" />
+                    </span>
                   ) : (
                     <div
                       className={`w-3.5 h-3.5 rounded-full border ${
@@ -336,11 +328,11 @@ export function DepartmentConfigPage(): React.ReactElement {
       {/* 3. Available Actions & Record Types */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Actions */}
-        <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs space-y-3">
+        <div className="bg-white p-6 rounded-2xl border border-[#D9D3C0] shadow-xs space-y-3">
           <h2 className="text-base font-extrabold text-[#10201F]">
             Allowed Actions
           </h2>
-          <p className="text-2xs text-[#10201F]/60">
+          <p className="text-xs text-[#10201F]/60">
             Define permissions granted to department workers
           </p>
 
@@ -367,7 +359,7 @@ export function DepartmentConfigPage(): React.ReactElement {
         </div>
 
         {/* Record Types */}
-        <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs space-y-3">
+        <div className="bg-white p-6 rounded-2xl border border-[#D9D3C0] shadow-xs space-y-3">
           <h2 className="text-base font-extrabold text-[#10201F]">
             Handled Record Types
           </h2>

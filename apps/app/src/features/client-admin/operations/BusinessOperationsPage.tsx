@@ -14,15 +14,13 @@ import {
   CreditCard,
   Wallet,
   ArrowRight,
-  TrendingUp,
-  CheckCircle2,
 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import type { OperationalModuleKey } from '../types';
 import { SubscriptionGate } from '../components/SubscriptionGate';
 import { PermissionGate } from '../components/PermissionGate';
 import { MODULE_VIEW_PERMISSIONS, hasClientPermission } from '../permissions';
-import { Button } from '../../../components/shared/Button';
+import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
 
 interface ModuleSpec {
   title: string;
@@ -137,79 +135,96 @@ export function BusinessOperationsPage(): React.ReactElement {
     return <PermissionGate permission={requiredPermission} />;
   }
 
-  const IconComp = spec.icon;
-
   return (
     <div className="space-y-6 font-sans">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center shrink-0">
-            <IconComp size={24} />
-          </div>
-          <div>
-            <span className="text-3xs font-extrabold uppercase tracking-wider text-[#0B5C63]">
-              Active Operation
-            </span>
-            <h1 className="text-2xl font-black text-[#10201F] tracking-tight">
-              {spec.title}
-            </h1>
-            <p className="text-xs sm:text-sm text-[#10201F]/70 mt-0.5">
-              {spec.subtitle}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
+      {/* 1. Standardized Platform Admin Page Header */}
+      <AdminPageHeader
+        title={spec.title}
+        description={spec.subtitle}
+        action={
           <Link
             to="/business/reports"
-            className="text-xs font-bold text-[#0B5C63] hover:underline flex items-center gap-1"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#D9D3C0] bg-white hover:bg-[#F6F3EA] text-xs font-semibold text-[#10201F] shadow-2xs transition-colors"
           >
-            Module Audit Reports <ArrowRight size={14} />
+            <span>Module Audit Reports</span>
+            <ArrowRight className="w-3.5 h-3.5 text-verdigris" />
           </Link>
-        </div>
-      </div>
+        }
+      />
 
-      {/* Operational Table */}
-      <div className="bg-white rounded-3xl border border-[#D9D3C0] shadow-xs overflow-hidden">
-        <div className="p-5 border-b border-[#D9D3C0]/60 flex items-center justify-between">
+      {/* 2. Operational Movement Ledger matching Platform Admin BusinessTable */}
+      <div className="bg-white border border-[#D9D3C0] rounded-2xl shadow-xs overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-[#D9D3C0] bg-[#F6F3EA]/30 flex items-center justify-between">
           <h3 className="text-sm font-extrabold text-[#10201F]">
             Operational Movement Ledger
           </h3>
-          <span className="px-2 py-0.5 rounded-full text-3xs font-extrabold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EBF3E8] text-[#3F7A2A]">
             Real-time Active Ledger
           </span>
         </div>
 
-        <table className="w-full text-left text-xs text-[#10201F]">
-          <thead className="bg-[#F6F3EA] border-b border-[#D9D3C0] text-3xs font-extrabold uppercase tracking-wider text-[#10201F]/70">
-            <tr>
-              <th className="py-3.5 px-5">{spec.headers[0]}</th>
-              <th className="py-3.5 px-4">{spec.headers[1]}</th>
-              <th className="py-3.5 px-4">{spec.headers[2]}</th>
-              <th className="py-3.5 px-4">{spec.headers[3]}</th>
-              <th className="py-3.5 px-5 text-right">{spec.headers[4]}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#D9D3C0]/40">
-            {spec.records.map((r) => (
-              <tr key={r.id} className="hover:bg-[#F6F3EA]/40 transition-colors">
-                <td className="py-3.5 px-5">
-                  <span className="font-bold text-sm text-[#10201F] block">{r.col1}</span>
-                  <code className="text-2xs font-mono text-[#10201F]/60">{r.id}</code>
-                </td>
-                <td className="py-3.5 px-4 font-semibold text-[#10201F]/80">{r.col2}</td>
-                <td className="py-3.5 px-4 font-bold text-[#10201F]">{r.col3}</td>
-                <td className="py-3.5 px-4 text-[#10201F]/70">{r.col4}</td>
-                <td className="py-3.5 px-5 text-right">
-                  <span className="inline-block px-2 py-0.5 rounded-full text-2xs font-extrabold bg-[#0B5C63]/10 text-[#0B5C63]">
-                    {r.status}
-                  </span>
-                </td>
+        {/* Mobile Stacked View */}
+        <div className="md:hidden divide-y divide-[#E5E0D0]">
+          {spec.records.map((r) => (
+            <div key={`mobile-${r.id}`} className="p-4 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-sm text-[#10201F]">{r.col1}</h4>
+                  <span className="font-mono text-xs text-[#10201F]/60">{r.id}</span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0B5C63]/10 text-[#0B5C63]">
+                  {r.status}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-[#10201F]/80 pt-2 border-t border-[#E5E0D0]">
+                <div>
+                  <span className="text-[#10201F]/60 block">{spec.headers[1]}:</span>
+                  <span className="font-semibold">{r.col2}</span>
+                </div>
+                <div>
+                  <span className="text-[#10201F]/60 block">{spec.headers[2]}:</span>
+                  <span className="font-bold">{r.col3}</span>
+                </div>
+              </div>
+              <div className="pt-1 text-xs text-[#10201F]/70">
+                <span className="text-[#10201F]/60">{spec.headers[3]}:</span> <span className="font-medium">{r.col4}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left text-xs text-[#10201F]">
+            <thead className="border-b border-[#D9D3C0] bg-[#F6F3EA]/60 text-xs font-bold text-[#10201F]/80 uppercase tracking-wider">
+              <tr>
+                <th className="py-3.5 px-5">{spec.headers[0]}</th>
+                <th className="py-3.5 px-4">{spec.headers[1]}</th>
+                <th className="py-3.5 px-4">{spec.headers[2]}</th>
+                <th className="py-3.5 px-4">{spec.headers[3]}</th>
+                <th className="py-3.5 px-5 text-right">{spec.headers[4]}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-[#E5E0D0]">
+              {spec.records.map((r) => (
+                <tr key={r.id} className="hover:bg-[#F6F3EA]/40 transition-colors">
+                  <td className="py-3.5 px-5">
+                    <span className="font-bold text-sm text-[#10201F] block">{r.col1}</span>
+                    <code className="text-xs font-mono text-[#10201F]/60">{r.id}</code>
+                  </td>
+                  <td className="py-3.5 px-4 font-semibold text-[#10201F]/80">{r.col2}</td>
+                  <td className="py-3.5 px-4 font-bold text-[#10201F]">{r.col3}</td>
+                  <td className="py-3.5 px-4 text-[#10201F]/70">{r.col4}</td>
+                  <td className="py-3.5 px-5 text-right">
+                    <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0B5C63]/10 text-[#0B5C63]">
+                      {r.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

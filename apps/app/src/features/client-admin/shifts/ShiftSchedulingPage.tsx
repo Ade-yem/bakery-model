@@ -3,20 +3,19 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { CalendarClock, Plus, Edit2, Trash2, Clock, Users, Calendar, AlertTriangle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Clock, Users } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import type { ClientShift } from '../types';
-import { Button } from '../../../components/shared/Button';
 import { SearchFilterBar } from '../components/SearchFilterBar';
-import { StatusBadge } from '../components/StatusBadge';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { ShiftModal } from './components/ShiftModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
+import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
 
 const DAYS_HEADER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export function ShiftSchedulingPage(): React.ReactElement {
-  const { shifts, departments, staff, actor, createShift, updateShift, deleteShift } = useTenant();
+  const { shifts, departments, actor, createShift, updateShift, deleteShift } = useTenant();
 
   const canManage = hasClientPermission(actor, CLIENT_PERMISSIONS.SHIFTS_MANAGE);
 
@@ -62,57 +61,48 @@ export function ShiftSchedulingPage(): React.ReactElement {
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-3xs font-extrabold uppercase tracking-wider text-[#0B5C63]">
-            Workforce Rostering
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#10201F] tracking-tight">
-            Shift Scheduling
-          </h1>
-          <p className="text-xs sm:text-sm text-[#10201F]/70 mt-0.5">
-            Plan operating schedules, configure rotations, and resolve staff assignment conflicts.
-          </p>
-        </div>
+      {/* 1. Standardized Platform Admin Page Header */}
+      <AdminPageHeader
+        title="Shift Scheduling"
+        description="Plan operating rosters, configure shift rotations, and resolve staff assignment conflicts."
+        action={
+          <div className="flex items-center gap-3">
+            <div className="inline-flex p-1 rounded-xl bg-[#F6F3EA] border border-[#D9D3C0]">
+              <button
+                type="button"
+                onClick={() => setViewMode('calendar')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'calendar' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70'
+                }`}
+              >
+                Weekly Calendar
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'list' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70'
+                }`}
+              >
+                List View
+              </button>
+            </div>
 
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center p-1 rounded-xl bg-[#F6F3EA] border border-[#D9D3C0]">
-            <button
-              type="button"
-              onClick={() => setViewMode('calendar')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                viewMode === 'calendar' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70'
-              }`}
-            >
-              Weekly Calendar
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                viewMode === 'list' ? 'bg-[#0B5C63] text-white shadow-2xs' : 'text-[#10201F]/70'
-              }`}
-            >
-              List View
-            </button>
+            {canManage && (
+              <button
+                type="button"
+                onClick={handleOpenCreate}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verdigris hover:bg-verdigris-lift text-flour text-sm font-semibold shadow-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Schedule Shift</span>
+              </button>
+            )}
           </div>
+        }
+      />
 
-          {canManage && (
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<Plus size={16} />}
-              iconPosition="left"
-              onClick={handleOpenCreate}
-            >
-              Schedule Shift
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Filter Bar */}
+      {/* 2. Filter Bar */}
       <SearchFilterBar
         search={search}
         onSearchChange={setSearch}
@@ -133,12 +123,12 @@ export function ShiftSchedulingPage(): React.ReactElement {
         </select>
       </SearchFilterBar>
 
-      {/* Calendar Grid View */}
+      {/* 3. Calendar Grid View or Table View */}
       {viewMode === 'calendar' ? (
-        <div className="bg-white rounded-3xl border border-[#D9D3C0] shadow-xs p-5 space-y-4">
+        <div className="bg-white rounded-2xl border border-[#D9D3C0] shadow-xs p-5 space-y-4">
           <div className="grid grid-cols-7 gap-2 border-b border-[#D9D3C0]/60 pb-3 text-center">
             {DAYS_HEADER.map((d) => (
-              <span key={d} className="text-xs font-black uppercase tracking-wider text-[#10201F]/70">
+              <span key={d} className="text-xs font-extrabold uppercase tracking-wider text-[#10201F]/70">
                 {d}
               </span>
             ))}
@@ -150,29 +140,29 @@ export function ShiftSchedulingPage(): React.ReactElement {
               return (
                 <div
                   key={dayKey}
-                  className="rounded-2xl bg-[#F6F3EA]/40 p-2 space-y-2 border border-[#D9D3C0]/40 flex flex-col"
+                  className="rounded-xl bg-[#F6F3EA]/40 p-2 space-y-2 border border-[#D9D3C0]/40 flex flex-col"
                 >
                   {dayShifts.map((s) => (
                     <div
                       key={s.id}
                       onClick={() => canManage && handleOpenEdit(s)}
-                      className="p-2 rounded-xl bg-white border border-[#D9D3C0] shadow-2xs space-y-1 cursor-pointer hover:border-[#0B5C63] transition-all text-left"
+                      className="p-2.5 rounded-xl bg-white border border-[#D9D3C0] shadow-2xs space-y-1 cursor-pointer hover:border-[#0B5C63] transition-all text-left"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-2xs text-[#10201F] truncate">{s.name}</span>
+                        <span className="font-extrabold text-xs text-[#10201F] truncate">{s.name}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-3xs text-[#0B5C63] font-mono font-bold">
-                        <Clock size={10} />
+                      <div className="flex items-center gap-1 text-xs text-[#0B5C63] font-mono font-bold">
+                        <Clock size={11} />
                         <span>{s.startTime}-{s.endTime}</span>
                       </div>
-                      <div className="flex items-center justify-between text-3xs text-[#10201F]/60 pt-0.5">
+                      <div className="flex items-center justify-between text-xs text-[#10201F]/60 pt-0.5">
                         <span className="truncate">{getDepartmentName(s.assignedDepartmentId)}</span>
                         <span className="font-bold">{s.assignedStaffIds.length} staff</span>
                       </div>
                     </div>
                   ))}
                   {dayShifts.length === 0 && (
-                    <span className="text-3xs text-[#10201F]/30 text-center my-auto">No shifts</span>
+                    <span className="text-xs text-[#10201F]/30 text-center my-auto py-8">No shifts</span>
                   )}
                 </div>
               );
@@ -180,10 +170,10 @@ export function ShiftSchedulingPage(): React.ReactElement {
           </div>
         </div>
       ) : (
-        /* List View */
-        <div className="bg-white rounded-3xl border border-[#D9D3C0] shadow-xs overflow-hidden">
+        /* List View matching Platform Admin BusinessTable */
+        <div className="bg-white rounded-2xl border border-[#D9D3C0] shadow-xs overflow-hidden">
           <table className="w-full text-left text-xs text-[#10201F]">
-            <thead className="bg-[#F6F3EA] border-b border-[#D9D3C0] text-3xs font-extrabold uppercase tracking-wider text-[#10201F]/70">
+            <thead className="border-b border-[#D9D3C0] bg-[#F6F3EA]/60 text-xs font-bold text-[#10201F]/80 uppercase tracking-wider">
               <tr>
                 <th className="py-3.5 px-5">Shift Title</th>
                 <th className="py-3.5 px-4">Timing & Type</th>
@@ -193,7 +183,7 @@ export function ShiftSchedulingPage(): React.ReactElement {
                 <th className="py-3.5 px-5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#D9D3C0]/40">
+            <tbody className="divide-y divide-[#E5E0D0]">
               {filteredShifts.map((s) => (
                 <tr key={s.id} className="hover:bg-[#F6F3EA]/40 transition-colors">
                   <td className="py-3.5 px-5 font-bold text-sm text-[#10201F]">
@@ -204,7 +194,7 @@ export function ShiftSchedulingPage(): React.ReactElement {
                       <Clock size={13} />
                       <span>{s.startTime} - {s.endTime}</span>
                     </div>
-                    <span className="text-3xs font-extrabold uppercase text-[#10201F]/50">{s.shiftType} shift</span>
+                    <span className="text-xs font-bold uppercase text-[#10201F]/50">{s.shiftType} shift</span>
                   </td>
                   <td className="py-3.5 px-4 font-semibold text-[#10201F]">
                     {getDepartmentName(s.assignedDepartmentId)}
@@ -212,7 +202,7 @@ export function ShiftSchedulingPage(): React.ReactElement {
                   <td className="py-3.5 px-4">
                     <div className="flex flex-wrap gap-1">
                       {s.shiftDays.map((d) => (
-                        <span key={d} className="px-1.5 py-0.5 rounded bg-[#F6F3EA] text-3xs font-bold uppercase text-[#10201F]/70 border border-[#D9D3C0]/40">
+                        <span key={d} className="px-1.5 py-0.5 rounded bg-[#F6F3EA] text-xs font-bold uppercase text-[#10201F]/70 border border-[#D9D3C0]/40">
                           {d}
                         </span>
                       ))}
@@ -230,7 +220,7 @@ export function ShiftSchedulingPage(): React.ReactElement {
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(s)}
-                          className="p-1.5 rounded-lg text-[#10201F]/70 hover:text-[#0B5C63] hover:bg-[#F6F3EA]"
+                          className="p-1.5 rounded-lg text-[#10201F]/70 hover:text-[#0B5C63] hover:bg-[#F6F3EA] cursor-pointer"
                           title="Edit shift"
                         >
                           <Edit2 size={14} />
@@ -238,7 +228,7 @@ export function ShiftSchedulingPage(): React.ReactElement {
                         <button
                           type="button"
                           onClick={() => setDeleteTarget(s)}
-                          className="p-1.5 rounded-lg text-[#10201F]/70 hover:text-[#8C1D18] hover:bg-[#8C1D18]/10"
+                          className="p-1.5 rounded-lg text-[#10201F]/70 hover:text-[#DF1B22] hover:bg-[#FDECEC] cursor-pointer"
                           title="Delete shift"
                         >
                           <Trash2 size={14} />

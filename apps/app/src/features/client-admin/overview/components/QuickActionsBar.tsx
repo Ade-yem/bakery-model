@@ -1,68 +1,97 @@
 /**
- * @file Quick action shortcut buttons displayed on the business overview.
+ * @file Client Admin Quick Actions panel adopting the Platform Admin design standards.
  */
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { PlusCircle, CalendarPlus, FolderPlus, UserPlus } from 'lucide-react';
+import {
+  FolderPlus,
+  UserPlus,
+  CalendarPlus,
+  PlusCircle,
+  Zap,
+} from 'lucide-react';
 import { useTenant } from '../../context/TenantContext';
 
 export function QuickActionsBar(): React.ReactElement {
   const { subscription } = useTenant();
 
+  const actions = [
+    {
+      id: 'departments',
+      label: 'Add Department',
+      description: 'Create and configure functional bakery units',
+      path: '/business/departments',
+      icon: <FolderPlus className="w-4 h-4 text-verdigris" />,
+    },
+    {
+      id: 'staff',
+      label: 'Invite Staff',
+      description: 'Onboard new workers with roles & department permissions',
+      path: '/business/staff',
+      icon: <UserPlus className="w-4 h-4 text-status-balanced" />,
+    },
+    {
+      id: 'shifts',
+      label: 'Schedule Shift',
+      description: 'Plan daily rosters, shift hours & conflict checks',
+      path: '/business/shifts',
+      icon: <CalendarPlus className="w-4 h-4 text-copper" />,
+    },
+    subscription.isMultiBranchSupported
+      ? {
+          id: 'branches',
+          label: 'Add Branch',
+          description: 'Register a new retail counter or production facility',
+          path: '/business/branches',
+          icon: <PlusCircle className="w-4 h-4 text-verdigris" />,
+        }
+      : {
+          id: 'profile',
+          label: 'Business Profile',
+          description: 'Update organization legal identity and brand logo',
+          path: '/business/profile',
+          icon: <PlusCircle className="w-4 h-4 text-copper" />,
+        },
+  ];
+
   return (
-    <div className="bg-[#10201F] rounded-3xl p-5 sm:p-6 text-[#F6F3EA] shadow-sm font-sans space-y-4">
-      <div>
-        <h3 className="text-base font-extrabold text-white">
-          Workspace Quick Actions
-        </h3>
-        <p className="text-2xs sm:text-xs text-white/60">
-          Fast shortcuts to configure and manage your business operations
-        </p>
+    <div className="p-5 sm:p-6 rounded-2xl bg-white border border-rule shadow-2xs font-sans">
+      <div className="flex items-center gap-2.5 pb-4 border-b border-[#E5E0D0]">
+        <div className="p-2 rounded-xl bg-verdigris/10 text-verdigris border border-verdigris/20">
+          <Zap className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-oven-black">Quick Actions</h2>
+          <p className="text-xs text-oven-black/60">
+            Frequently performed bakery workspace operations
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <Link
-          to="/business/departments"
-          className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex flex-col items-center justify-center text-center gap-2 transition-all hover:scale-[1.02] cursor-pointer"
-        >
-          <FolderPlus size={20} className="text-[#0B5C63]" />
-          <span className="text-xs font-bold text-white">Add Department</span>
-        </Link>
-
-        <Link
-          to="/business/staff"
-          className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex flex-col items-center justify-center text-center gap-2 transition-all hover:scale-[1.02] cursor-pointer"
-        >
-          <UserPlus size={20} className="text-emerald-400" />
-          <span className="text-xs font-bold text-white">Invite Staff</span>
-        </Link>
-
-        <Link
-          to="/business/shifts"
-          className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex flex-col items-center justify-center text-center gap-2 transition-all hover:scale-[1.02] cursor-pointer"
-        >
-          <CalendarPlus size={20} className="text-[#A9501A]" />
-          <span className="text-xs font-bold text-white">Create Shift</span>
-        </Link>
-
-        {subscription.isMultiBranchSupported ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-4">
+        {actions.map((action) => (
           <Link
-            to="/business/branches"
-            className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex flex-col items-center justify-center text-center gap-2 transition-all hover:scale-[1.02] cursor-pointer"
+            key={action.id}
+            to={action.path}
+            className="p-4 rounded-xl bg-flour border border-rule hover:border-[#C8C2AD] hover:bg-[#EFEBDB] transition-all duration-200 group flex flex-col justify-between cursor-pointer shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
           >
-            <PlusCircle size={20} className="text-amber-400" />
-            <span className="text-xs font-bold text-white">Add Branch</span>
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-white border border-rule shadow-2xs group-hover:scale-105 transition-transform">
+                {action.icon}
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <span className="font-bold text-sm text-oven-black group-hover:text-verdigris transition-colors block">
+                {action.label}
+              </span>
+              <span className="text-xs text-oven-black/60 mt-0.5 line-clamp-2 leading-relaxed">
+                {action.description}
+              </span>
+            </div>
           </Link>
-        ) : (
-          <Link
-            to="/business/profile"
-            className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex flex-col items-center justify-center text-center gap-2 transition-all hover:scale-[1.02] cursor-pointer"
-          >
-            <PlusCircle size={20} className="text-white/40" />
-            <span className="text-xs font-bold text-white">Edit Profile</span>
-          </Link>
-        )}
+        ))}
       </div>
     </div>
   );

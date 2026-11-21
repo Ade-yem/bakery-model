@@ -7,11 +7,10 @@ import React, { useState, useMemo } from 'react';
 import { ShieldCheck, Plus, Edit2, Lock, Users } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import type { ClientRole } from '../types';
-import { Button } from '../../../components/shared/Button';
 import { SearchFilterBar } from '../components/SearchFilterBar';
-import { StatusBadge } from '../components/StatusBadge';
 import { RoleModal } from './components/RoleModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
+import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
 
 export function RolesPermissionsPage(): React.ReactElement {
   const { roles, actor, createRole, updateRole } = useTenant();
@@ -55,148 +54,146 @@ export function RolesPermissionsPage(): React.ReactElement {
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-[#D9D3C0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-3xs font-extrabold uppercase tracking-wider text-[#0B5C63]">
-            Access Governance
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#10201F] tracking-tight">
-            Roles & Permissions
-          </h1>
-          <p className="text-xs sm:text-sm text-[#10201F]/70 mt-0.5">
-            Maintain clear role responsibilities and configure granular action permissions.
-          </p>
-        </div>
+      {/* 1. Standardized Platform Admin Page Header */}
+      <AdminPageHeader
+        title="Roles & Permissions"
+        description="Maintain clear role responsibilities and configure granular operational action boundaries."
+        action={
+          canManage ? (
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verdigris hover:bg-verdigris-lift text-flour text-sm font-semibold shadow-xs transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Role</span>
+            </button>
+          ) : undefined
+        }
+      />
 
-        {canManage && (
-          <Button
-            variant="primary"
-            size="sm"
-            icon={<Plus size={16} />}
-            iconPosition="left"
-            onClick={handleOpenCreate}
-          >
-            Create Role
-          </Button>
-        )}
-      </div>
-
-      {/* Role vs Department Clarity Callout */}
-      <div className="p-4 rounded-2xl bg-[#0B5C63]/5 border border-[#0B5C63]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#10201F]">
+      {/* 2. Access Model Clarity Banner */}
+      <div className="p-4 rounded-2xl bg-white border border-[#D9D3C0] shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#10201F]">
         <div className="space-y-0.5">
           <p className="font-extrabold text-[#0B5C63]">Cadence Three-Tier Access Model</p>
-          <p className="text-[#10201F]/70 text-2xs">
+          <p className="text-[#10201F]/70 text-xs">
             <strong>Department</strong> defines where staff work • <strong>Role</strong> defines general responsibility • <strong>Permissions</strong> define specific transactional actions allowed.
           </p>
         </div>
       </div>
 
-      {/* Filter Bar */}
+      {/* 3. Filter Bar */}
       <SearchFilterBar
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder="Search roles by title, code, or description..."
       />
 
-      {/* Desktop Table View */}
-      <div className="hidden md:block bg-white rounded-3xl border border-[#D9D3C0] shadow-xs overflow-hidden">
-        <table className="w-full text-left text-xs text-[#10201F]">
-          <thead className="bg-[#F6F3EA] border-b border-[#D9D3C0] text-3xs font-extrabold uppercase tracking-wider text-[#10201F]/70">
-            <tr>
-              <th className="py-3.5 px-5">Role Name & Code</th>
-              <th className="py-3.5 px-4">Description</th>
-              <th className="py-3.5 px-4">Assigned Staff</th>
-              <th className="py-3.5 px-4">Permissions Granted</th>
-              <th className="py-3.5 px-4">Type</th>
-              <th className="py-3.5 px-5 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#D9D3C0]/40">
-            {filteredRoles.map((r) => (
-              <tr key={r.id} className="hover:bg-[#F6F3EA]/40 transition-colors">
-                <td className="py-3.5 px-5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center font-bold shrink-0">
-                      <ShieldCheck size={16} />
-                    </div>
-                    <div>
-                      <span className="font-bold text-sm text-[#10201F] block">{r.name}</span>
-                      <code className="text-2xs font-mono text-[#10201F]/60">{r.code}</code>
-                    </div>
-                  </div>
-                </td>
-                <td className="py-3.5 px-4 max-w-[240px] truncate text-[#10201F]/70">
-                  {r.description}
-                </td>
-                <td className="py-3.5 px-4">
-                  <span className="inline-flex items-center gap-1 font-bold text-[#10201F]">
-                    <Users size={12} className="text-[#0B5C63]" />
-                    {r.staffCount} Staff
-                  </span>
-                </td>
-                <td className="py-3.5 px-4">
-                  <span className="px-2 py-0.5 rounded-full text-2xs font-bold bg-[#0B5C63]/10 text-[#0B5C63]">
-                    {r.permissions.length} actions
-                  </span>
-                </td>
-                <td className="py-3.5 px-4">
-                  {r.isSystem ? (
-                    <span className="inline-flex items-center gap-1 text-2xs font-bold text-[#10201F]/60 bg-[#EFE9D9] px-2 py-0.5 rounded-full">
-                      <Lock size={10} /> System
-                    </span>
-                  ) : (
-                    <span className="text-2xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Custom
-                    </span>
-                  )}
-                </td>
-                <td className="py-3.5 px-5 text-right">
-                  {canManage && (
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEdit(r)}
-                      className="p-1.5 rounded-lg text-[#10201F]/70 hover:text-[#0B5C63] hover:bg-[#F6F3EA]"
-                      title="Edit role permissions"
-                    >
-                      <Edit2 size={14} />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Stacked Cards */}
-      <div className="md:hidden space-y-3">
-        {filteredRoles.map((r) => (
-          <div key={r.id} className="bg-white p-4 rounded-2xl border border-[#D9D3C0] shadow-2xs space-y-3 text-xs">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-extrabold text-sm text-[#10201F]">{r.name}</h3>
-                <span className="font-mono text-2xs text-[#10201F]/60">{r.code}</span>
+      {/* 4. Table matching Platform Admin BusinessTable */}
+      <div className="bg-white border border-[#D9D3C0] rounded-2xl shadow-xs overflow-hidden">
+        {/* Mobile Stacked Cards */}
+        <div className="md:hidden divide-y divide-[#E5E0D0]">
+          {filteredRoles.map((r) => (
+            <div key={`mobile-${r.id}`} className="p-4 space-y-3 text-xs">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-sm text-[#10201F]">{r.name}</h4>
+                  <span className="font-mono text-xs text-[#10201F]/60">{r.code}</span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EBF3E8] text-[#3F7A2A]">
+                  {r.permissions.length} perms
+                </span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-2xs font-bold bg-[#0B5C63]/10 text-[#0B5C63]">
-                {r.permissions.length} perms
-              </span>
-            </div>
 
-            <p className="text-2xs text-[#10201F]/70 border-t border-[#D9D3C0]/40 pt-2">
-              {r.description}
-            </p>
+              <p className="text-xs text-[#10201F]/70 border-t border-[#E5E0D0] pt-2">
+                {r.description}
+              </p>
 
-            <div className="flex items-center justify-between pt-2 border-t border-[#D9D3C0]/40 text-2xs">
-              <span className="text-[#10201F]/60">{r.staffCount} staff members</span>
-              {canManage && (
-                <Button variant="ghost" size="sm" onClick={() => handleOpenEdit(r)}>
-                  Edit Permissions
-                </Button>
-              )}
+              <div className="flex items-center justify-between pt-2 border-t border-[#E5E0D0] text-xs">
+                <span className="text-[#10201F]/60">{r.staffCount} staff members</span>
+                {canManage && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(r)}
+                    className="font-semibold text-verdigris hover:text-verdigris-lift cursor-pointer"
+                  >
+                    Edit Permissions
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left text-xs text-[#10201F]">
+            <thead className="border-b border-[#D9D3C0] bg-[#F6F3EA]/60 text-xs font-bold text-[#10201F]/80 uppercase tracking-wider">
+              <tr>
+                <th className="py-3.5 px-5">Role Name & Code</th>
+                <th className="py-3.5 px-4">Description</th>
+                <th className="py-3.5 px-4">Assigned Staff</th>
+                <th className="py-3.5 px-4">Permissions Granted</th>
+                <th className="py-3.5 px-4">Type</th>
+                <th className="py-3.5 px-5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E5E0D0]">
+              {filteredRoles.map((r) => (
+                <tr key={r.id} className="hover:bg-[#F6F3EA]/40 transition-colors">
+                  <td className="py-3.5 px-5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center font-bold shrink-0">
+                        <ShieldCheck size={16} />
+                      </div>
+                      <div>
+                        <span className="font-bold text-sm text-[#10201F] block">{r.name}</span>
+                        <code className="text-xs font-mono text-[#10201F]/60">{r.code}</code>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4 max-w-[240px] truncate text-[#10201F]/70">
+                    {r.description}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className="inline-flex items-center gap-1 font-bold text-[#10201F]">
+                      <Users size={12} className="text-[#0B5C63]" />
+                      {r.staffCount} Staff
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0B5C63]/10 text-[#0B5C63]">
+                      {r.permissions.length} actions
+                    </span>
+                  </td>
+                  <td className="py-3.5 px-4">
+                    {r.isSystem ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-[#10201F]/60 bg-[#EFE9D9] px-2.5 py-0.5 rounded-full">
+                        <Lock size={10} /> System
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                        Custom
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3.5 px-5 text-right">
+                    {canManage && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(r)}
+                        className="p-1.5 rounded-lg text-[#10201F]/70 hover:text-[#0B5C63] hover:bg-[#F6F3EA] cursor-pointer"
+                        title="Edit role permissions"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Role Modal */}

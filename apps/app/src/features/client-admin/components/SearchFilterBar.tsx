@@ -1,5 +1,5 @@
 /**
- * @file Unified search and status filter control bar.
+ * @file Unified search and filter toolbar adopting Platform Admin styling standards.
  */
 
 import React from 'react';
@@ -18,7 +18,7 @@ export interface SearchFilterBarProps {
 export function SearchFilterBar({
   search,
   onSearchChange,
-  searchPlaceholder = 'Search records...',
+  searchPlaceholder = 'Search records by keyword, name, or code...',
   statusFilter,
   onStatusFilterChange,
   statusOptions = [
@@ -29,25 +29,27 @@ export function SearchFilterBar({
   children,
 }: SearchFilterBarProps): React.ReactElement {
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 sm:p-4 rounded-2xl border border-[#D9D3C0] shadow-2xs font-sans">
-      <div className="flex flex-1 items-center gap-2">
-        <div className="relative flex-1 max-w-md">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#10201F]/40" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-[#D9D3C0] bg-[#F6F3EA]/50 text-xs sm:text-sm text-[#10201F] placeholder-[#10201F]/40 focus:outline-none focus:border-[#0B5C63] focus:bg-white transition-colors"
-          />
-        </div>
+    <div className="bg-white border border-[#D9D3C0] rounded-2xl p-3 sm:p-4 shadow-xs font-sans flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      {/* Search Input */}
+      <div className="relative flex-1">
+        <Search className="w-4 h-4 text-[#10201F]/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={searchPlaceholder}
+          aria-label="Search records"
+          className="w-full pl-10 pr-4 py-2.5 bg-[#F6F3EA]/50 border border-[#D9D3C0] rounded-xl text-sm text-[#10201F] placeholder:text-[#10201F]/50 focus:outline-none focus:ring-2 focus:ring-[#0B5C63] focus:border-transparent transition-all"
+        />
+      </div>
 
+      <div className="flex flex-wrap items-center gap-2.5 shrink-0">
         {onStatusFilterChange && (
           <select
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value)}
             aria-label="Filter by status"
-            className="px-3 py-2 rounded-xl border border-[#D9D3C0] bg-white text-xs sm:text-sm text-[#10201F] focus:outline-none focus:border-[#0B5C63] cursor-pointer"
+            className="px-3.5 py-2.5 bg-[#F6F3EA]/50 border border-[#D9D3C0] rounded-xl text-sm text-[#10201F] focus:outline-none focus:ring-2 focus:ring-[#0B5C63] focus:border-transparent transition-all cursor-pointer font-medium"
           >
             {statusOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -56,9 +58,9 @@ export function SearchFilterBar({
             ))}
           </select>
         )}
-      </div>
 
-      {children && <div className="flex items-center gap-2 shrink-0">{children}</div>}
+        {children}
+      </div>
     </div>
   );
 }

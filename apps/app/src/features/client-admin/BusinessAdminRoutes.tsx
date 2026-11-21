@@ -49,17 +49,26 @@ const BusinessSettingsPage = lazy(() =>
  */
 function BusinessNotFound(): React.ReactElement {
   return (
-    <div className="p-8 max-w-xl mx-auto my-12 text-center bg-white rounded-3xl border border-[#D9D3C0] shadow-xs space-y-4 font-sans">
-      <h2 className="text-xl font-extrabold text-[#10201F]">
+    <div className="w-full py-8 px-4 flex flex-col items-center justify-center font-sans text-oven-black text-center bg-white animate-fade-in">
+      {/* 404 illustrator image matching background */}
+      <div className="w-full max-w-md mb-4 flex justify-center">
+        <img
+          src="/images/error_page.jpg"
+          alt="Workspace Page Not Found Illustration"
+          className="w-full max-h-56 sm:max-h-64 object-contain mix-blend-multiply select-none"
+          loading="eager"
+        />
+      </div>
+      <h2 className="text-xl sm:text-2xl font-extrabold text-[#10201F] tracking-tight mb-2">
         Workspace Page Not Found
       </h2>
-      <p className="text-xs text-[#10201F]/70">
+      <p className="text-xs sm:text-sm text-[#10201F]/70 max-w-md mb-6 leading-relaxed">
         The requested business administration section does not exist or has been relocated.
       </p>
-      <div className="pt-2">
+      <div>
         <Link
           to="/business/dashboard"
-          className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[#0B5C63] text-white text-xs font-bold shadow-xs hover:bg-[#0F7480] transition-colors"
+          className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#0B5C63] text-white text-xs sm:text-sm font-semibold shadow-xs hover:bg-[#0F7480] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
         >
           Return to Business Overview
         </Link>

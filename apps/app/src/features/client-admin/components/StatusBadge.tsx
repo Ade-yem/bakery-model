@@ -1,8 +1,9 @@
 /**
- * @file Unified status badge component for branches, departments, staff, and shifts.
+ * @file Unified status badge component matching Platform Admin status pill design.
  */
 
 import React from 'react';
+import { CheckCircle2, AlertOctagon, Clock } from 'lucide-react';
 
 export interface StatusBadgeProps {
   status: 'active' | 'inactive' | 'pending' | 'suspended';
@@ -10,21 +11,30 @@ export interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, label }: StatusBadgeProps): React.ReactElement {
-  const styles = {
-    active: 'bg-emerald-500/10 text-emerald-800 border-emerald-500/20',
-    inactive: 'bg-[#10201F]/10 text-[#10201F]/70 border-[#10201F]/20',
-    pending: 'bg-amber-500/10 text-amber-800 border-amber-500/20',
-    suspended: 'bg-[#8C1D18]/10 text-[#8C1D18] border-[#8C1D18]/20',
-  }[status];
-
   const display = label || status.charAt(0).toUpperCase() + status.slice(1);
 
+  if (status === 'active') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EBF3E8] text-[#3F7A2A] border border-[#CBE2C4]">
+        <CheckCircle2 className="w-3.5 h-3.5 text-[#3F7A2A]" />
+        <span>{display}</span>
+      </span>
+    );
+  }
+
+  if (status === 'suspended' || status === 'inactive') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FDECEC] text-[#DF1B22] border border-[#F8C8C8]">
+        <AlertOctagon className="w-3.5 h-3.5 text-[#DF1B22]" />
+        <span>{display}</span>
+      </span>
+    );
+  }
+
   return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-extrabold uppercase tracking-wider border font-sans ${styles}`}
-    >
-      <span className="w-1.5 h-1.5 rounded-full mr-1.5 bg-current" />
-      {display}
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FEF6E7] text-[#D97706] border border-[#FDE68A]">
+      <Clock className="w-3.5 h-3.5 text-[#D97706]" />
+      <span>{display}</span>
     </span>
   );
 }

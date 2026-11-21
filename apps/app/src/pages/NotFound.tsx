@@ -40,40 +40,41 @@ export function NotFound({
   };
 
   const containerClasses = isNested
-    ? 'w-full py-12 px-4 flex flex-col items-center justify-center font-sans text-oven-black text-center'
-    : 'min-h-screen w-full flex flex-col items-center justify-center p-6 bg-flour text-oven-black font-sans text-center';
+    ? 'w-full py-12 px-4 flex flex-col items-center justify-center font-sans text-oven-black text-center bg-white'
+    : 'min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-6 bg-white text-oven-black font-sans text-center';
 
   return (
     <div className={containerClasses} role="main" aria-labelledby="not-found-heading">
-      <div className="w-full max-w-lg bg-white rounded-3xl border border-rule shadow-sm p-8 sm:p-12 flex flex-col items-center animate-fade-in">
-        {/* Subtle decorative brand icon badge */}
-        <div className="w-16 h-16 rounded-2xl bg-verdigris/10 border border-verdigris/20 text-verdigris flex items-center justify-center mb-6 shadow-xs">
-          <Compass className="w-8 h-8" aria-hidden="true" />
+      <div className="w-full max-w-2xl flex flex-col items-center text-center animate-fade-in">
+        {/* 404 Illustration sized to fit viewport without scrolling */}
+        <div className="w-full max-w-md mb-4 flex justify-center">
+          <img
+            src="/images/error_page.jpg"
+            alt="404 Page Not Found Illustration"
+            className="w-full max-h-56 sm:max-h-72 object-contain mix-blend-multiply select-none"
+            loading="eager"
+          />
         </div>
 
-        {/* Prominent 404 Badge */}
-        <div className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider bg-copper/10 text-copper border border-copper/20 mb-4">
-          Error 404
-        </div>
 
         {/* Heading */}
         <h1
           id="not-found-heading"
-          className="text-3xl sm:text-4xl font-extrabold text-oven-black tracking-tight mb-3"
+          className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-oven-black tracking-tight mb-2"
         >
           Page not found
         </h1>
 
         {/* Description */}
-        <p className="text-base text-oven-black/75 max-w-sm mb-8 leading-relaxed">
+        <p className="text-xs sm:text-sm text-oven-black/75 max-w-md mb-6 leading-relaxed">
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full justify-center">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
           <Link
             to={homePath}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-semibold bg-verdigris text-flour hover:bg-verdigris-lift transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-verdigris text-flour hover:bg-verdigris-lift transition-colors cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
           >
             <Home className="w-4 h-4" aria-hidden="true" />
             <span>{homeLabel}</span>
@@ -82,7 +83,7 @@ export function NotFound({
           <button
             type="button"
             onClick={handleGoBack}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-semibold bg-ledger text-oven-black hover:bg-ledger/80 border border-rule transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-flour text-oven-black hover:bg-flour/80 border border-rule transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-verdigris"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             <span>Go Back</span>

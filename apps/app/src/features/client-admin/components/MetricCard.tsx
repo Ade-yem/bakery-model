@@ -1,15 +1,18 @@
 /**
- * @file Reusable KPI metric card with icon, amount, and context subtitle.
+ * @file KPI metric card adopting the Platform Admin design standards.
  */
 
 import React from 'react';
+import { ArrowUpRight, ArrowDownRight, Activity } from 'lucide-react';
 
 export interface MetricCardProps {
   label: string;
   value: string | number;
   subtitle?: string;
   icon?: React.ReactNode;
-  variant?: 'default' | 'accent' | 'warning' | 'success';
+  trend?: string;
+  trendDirection?: 'up' | 'down' | 'neutral';
+  targetPath?: string;
 }
 
 export function MetricCard({
@@ -17,37 +20,46 @@ export function MetricCard({
   value,
   subtitle,
   icon,
-  variant = 'default',
+  trend,
+  trendDirection = 'neutral',
 }: MetricCardProps): React.ReactElement {
-  const iconBg = {
-    default: 'bg-[#0B5C63]/10 text-[#0B5C63]',
-    accent: 'bg-[#A9501A]/10 text-[#A9501A]',
-    warning: 'bg-amber-500/10 text-amber-700',
-    success: 'bg-emerald-600/10 text-emerald-700',
-  }[variant];
-
   return (
-    <div className="bg-white rounded-2xl border border-[#D9D3C0] p-4 sm:p-5 shadow-2xs flex flex-col justify-between transition-all duration-150 hover:border-[#0B5C63]/40 font-sans">
-      <div className="flex items-center justify-between gap-3 mb-2">
-        <span className="text-xs font-bold uppercase tracking-wider text-[#10201F]/60">
+    <div className="p-5 rounded-2xl bg-white border border-rule shadow-2xs flex flex-col justify-between h-full transition-all duration-200 hover:shadow-xs hover:border-[#C8C2AD] group font-sans">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-oven-black/70 group-hover:text-oven-black transition-colors">
           {label}
         </span>
-        {icon && (
-          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
-            {icon}
-          </div>
-        )}
+        <div className="p-2.5 rounded-xl bg-flour border border-[#E5E0D0] text-verdigris shadow-2xs group-hover:bg-[#EFEBDB] transition-colors">
+          {icon || <Activity className="w-5 h-5 text-verdigris" />}
+        </div>
       </div>
 
-      <div className="space-y-1">
-        <div className="text-xl sm:text-2xl font-black text-[#10201F] tracking-tight">
+      <div className="mt-4">
+        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-oven-black">
           {value}
         </div>
-        {subtitle && (
-          <p className="text-2xs text-[#10201F]/60 font-medium">
-            {subtitle}
-          </p>
-        )}
+        <div className="flex items-center gap-2 mt-1">
+          {trend && (
+            <span
+              className={`inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                trendDirection === 'up'
+                  ? 'bg-emerald-50 text-emerald-800'
+                  : trendDirection === 'down'
+                  ? 'bg-rose-50 text-rose-800'
+                  : 'bg-ledger text-oven-black/70'
+              }`}
+            >
+              {trendDirection === 'up' && <ArrowUpRight className="w-3 h-3" />}
+              {trendDirection === 'down' && <ArrowDownRight className="w-3 h-3" />}
+              {trend}
+            </span>
+          )}
+          {subtitle && (
+            <span className="text-xs text-oven-black/60 truncate">
+              {subtitle}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

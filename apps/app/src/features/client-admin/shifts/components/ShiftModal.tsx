@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, CalendarClock, AlertTriangle, AlertCircle, Clock } from 'lucide-react';
+import { X, CalendarClock, AlertTriangle, AlertCircle } from 'lucide-react';
 import type { ClientShift, ShiftConflict } from '../../types';
 import { useTenant } from '../../context/TenantContext';
 import { detectShiftConflicts } from '../utils/conflict-detector';
