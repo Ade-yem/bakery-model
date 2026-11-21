@@ -1,18 +1,18 @@
 /** @file Read-only production record table shared by home and records pages. */
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { productionRecords } from './preview-data';
+import { useProductionRecords } from './production-store';
 interface Props {
   base: string;
   query?: string;
 }
 /**
  * @description Shows production-only fields, never sales, customers or monetary values.
- * @param props Preview route base and optional user search query.
+ * @param props Workspace route base and optional user search query.
  * @returns Searchable batch rows or an explicit empty state.
  */
 export function StaffTable({ base, query = '' }: Props) {
-  const records = productionRecords.filter((record) =>
+  const records = useProductionRecords().filter((record) =>
     `${record.id} ${record.product} ${record.state}`.toLowerCase().includes(query.toLowerCase())
   );
   return (

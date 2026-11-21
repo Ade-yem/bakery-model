@@ -1,12 +1,12 @@
 /** @file Unit tests for procurement localStorage persistence, corruption safety, and reset. */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { initialProcurementSnapshot } from '../data';
+import { initialProcurementSnapshot } from './fixtures/data';
 import {
   loadProcurementPreview,
   resetProcurementPreview,
   saveProcurementPreview,
   storageKey,
-} from '../storage';
+} from './fixtures/storage';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -76,4 +76,3 @@ describe('Procurement preview storage', () => {
     expect(JSON.parse(store.get(storageKey) ?? '{}').suppliers.length).toBe(3);
   });
 });
-

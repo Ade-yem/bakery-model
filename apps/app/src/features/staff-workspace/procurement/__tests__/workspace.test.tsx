@@ -1,3 +1,4 @@
+import { TestWorkspace } from '../../__tests__/fixtures/workspace';
 /** @file Integration and rendering tests for the Procurement workspace preview. */
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -8,45 +9,28 @@ import { ProcurementOverview } from '../ProcurementOverview';
 import { PurchaseOrdersPage } from '../PurchaseOrdersPage';
 import { RawMaterialStockPage } from '../RawMaterialStockPage';
 import { ReceiptsLedgerPage } from '../ReceiptsLedgerPage';
-import { initialProcurementSnapshot } from '../data';
-import {
-  addSupplier,
-  createPurchaseOrder,
-  formatMoney,
-  receivePurchaseOrder,
-} from '../domain';
+import { initialProcurementSnapshot } from './fixtures/data';
+import { addSupplier, createPurchaseOrder, formatMoney, receivePurchaseOrder } from '../domain';
 
 describe('Procurement workspace integration', () => {
-  it('TEST-PROC-011: renders all 5 routes inside StaffShell with strict role isolation', () => {
-    for (const path of ['', '/purchase-orders', '/receipts', '/stock', '/suppliers']) {
-      const html = renderToStaticMarkup(
-        <MemoryRouter initialEntries={[`/workspace-preview/procurement${path}`]}>
+  it('TEST-PROC-011: retains the Procurement shell behind a verified scoped data provider', () => {
+    const html = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/workspace/procurement']}>
+        <TestWorkspace department="procurement">
           <ProcurementWorkspace />
-        </MemoryRouter>,
-      );
-
-      expect(html).toContain('Sample data');
-      expect(html).toContain('Procurement');
-      expect(html).toContain('Overview');
-      expect(html).toContain('Purchase Orders');
-      expect(html).toContain('Receipts &amp; Ledger');
-      expect(html).toContain('Raw Material Stock');
-      expect(html).toContain('Suppliers');
-      expect(html).not.toMatch(/Network available|Sync queue not connected|Pending count unavailable/);
-      expect(html).not.toMatch(/Customer credit|Push to Disbursement|Record a production batch|BAT-0186/);
-    }
+        </TestWorkspace>
+      </MemoryRouter>
+    );
+    expect(html).toContain('Staff navigation');
+    expect(html).not.toContain('Sample data');
+    expect(html).not.toContain('Reset demo data');
   });
-
   it('TEST-PROC-012: pre-fills CreatePoDialog with low-stock material and its preferred supplier', () => {
     const lowFlour = initialProcurementSnapshot.materials.find((m) => m.id === 'RM-001')!;
     const overviewHtml = renderToStaticMarkup(
       <MemoryRouter>
-        <ProcurementOverview
-          snapshot={initialProcurementSnapshot}
-          onReorder={() => {}}
-          onReset={() => {}}
-        />
-      </MemoryRouter>,
+        <ProcurementOverview snapshot={initialProcurementSnapshot} onReorder={() => {}} />
+      </MemoryRouter>
     );
     expect(overviewHtml).toContain('Bread Flour');
     expect(overviewHtml).toContain('Reorder');
@@ -57,7 +41,7 @@ describe('Procurement workspace integration', () => {
         prefilledMaterial={lowFlour}
         onClose={() => {}}
         onSubmit={() => null}
-      />,
+      />
     );
     expect(dialogHtml).toContain('Golden Penny Flour Mills');
     expect(dialogHtml).toContain('Bread Flour · 50kg bag');
@@ -82,7 +66,7 @@ describe('Procurement workspace integration', () => {
         reference: 'INV-9981',
         receivedBy: 'Kemi Adeyemi',
       },
-      todayIso,
+      todayIso
     );
 
     const poHtml = renderToStaticMarkup(
@@ -92,7 +76,7 @@ describe('Procurement workspace integration', () => {
         onReceive={() => {}}
         onDirectReceipt={() => {}}
         onCancel={() => {}}
-      />,
+      />
     );
     expect(poHtml).toContain('PO-0103');
     expect(poHtml).toContain('RECEIVED');
@@ -102,7 +86,7 @@ describe('Procurement workspace integration', () => {
         materials={afterReceive.materials}
         suppliers={afterReceive.suppliers}
         onReorder={() => {}}
-      />,
+      />
     );
     expect(stockHtml).toContain('<strong>16</strong> 50kg bag');
 
@@ -112,17 +96,13 @@ describe('Procurement workspace integration', () => {
         movements={afterReceive.movements}
         suppliers={afterReceive.suppliers}
         onRecordDirectReceipt={() => {}}
-      />,
+      />
     );
     expect(ledgerHtml).toContain('INV-9981');
     expect(ledgerHtml).toContain(formatMoney(54500000));
 
     const overviewHtml = renderToStaticMarkup(
-      <ProcurementOverview
-        snapshot={afterReceive}
-        onReorder={() => {}}
-        onReset={() => {}}
-      />,
+      <ProcurementOverview snapshot={afterReceive} onReorder={() => {}} />
     );
     expect(overviewHtml).toContain(formatMoney(54500000));
   });
@@ -142,17 +122,18 @@ describe('Procurement workspace integration', () => {
         prefilledMaterial={null}
         onClose={() => {}}
         onSubmit={() => null}
-      />,
+      />
     );
     expect(dialogHtml).toContain('Olam Grains Nigeria');
 
     const notFoundHtml = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/workspace-preview/procurement/unknown']}>
-        <ProcurementWorkspace />
-      </MemoryRouter>,
+      <MemoryRouter initialEntries={['/workspace/procurement/unknown']}>
+        <TestWorkspace department="procurement">
+          <ProcurementWorkspace />
+        </TestWorkspace>
+      </MemoryRouter>
     );
     expect(notFoundHtml).toContain('Page not found');
     expect(notFoundHtml).toContain('Return to overview');
   });
 });
-

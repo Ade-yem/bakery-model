@@ -1,4 +1,4 @@
-/** @file Reception preview calculations and dispatch boundaries, tested before implementation. */
+/** @file Reception workspace calculations and dispatch boundaries, tested before implementation. */
 import { describe, expect, it } from 'vitest';
 import {
   parseMoney,
@@ -96,7 +96,7 @@ describe('Explicit manual dispatch', () => {
     expect(pushed).not.toHaveProperty('stock');
     expect(() => recordPayment(pushed, [{ method: 'CASH', amount: 1, reference: '' }])).toThrow();
   });
-  it('recovers valid preview records and rejects corrupt or inconsistent saved data', () => {
+  it('recovers valid workspace records and rejects corrupt or inconsistent saved data', () => {
     expect(parseOrders(JSON.stringify([order]))).toEqual([order]);
     for (const raw of [
       null,

@@ -1,0 +1,53 @@
+.ho-form {
+  margin-top: 24px;
+  display: grid;
+  gap: 16px;
+  max-width: 680px;
+}
+.ho-form label,
+.ho-form fieldset {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  min-width: 0;
+}
+.ho-form fieldset {
+  gap: 16px;
+  border: 1px solid var(--sw-rule);
+  padding: 16px;
+}
+.ho-form input:not([type='checkbox']),
+.ho-form textarea {
+  min-width: 0;
+  width: 100%;
+  background: var(--color-flour);
+  border: 1px solid var(--sw-rule);
+  border-radius: 4px;
+  padding: 12px;
+  color: var(--sw-ink);
+  font: inherit;
+}
+.ho-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+.ho-form .ho-check {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  line-height: 1.6;
+}
+.ho-check input {
+  margin-top: 4px;
+  accent-color: var(--sw-teal);
+}
+.ho-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .ho-actions button {
+    white-space: normal;
+  }
+}

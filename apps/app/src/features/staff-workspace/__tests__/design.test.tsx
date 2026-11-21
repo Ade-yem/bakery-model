@@ -1,19 +1,25 @@
 /// <reference types="node" />
+import { TestWorkspace } from './fixtures/workspace';
 /** @file Brand consistency contract with the existing landing/auth components. */
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import { Logo } from '../../../../../../packages/ui/src/component/Logo.js';
+import { Logo } from '@repo/ui/component/Logo';
 import { StaffWorkspace } from '../StaffWorkspace';
 import { readFileSync } from 'node:fs';
-const tokens = readFileSync(new URL('../../../../../../packages/ui/src/styles/variables.css', import.meta.url), 'utf8');
+const tokens = readFileSync(
+  new URL('../../../../../../packages/ui/src/styles/variables.css', import.meta.url),
+  'utf8'
+);
 const globalStyles = readFileSync(new URL('../../../styles/global.css', import.meta.url), 'utf8');
 
 describe('Shared visual identity', () => {
   it('uses the existing loaf logo in the staff workspace rather than a second brand mark', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
-        <StaffWorkspace preview />
+        <TestWorkspace department="production">
+          <StaffWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('M4 15C4 10.5');
@@ -30,14 +36,14 @@ describe('Shared visual identity', () => {
   it('keeps the workspace brand link inside the workspace', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
-        <Logo to="/workspace-preview" />
+        <Logo to="/workspace/production" />
       </MemoryRouter>
     );
-    expect(html).toContain('href="/workspace-preview"');
+    expect(html).toContain('href="/workspace/production"');
   });
   it('matches the frontend branch Figtree typography', () => {
     expect(tokens).toContain("--font-family-base: 'Figtree'");
-    expect(globalStyles).toContain("--font-sans: 'Figtree'");
+    expect(globalStyles).toMatch(/--font-sans:\s*['"]Figtree['"]/);
     expect(tokens + globalStyles).not.toContain('Switzer');
   });
   it('keeps the frontend core palette in the global and component tokens', () => {
@@ -52,7 +58,7 @@ describe('Shared visual identity', () => {
     };
     for (const [name, value] of Object.entries(palette)) {
       for (const css of [tokens, globalStyles]) {
-        expect(css).toContain(`--color-${name}: ${value}`);
+        expect(css.toLowerCase()).toContain(`--color-${name}: ${value.toLowerCase()}`);
       }
     }
   });

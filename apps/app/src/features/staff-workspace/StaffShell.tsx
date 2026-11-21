@@ -1,6 +1,8 @@
+import { AssignedAccess, canOpenStaffPath } from './policy';
+import { useAuth, type Department } from '../integration/auth';
 /** @file Shared staff shell; department pages supply only their own authorized UI. */
-import { useEffect, useState, type ReactNode } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useContext, useEffect, useState, type ReactNode } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -19,19 +21,20 @@ import { getStaffNavigation, type StaffAccess } from './access';
 interface Props {
   base: string;
   department: string;
-  name: string;
-  initials: string;
-  role: string;
-  access: StaffAccess;
   children: ReactNode;
   dialog?: ReactNode;
   extraLinks?: { path: string; label: string }[];
   navigationLabels?: Record<string, string>;
-  hiddenNavigationPaths?: string[];
-  navigationPathOverrides?: Record<string, string>;
-  showSyncStatus?: boolean;
+  navigationLinks?: { path: string; label: string }[];
 }
-const navigationIcons = [LayoutDashboard, ClipboardList, Files, History, CalendarDays, UserRound];
+const navigationIcons = {
+  '/workspace': LayoutDashboard,
+  '/workspace/tasks': ClipboardList,
+  '/workspace/records': Files,
+  '/workspace/history': History,
+  '/workspace/schedule': CalendarDays,
+  '/workspace/profile': UserRound,
+};
 /**
  * @description Keeps the approved navigation, typography and layout identical across staff departments.
  * @param props Department-specific identity, access hints and page content; no auth is established here.
@@ -40,18 +43,23 @@ const navigationIcons = [LayoutDashboard, ClipboardList, Files, History, Calenda
 export function StaffShell({
   base,
   department,
-  name,
-  initials,
-  role,
-  access,
   children,
   dialog,
   extraLinks = [],
   navigationLabels = {},
-  hiddenNavigationPaths = [],
-  navigationPathOverrides = {},
-  showSyncStatus = true,
+  navigationLinks,
 }: Props) {
+  const auth = useAuth();
+  const [logoutError, setLogoutError] = useState('');
+  const assigned = useContext(AssignedAccess);
+  const effectiveAccess: StaffAccess = assigned ?? { enabledModules: [], permissions: [] };
+  const name = auth.session?.displayName ?? '';
+  const role = auth.session?.role ?? '';
+  const initials = name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('');
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
   useEffect(() => {
@@ -78,32 +86,63 @@ export function StaffShell({
           </span>
           <div>
             <strong>{department}</strong>
-            <p>Tally Artisan Bakery</p>
+            <p>{auth.session?.tenantName ?? 'Business workspace'}</p>
           </div>
         </div>
         <p className="sw-nav-caption">My workspace</p>
         <nav aria-label="Staff navigation" onClick={() => setMenuOpen(false)}>
-          {getStaffNavigation(access)
-            .filter((item) => !hiddenNavigationPaths.includes(item.path))
-            .map((item, index) => {
-              const Icon = navigationIcons[index];
-              return (
-                <NavLink
-                  end={item.path === '/workspace'}
-                  key={item.path}
-                  to={navigationPathOverrides[item.path] ?? item.path.replace('/workspace', base)}
-                >
-                  <Icon size={18} strokeWidth={1.6} />
-                  <span>{navigationLabels[item.path] ?? item.label}</span>
+          {navigationLinks
+            ? navigationLinks.map((item) => (
+                <NavLink end={item.path === base} key={item.path} to={item.path}>
+                  <Files size={18} strokeWidth={1.6} />
+                  <span>{item.label}</span>
                 </NavLink>
-              );
-            })}
-          {extraLinks.map((item) => (
-            <NavLink key={item.path} to={item.path}>
-              <UserRound size={18} strokeWidth={1.6} />
-              <span>{item.label}</span>
+              ))
+            : getStaffNavigation(effectiveAccess)
+                .filter(
+                  (item) =>
+                    !assigned ||
+                    canOpenStaffPath(
+                      department.toLowerCase() as Department,
+                      item.path.replace('/workspace', ''),
+                      effectiveAccess
+                    )
+                )
+                .map((item) => {
+                  const Icon = navigationIcons[item.path as keyof typeof navigationIcons];
+                  return (
+                    <NavLink
+                      end={item.path === '/workspace'}
+                      key={item.path}
+                      to={item.path.replace('/workspace', base)}
+                    >
+                      <Icon size={18} strokeWidth={1.6} />
+                      <span>{navigationLabels[item.path] ?? item.label}</span>
+                    </NavLink>
+                  );
+                })}
+          {effectiveAccess.enabledModules.length > 0 && (
+            <NavLink to={`${base}/sync`}>
+              <ShieldCheck size={18} />
+              <span>Pending work & conflicts</span>
             </NavLink>
-          ))}
+          )}
+          {extraLinks
+            .filter(
+              (item) =>
+                !assigned ||
+                canOpenStaffPath(
+                  department.toLowerCase() as Department,
+                  item.path.slice(base.length),
+                  effectiveAccess
+                )
+            )
+            .map((item) => (
+              <NavLink key={item.path} to={item.path}>
+                <UserRound size={18} strokeWidth={1.6} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
         </nav>
         <div className="sw-sidebar-bottom">
           <div className="sw-scope-note">
@@ -117,10 +156,21 @@ export function StaffShell({
               <p>{role}</p>
             </div>
           </div>
-          <Link className="sw-exit" to="/login">
+          <button
+            className="sw-exit"
+            onClick={async () => {
+              setLogoutError('');
+              try {
+                await auth.signOut();
+              } catch {
+                setLogoutError('Sign-out failed. Please retry.');
+              }
+            }}
+          >
             <LogOut size={16} />
-            Exit preview
-          </Link>
+            Log out
+          </button>
+          {logoutError && <p role="alert">{logoutError}</p>}
         </div>
       </aside>
       <div className="sw-main">
@@ -134,16 +184,13 @@ export function StaffShell({
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <span>Ikeja branch</span>
+            <span>{auth.session?.branchName}</span>
             <span className="sw-top-divider">/</span>
             <span className="sw-muted">Staff workspace</span>
           </div>
-          <span className="sw-preview-badge">Sample data · UI preview</span>
+          <span className="sw-muted">{department}</span>
         </header>
-        {showSyncStatus && <GlobalSyncStatus />}
-        <div className="sw-preview-notice">
-          Preview only. No live shift, stock or server connection. <span>{department} role</span>
-        </div>
+        <GlobalSyncStatus />
         <div className="sw-content" id="staff-content" tabIndex={-1}>
           {children}
           <footer className="sw-footer">

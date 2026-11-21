@@ -1,3 +1,4 @@
+import { TestWorkspace } from '../../__tests__/fixtures/workspace';
 /** @file Reception rendering and privacy boundaries. */
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -18,11 +19,15 @@ for (const path of [
 ]) {
   it(`renders Reception ${path || '/'} with the approved shell and no forbidden operational controls`, () => {
     const html = renderToStaticMarkup(
-      <MemoryRouter initialEntries={[`/workspace-preview/reception${path}`]}>
-        <ReceptionWorkspace />
+      <MemoryRouter initialEntries={[`/workspace/reception${path}`]}>
+        <TestWorkspace department="reception">
+          <ReceptionWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
-    expect(html).toContain('Sample data');
+    expect(html).toContain('Staff navigation');
+    expect(html).toContain('Log out');
+    expect(html).not.toContain('Sample data');
     expect(html).toContain('Reception');
     expect(html).toContain('<h1');
     expect(html).toContain('M4 15C4 10.5');
@@ -35,8 +40,10 @@ for (const path of [
 describe('Reception views', () => {
   it('makes dispatch a separate Reception action and distinguishes credit from cash', () => {
     const html = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/workspace-preview/reception/records/ORD-0246']}>
-        <ReceptionWorkspace />
+      <MemoryRouter initialEntries={['/workspace/reception/records/ORD-0246']}>
+        <TestWorkspace department="reception">
+          <ReceptionWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('Push to Disbursement');
@@ -45,8 +52,10 @@ describe('Reception views', () => {
   });
   it('shows an unknown order without leaking another department record', () => {
     const html = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/workspace-preview/reception/records/BAT-0186']}>
-        <ReceptionWorkspace />
+      <MemoryRouter initialEntries={['/workspace/reception/records/BAT-0186']}>
+        <TestWorkspace department="reception">
+          <ReceptionWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('Order not found');

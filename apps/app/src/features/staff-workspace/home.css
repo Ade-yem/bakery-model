@@ -251,3 +251,11 @@
   align-items: center;
   gap: 10px;
 }
+
+.sw-page-header > div {
+  min-width: 0;
+  max-width: 100%;
+}
+.sw-page-header h1 {
+  overflow-wrap: anywhere;
+}

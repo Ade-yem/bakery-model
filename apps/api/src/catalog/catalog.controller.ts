@@ -36,7 +36,7 @@ export class CatalogController {
   constructor(private readonly catalogService: CatalogService) {}
 
   /**
-   * Lists all catalog items registered in the active tenant.
+   * Lists catalog items visible to the caller in the active tenant.
    *
    * @param actor - The authenticated actor context.
    * @returns Array of catalog item records.
@@ -46,7 +46,7 @@ export class CatalogController {
   @ApiOperation({
     summary: 'List catalog items',
     description:
-      'Retrieves all inventory items (raw materials, finished goods, packaging) for the tenant.',
+      'Retrieves tenant inventory items with role and price visibility restrictions applied.',
   })
   @ApiOkResponse({
     description: 'List of catalog items.',
@@ -58,7 +58,20 @@ export class CatalogController {
     description: 'Caller lacks items:read permission.',
   })
   async list(@CurrentActor() actor: ActorContext) {
-    return this.catalogService.list(actor.tenantId);
+    const items = await this.catalogService.list(actor.tenantId);
+    const canReadPrice = actor.permissions.has(
+      PERMISSION_KEYS.ITEMS_PRICE_READ,
+    );
+    const itemType = new Map([
+      ['PRODUCTION_SUPERVISOR', 'RAW_MATERIAL'],
+      ['RECEPTIONIST', 'FINISHED_GOOD'],
+      ['DISPATCH_OFFICER', 'FINISHED_GOOD'],
+    ]).get(actor.role);
+    return items
+      .filter((item) => !itemType || item.itemType === itemType)
+      .map((item) =>
+        canReadPrice ? item : { ...item, sellingPrice: null, currency: null },
+      );
   }
 
   /**

@@ -30,7 +30,7 @@ describe('Production draft validation', () => {
   });
 });
 
-describe('Preview draft recovery', () => {
+describe('Workspace draft recovery', () => {
   it('recovers a well-formed browser draft without trusting unknown properties', async () => {
     const { parseBatchDraft } = await import('../draft');
     expect(
