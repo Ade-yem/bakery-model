@@ -35,7 +35,7 @@ function signature(
   const counts: Record<string, number> = {};
   for (const line of lines) {
     if (
-      !/^[a-z][a-z0-9_-]*$/i.test(line.id) ||
+      !/^[a-z0-9][a-z0-9_-]*$/i.test(line.id) ||
       ![1, 100].includes(line.scale) ||
       !Number.isSafeInteger(line.expected)
     )
