@@ -45,7 +45,7 @@ export class CustomersController {
   @ApiOperation({
     summary: 'List tenant customers',
     description:
-      'Retrieves all registered wholesale or retail account customers for the tenant.',
+      'Retrieves tenant customers with contact fields restricted to authorized callers.',
   })
   @ApiOkResponse({
     description: 'List of customer records.',
@@ -57,7 +57,14 @@ export class CustomersController {
     description: 'Caller lacks customers:read permission.',
   })
   async list(@CurrentActor() actor: ActorContext) {
-    return this.customersService.list(actor.tenantId);
+    const customers = await this.customersService.list(actor.tenantId);
+    return actor.permissions.has(PERMISSION_KEYS.CUSTOMERS_CONTACT_READ)
+      ? customers
+      : customers.map((customer) => ({
+          ...customer,
+          phone: null,
+          email: null,
+        }));
   }
 
   /**
