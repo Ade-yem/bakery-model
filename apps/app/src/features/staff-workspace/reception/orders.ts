@@ -21,6 +21,7 @@ export interface ReceptionOrder {
   payments: Tender[];
   status: OrderStatus;
   creditAuthorized: boolean;
+  fulfilledQuantity?: number;
 }
 /**
  * @description Converts a decimal naira input into integer kobo without fractional currency arithmetic.

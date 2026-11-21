@@ -1,5 +1,16 @@
+import { dataFor } from '../__tests__/fixtures/data';
+import type { DisbursementData } from '../../integration/workspace';
+import type { State, Action } from './model';
+const source = dataFor('disbursement') as DisbursementData;
+const applyAction = (state: State, action: Action) => apply(state, action, source);
+const parseState = (raw: string) => parseLedger(raw, source);
 import { describe, expect, it } from 'vitest';
-import { applyAction, balances, initialState, parseState } from './model';
+import {
+  applyAction as apply,
+  balances as balance,
+  initialState,
+  parseState as parseLedger,
+} from './model';
 
 describe('Disbursement sample ledger', () => {
   it('adds only independently accepted quantities and preserves intake differences', () => {
@@ -55,3 +66,7 @@ describe('Disbursement sample ledger', () => {
     ).toBeNull();
   });
 });
+
+function balances(state: State) {
+  return balance(state, source.opening);
+}

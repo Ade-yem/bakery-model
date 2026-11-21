@@ -10,7 +10,7 @@ export interface BatchDraftValues {
 }
 /**
  * @description Validates basic quantity shape without inventing production yield constraints.
- * @param values Unposted sample production input with explicit field units.
+ * @param values Unposted production input with explicit field units.
  * @returns Field-specific errors; an empty object indicates a well-formed local draft.
  */
 export function validateBatchDraft(
@@ -82,7 +82,9 @@ export function parseBatchDraft(raw: string | null): BatchDraftValues | null {
     };
     if (
       'product' in value &&
-      (value.product === 'Family loaf · 500g' || value.product === 'Sandwich bread · 1kg')
+      typeof value.product === 'string' &&
+      value.product.trim().length > 0 &&
+      value.product.length <= 200
     )
       draft.product = value.product;
     if ('sugar' in value) {

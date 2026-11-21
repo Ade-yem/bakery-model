@@ -1,23 +1,28 @@
+import { useStaffIdentity } from '../useStaffIdentity';
+import { useDepartmentData } from '../../integration/workspace';
 import { ShiftBadge } from '../ShiftBadge';
 import { Link } from 'react-router-dom';
 import { ArrowRight, PackageCheck, Boxes, ClipboardCheck } from 'lucide-react';
 import { StaffHeading } from '../StaffPages';
-import { balances, products, getOrders, getTransfers, type State } from './model';
+import { balances, type State } from './model';
 
 export function DisbursementHome({ state, base }: { state: State; base: string }) {
-  const stock = balances(state);
-  const incoming = getTransfers().filter(
+  const identity = useStaffIdentity();
+  const data = useDepartmentData('disbursement');
+  const products = data.products;
+  const stock = balances(state, data.opening);
+  const incoming = data.transfers.filter(
     (item) => !state.events.some((e) => e.kind === 'accept' && e.id === item.id)
   );
-  const waiting = getOrders().filter(
+  const waiting = data.orders.filter(
     (item) => !state.events.some((e) => e.kind === 'fulfill' && e.id === item.id)
   );
   return (
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Wednesday, 04 November 2026</p>
-          <h1>Good morning, Chidi.</h1>
+          <p className="sw-eyebrow">{identity.date}</p>
+          <h1>Welcome, {identity.name}.</h1>
           <p>Count it in. Check it out. Keep every handoff clear.</p>
         </div>
         <Link className="sw-primary" to={`${base}/tasks`}>
@@ -26,8 +31,8 @@ export function DisbursementHome({ state, base }: { state: State; base: string }
       </header>
       <section className="sw-shift-banner" aria-label="Current shift">
         <ShiftBadge department="disbursement" />
-        <strong>Morning · 06:00–14:00</strong>
-        <span>Disbursement / Ikeja branch</span>
+        <strong>{identity.shiftLabel}</strong>
+        <span>Disbursement / {identity.branch}</span>
         <Link to={`${base}/schedule`}>
           My schedule <ArrowRight size={14} />
         </Link>
@@ -118,6 +123,8 @@ export function DisbursementHome({ state, base }: { state: State; base: string }
 }
 
 export function DisbursementHistory({ state, base }: { state: State; base: string }) {
+  const data = useDepartmentData('disbursement');
+  const products = data.products;
   return (
     <>
       <StaffHeading
@@ -127,7 +134,7 @@ export function DisbursementHistory({ state, base }: { state: State; base: strin
       <section className="sw-panel">
         {!state.events.length ? (
           <div className="sw-empty">
-            <h2>No local activity yet</h2>
+            <h2>No stock activity yet</h2>
             <p>
               Accept a transfer, fulfill an order or record a physical count to start your history.
             </p>

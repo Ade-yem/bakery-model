@@ -1,7 +1,5 @@
-import { localQueueStatus } from '../staff-workspace/journal/store';
-import { DEMO_SESSION_KEY, readDemoSession } from '../mock-auth/session';
 /** @file Accessible global network banner and reusable pending-mutation pill. */
-import { useContext, useEffect, useState, useSyncExternalStore } from 'react';
+import { useContext, useSyncExternalStore } from 'react';
 import { Wifi, WifiOff, CloudOff, RefreshCw, Clock3, Check, CircleAlert } from 'lucide-react';
 import { Button } from '../../components/shared/Button';
 import { SyncContext } from './context';
@@ -171,28 +169,9 @@ export function GlobalSyncStatus() {
     controller.getSnapshot,
     controller.getSnapshot
   );
-  const readLocal = () => {
-    try {
-      const session = readDemoSession(sessionStorage.getItem(DEMO_SESSION_KEY));
-      if (!session) return null;
-      return localQueueStatus(session.department);
-    } catch {
-      return null;
-    }
-  };
-  const [local, setLocal] = useState(readLocal);
-  useEffect(() => {
-    const refresh = () => setLocal(readLocal());
-    window.addEventListener('staff-journal-change', refresh);
-    window.addEventListener('storage', refresh);
-    return () => {
-      window.removeEventListener('staff-journal-change', refresh);
-      window.removeEventListener('storage', refresh);
-    };
-  }, []);
   return (
     <OnlineOfflineBanner
-      snapshot={!snapshot.configured && local ? { ...snapshot, ...local } : snapshot}
+      snapshot={snapshot}
       onSync={() => {
         void controller.syncNow();
       }}

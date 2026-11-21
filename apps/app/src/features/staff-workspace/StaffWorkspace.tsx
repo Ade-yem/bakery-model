@@ -1,14 +1,10 @@
 import { useStaffActions } from './policy';
-import { commitRecord } from './journal/store';
-import { receivingResult } from './receiving';
-import { ProductionRecords, loadBatches, makeBatch, batchKey } from './production-store';
-import { productionRecords as initialBatches } from '../mock-auth/production-data';
+import { useDepartmentData, useWorkspace, useDraftKey } from '../integration/workspace';
 /** @file Production staff pages; the router owns session enforcement. */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { StaffShell } from './StaffShell';
-import { productionAccess } from '../mock-auth/production-data';
 import { StaffHome } from './StaffHome';
 import {
   StaffHeading,
@@ -31,42 +27,10 @@ interface Props {
  */
 export function StaffWorkspace({ basePath }: Props) {
   const permissions = useStaffActions();
-  const load = () => {
-    const loaded = loadBatches();
-    if (loaded.error) return loaded;
-    try {
-      return {
-        records: loaded.records.map((batch) => {
-          const result = receivingResult(batch.id);
-          return result
-            ? {
-                ...batch,
-                state: result.quantity === batch.quantity ? 'Accepted' : 'Accepted with difference',
-                accepted: result.quantity,
-                receivingNote: result.note,
-              }
-            : batch;
-        }),
-        error: '',
-      };
-    } catch (error) {
-      return {
-        records: [],
-        error: error instanceof Error ? error.message : 'Receiving results are unavailable.',
-      };
-    }
-  };
+  const data = useDepartmentData('production');
+  const workspace = useWorkspace();
+  const draftKey = useDraftKey('production');
   const location = useLocation();
-  const [batches, setBatches] = useState(load);
-  useEffect(() => {
-    const refresh = () => setBatches(load());
-    window.addEventListener('storage', refresh);
-    window.addEventListener('focus', refresh);
-    return () => {
-      window.removeEventListener('storage', refresh);
-      window.removeEventListener('focus', refresh);
-    };
-  }, []);
   const [batchId, setBatchId] = useState('');
   const [batchOpen, setBatchOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -81,16 +45,7 @@ export function StaffWorkspace({ basePath }: Props) {
     setBatchOpen(true);
   };
   let content;
-  if (batches.error)
-    content = (
-      <>
-        <StaffHeading title="Saved batches need attention" description={batches.error} />
-        <button className="sw-quiet" onClick={() => setBatches(load())}>
-          Retry loading batches
-        </button>
-      </>
-    );
-  else if (page === '') content = <StaffHome base={base} onBatch={openBatch} />;
+  if (page === '') content = <StaffHome base={base} onBatch={openBatch} />;
   else if (page === '/tasks') content = <StaffTasks base={base} onBatch={openBatch} />;
   else if (page === '/records') content = <StaffRecords base={base} />;
   else if (/^\/records\/[^/]+$/.test(page))
@@ -111,70 +66,57 @@ export function StaffWorkspace({ basePath }: Props) {
       </>
     );
   return (
-    <ProductionRecords.Provider value={batches.records}>
-      <StaffShell
-        base={base}
-        department="Production"
-        name="Ada Okonkwo"
-        initials="AO"
-        role="Production supervisor"
-        access={productionAccess}
-        dialog={
-          batchOpen ? (
-            <BatchDraftDialog
-              onSubmitBatch={(values) => {
+    <StaffShell
+      base={base}
+      department="Production"
+
+      dialog={
+        batchOpen ? (
+          <BatchDraftDialog
+            onSubmitBatch={async (values) => {
+              try {
+                permissions.require('production:create');
+                if (!data.products.includes(values.product ?? ''))
+                  return 'Choose a listed product.';
+                await workspace.submit({ type: 'production:create', id: batchId, values });
                 try {
-                  permissions.require('production:create');
-                  const current = loadBatches();
-                  if (current.error) return current.error;
-                  if (current.records.some((r) => r.id === batchId))
-                    return 'This batch has already been submitted.';
-                  const record = makeBatch(values, batchId);
-                  const records = [record, ...current.records];
-                  commitRecord(
-                    batchKey,
-                    JSON.stringify(
-                      records.filter((r) => !initialBatches.some((seed) => seed.id === r.id))
-                    )
-                  );
-                  setBatches(load());
-                  setBatchOpen(false);
-                  setMessage('Batch submitted. Output awaits independent receiving acceptance.');
-                  try {
-                    localStorage.removeItem('tallybakery:production-draft:v1');
-                  } catch {
-                    /* Submitted record remains durable. */
-                  }
-                  return null;
-                } catch (failure) {
-                  return failure instanceof Error
-                    ? failure.message
-                    : 'Batch could not be saved. Your input is retained.';
+                  localStorage.removeItem(draftKey);
+                } catch {
+                  /* The recorded submission remains available. */
                 }
-              }}
-              onClose={() => setBatchOpen(false)}
-              onSaved={() => {
                 setBatchOpen(false);
-                setMessage('Draft saved.');
-              }}
-            />
-          ) : undefined
-        }
-      >
-        {message && (
-          <div role="status" className="sw-feedback">
-            {message}
-            <button
-              className="sw-icon-button"
-              aria-label="Dismiss message"
-              onClick={() => setMessage('')}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        )}
-        {content}
-      </StaffShell>
-    </ProductionRecords.Provider>
+                setMessage(
+                  'Batch submission recorded. Review its receiving and synchronization status in records.'
+                );
+                return null;
+              } catch (error) {
+                return error instanceof Error
+                  ? error.message
+                  : 'Batch could not be saved. Your input is retained.';
+              }
+            }}
+            onClose={() => setBatchOpen(false)}
+            onSaved={() => {
+              setBatchOpen(false);
+              setMessage('Draft saved.');
+            }}
+          />
+        ) : undefined
+      }
+    >
+      {message && (
+        <div role="status" className="sw-feedback">
+          {message}
+          <button
+            className="sw-icon-button"
+            aria-label="Dismiss message"
+            onClick={() => setMessage('')}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+      {content}
+    </StaffShell>
   );
 }

@@ -1,7 +1,8 @@
+import { useDepartmentData } from '../../integration/workspace';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Search } from 'lucide-react';
-import { getOrders, products, getTransfers, type State } from './model';
+import { type State } from './model';
 
 export function DisbursementRecords({
   state,
@@ -12,10 +13,12 @@ export function DisbursementRecords({
   base: string;
   pendingOnly?: boolean;
 }) {
+  const data = useDepartmentData('disbursement');
+  const products = data.products;
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const rows = [
-    ...getTransfers().map((item) => {
+    ...data.transfers.map((item) => {
       const event = state.events.find((e) => e.kind === 'accept' && e.id === item.id);
       return {
         ...item,
@@ -29,7 +32,7 @@ export function DisbursementRecords({
         complete: !!event,
       };
     }),
-    ...getOrders().map((item) => {
+    ...data.orders.map((item) => {
       const complete = state.events.some((e) => e.kind === 'fulfill' && e.id === item.id);
       return {
         ...item,

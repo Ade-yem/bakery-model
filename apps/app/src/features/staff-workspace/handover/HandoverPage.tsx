@@ -1,197 +1,148 @@
+import { useWorkspace as useFormWorkspace } from '../../integration/workspace';
 import { useStaffActions } from '../policy';
-import { readRecord, commitRecord } from '../journal/store';
+import { useWorkspace } from '../../integration/workspace';
 import { useState } from 'react';
 import { StaffHeading } from '../StaffPages';
-import { verifyIncoming } from '../../mock-auth/session';
-import {
-  submitOutgoing,
-  signIncoming,
-  parseHandover,
-  type CountLine,
-  type Handover,
-} from './model';
+import { submitOutgoing, signIncoming, type CountLine } from './model';
 import './handover.css';
 interface Props {
   department: 'reception' | 'disbursement';
   lines: CountLine[];
   actor: string;
-  currentLines?: () => CountLine[];
 }
-export function HandoverPage({ department, lines, actor, currentLines }: Props) {
+export function HandoverPage({ department, lines, actor }: Props) {
+  const { busy } = useFormWorkspace();
   const permissions = useStaffActions();
-  const key = `tallybakery:${department}:dual-handover:v1`;
-  const load = () => {
-    try {
-      const raw = readRecord(key);
-      const record = raw === null ? null : parseHandover(raw);
-      return {
-        record,
-        error:
-          raw !== null && !record
-            ? 'Saved handover evidence is invalid. It has not been overwritten.'
-            : '',
-      };
-    } catch {
-      return {
-        record: null,
-        error: 'Handover storage is unavailable. Allow browser storage, then retry.',
-      };
-    }
-  };
-  const [snapshot, setSnapshot] = useState<{ record: Handover | null; error: string }>(load);
+  const workspace = useWorkspace();
   const [counts, setCounts] = useState<Record<string, string>>({});
   const [note, setNote] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-  const record = snapshot.record;
+  const record = workspace.data.handover;
   const signed = record?.status === 'SEALED_PENDING_SYNC';
   const format = (value: number, line: CountLine) =>
     line.scale === 100
       ? new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(value / 100)
       : `${value} units`;
-  function save(next: Handover) {
-    commitRecord(key, JSON.stringify(next));
-    setSnapshot({ record: next, error: '' });
-    setCounts({});
-    setNote('');
-    setPassword('');
-    setChecked(false);
-  }
   return (
     <>
       <StaffHeading
         title="Closing & handover"
         description="Independent counts, two signatures and a clear reconciliation trail."
       />
-      {snapshot.error ? (
-        <section className="sw-panel sw-detail">
-          <p role="alert" className="sw-field-error">
-            {snapshot.error}
-          </p>
-          <button className="sw-quiet" onClick={() => setSnapshot(load())}>
-            Retry loading handover
-          </button>
-        </section>
-      ) : (
-        <>
-          <section className="sw-panel">
-            <div className="sw-panel-heading">
-              <div>
-                <h2>
-                  {signed
-                    ? 'Signed handover'
-                    : record
-                      ? 'Awaiting incoming verification'
-                      : 'Outgoing physical count'}
-                </h2>
-                <p>
-                  {signed
-                    ? `${record.result} · Awaiting server acknowledgement`
-                    : 'Counts are recorded separately from expected balances.'}
-                </p>
-              </div>
-              <span className="sw-label">
-                {signed ? 'Pending sync' : record ? 'Incoming signoff required' : 'Open shift'}
-              </span>
+      <>
+        <section className="sw-panel">
+          <div className="sw-panel-heading">
+            <div>
+              <h2>
+                {signed
+                  ? 'Signed handover'
+                  : record
+                    ? 'Awaiting incoming verification'
+                    : 'Outgoing physical count'}
+              </h2>
+              <p>
+                {signed
+                  ? `${record.result} · Awaiting server acknowledgement`
+                  : 'Counts are recorded separately from expected balances.'}
+              </p>
             </div>
-            <div className="sw-table-scroll">
-              <table className="sw-table">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Expected</th>
-                    <th>Outgoing count</th>
-                    <th>Incoming count</th>
-                    <th>Incoming variance</th>
+            <span className="sw-label">
+              {signed ? 'Pending sync' : record ? 'Incoming signoff required' : 'Open shift'}
+            </span>
+          </div>
+          <div className="sw-table-scroll">
+            <table className="sw-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Expected</th>
+                  <th>Outgoing count</th>
+                  <th>Incoming count</th>
+                  <th>Incoming variance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(record?.lines ?? lines).map((line) => (
+                  <tr key={line.id}>
+                    <td>{line.label}</td>
+                    <td>{format(line.expected, line)}</td>
+                    <td>
+                      {record ? format(record.outgoing.counts[line.id], line) : 'Not submitted'}
+                    </td>
+                    <td>
+                      {record?.incoming
+                        ? format(record.incoming.counts[line.id], line)
+                        : 'Not verified'}
+                    </td>
+                    <td>
+                      {record?.incoming
+                        ? format(record.incoming.counts[line.id] - line.expected, line)
+                        : '—'}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {(record?.lines ?? lines).map((line) => (
-                    <tr key={line.id}>
-                      <td>{line.label}</td>
-                      <td>{format(line.expected, line)}</td>
-                      <td>
-                        {record ? format(record.outgoing.counts[line.id], line) : 'Not submitted'}
-                      </td>
-                      <td>
-                        {record?.incoming
-                          ? format(record.incoming.counts[line.id], line)
-                          : 'Not verified'}
-                      </td>
-                      <td>
-                        {record?.incoming
-                          ? format(record.incoming.counts[line.id] - line.expected, line)
-                          : '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {record && (
+            <div className="sw-panel-footer">
+              Outgoing: {record.outgoing.actor} · {record.outgoing.note || 'No variance'}
+              {record.incoming && (
+                <>
+                  {' '}
+                  · Incoming: {record.incoming.actor} · {record.incoming.note || 'No variance'}
+                </>
+              )}
             </div>
-            {record && (
-              <div className="sw-panel-footer">
-                Outgoing: {record.outgoing.actor} · {record.outgoing.note || 'No variance'}
-                {record.incoming && (
-                  <>
-                    {' '}
-                    · Incoming: {record.incoming.actor} · {record.incoming.note || 'No variance'}
-                  </>
-                )}
-              </div>
-            )}
-          </section>
-          {signed ? (
-            <p role="status" className="sw-callout">
-              Both signatures are recorded. This shift is pending server validation; it is not
-              finalized.{' '}
-              {record.result === 'UNBALANCED' &&
-                'The acknowledged deficiency remains on the record for manager review.'}
-            </p>
-          ) : (
-            <form
-              className="sw-panel sw-detail ho-form"
-              noValidate
-              onSubmit={(e) => {
-                e.preventDefault();
-                setError('');
-                setNotice('');
-                try {
-                  permissions.require(record ? 'handover:sign' : 'handover:submit');
-                  if (!checked)
-                    throw new Error('Confirm that you independently performed the physical count.');
-                  const latest = load();
-                  if (latest.error) throw new Error(latest.error);
-                  if (JSON.stringify(latest.record) !== JSON.stringify(record))
-                    throw new Error(
-                      'Another person updated this handover. Reload the saved evidence before continuing.'
-                    );
-                  if (!record) {
-                    save(submitOutgoing(lines, counts, note, actor));
-                    setNotice(
-                      'Outgoing handover submitted. The incoming lead must independently verify and co-sign.'
-                    );
-                  } else {
-                    const incomingActor = verifyIncoming(department, email, password);
-                    save(
-                      signIncoming(record, counts, note, incomingActor, currentLines?.() ?? lines)
-                    );
-                    setNotice(
-                      'Incoming verification recorded. Handover is pending server acknowledgement.'
-                    );
-                  }
-                } catch (failure) {
-                  setPassword('');
-                  setError(
-                    failure instanceof Error
-                      ? failure.message
-                      : 'Could not save the handover. Your counts are retained.'
+          )}
+        </section>
+        {signed ? (
+          <p role="status" className="sw-callout">
+            Both signatures are recorded. This shift is pending server validation; it is not
+            finalized.{' '}
+            {record.result === 'UNBALANCED' &&
+              'The acknowledged deficiency remains on the record for manager review.'}
+          </p>
+        ) : (
+          <form
+            className="sw-panel sw-detail ho-form"
+            noValidate
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setError('');
+              setNotice('');
+              try {
+                permissions.require(record ? 'handover:sign' : 'handover:submit');
+                if (!checked)
+                  throw new Error('Confirm that you independently performed the physical count.');
+                if (!record) {
+                  submitOutgoing(lines, counts, note, actor);
+                  await workspace.submit({ type: 'handover:submit', counts, note });
+                  setNotice(
+                    'Outgoing handover submitted. The incoming lead must independently verify and co-sign.'
+                  );
+                } else {
+                  signIncoming(record, counts, note, actor, lines);
+                  await workspace.submit({ type: 'handover:sign', counts, note });
+                  setNotice(
+                    'Incoming verification recorded. Handover is pending server acknowledgement.'
                   );
                 }
-              }}
-            >
+                setCounts({});
+                setNote('');
+                setChecked(false);
+              } catch (failure) {
+                setError(
+                  failure instanceof Error
+                    ? failure.message
+                    : 'Could not save the handover. Your counts are retained.'
+                );
+              }
+            }}
+          >
+            <fieldset disabled={busy} className="sw-form-fields">
               <h2>{record ? 'Incoming independent count' : 'Outgoing closing count'}</h2>
               {(record?.lines ?? lines).map((line) => (
                 <label key={line.id}>
@@ -211,27 +162,10 @@ export function HandoverPage({ department, lines, actor, currentLines }: Props) 
                 <textarea maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} />
               </label>
               {record && (
-                <fieldset>
-                  <legend>Incoming lead verification</legend>
-                  <label>
-                    Incoming email
-                    <input
-                      type="email"
-                      autoComplete="off"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Incoming password
-                    <input
-                      type="password"
-                      autoComplete="off"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </label>
-                </fieldset>
+                <p className="sw-callout">
+                  Co-signing uses your signed-in identity. The incoming lead must sign in with their
+                  own authorized account.
+                </p>
               )}
               <label className="ho-check">
                 <input
@@ -250,7 +184,10 @@ export function HandoverPage({ department, lines, actor, currentLines }: Props) 
               <div className="ho-actions">
                 <button
                   className="sw-primary"
-                  disabled={!permissions.allowed(record ? 'handover:sign' : 'handover:submit')}
+                  disabled={
+                    !permissions.allowed(record ? 'handover:sign' : 'handover:submit') ||
+                    record?.outgoing.actor === actor
+                  }
                 >
                   {record ? 'Verify & co-sign handover' : 'Submit outgoing handover'}
                 </button>
@@ -258,22 +195,26 @@ export function HandoverPage({ department, lines, actor, currentLines }: Props) 
                   className="sw-quiet"
                   type="button"
                   onClick={() => {
-                    setSnapshot(load());
+                    void workspace
+                      .reload()
+                      .catch(() =>
+                        setError('Handover could not be reloaded. Your input is retained.')
+                      );
                     setError('');
                   }}
                 >
                   Reload saved evidence
                 </button>
               </div>
-            </form>
-          )}
-          {notice && (
-            <p role="status" className="sw-callout">
-              {notice}
-            </p>
-          )}
-        </>
-      )}
+            </fieldset>
+          </form>
+        )}
+        {notice && (
+          <p role="status" className="sw-callout">
+            {notice}
+          </p>
+        )}
+      </>
     </>
   );
 }

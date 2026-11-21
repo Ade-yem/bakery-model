@@ -1,8 +1,10 @@
+import { useWorkspace as useFormWorkspace } from '../../integration/workspace';
+import { useDepartmentData } from '../../integration/workspace';
 import { useStaffActions } from '../policy';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { StaffHeading } from '../StaffPages';
-import { balances, getOrders, products, getTransfers, type Action, type State } from './model';
+import { balances, type Action, type State } from './model';
 
 export function DisbursementDetail({
   id,
@@ -13,11 +15,14 @@ export function DisbursementDetail({
   id: string;
   state: State;
   base: string;
-  onSave: (action: Action) => string | null;
+  onSave: (action: Action) => Promise<string | null>;
 }) {
+  const { busy } = useFormWorkspace();
+  const data = useDepartmentData('disbursement');
+  const products = data.products;
   const permissions = useStaffActions();
-  const transfer = getTransfers().find((item) => item.id === id);
-  const order = getOrders().find((item) => item.id === id);
+  const transfer = data.transfers.find((item) => item.id === id);
+  const order = data.orders.find((item) => item.id === id);
   const [quantity, setQuantity] = useState('');
   const [note, setNote] = useState('');
   const [confirmed, setConfirmed] = useState(false);
@@ -36,7 +41,7 @@ export function DisbursementDetail({
   const event = state.events.find(
     (e) => e.id === id && e.kind === (transfer ? 'accept' : 'fulfill')
   );
-  const stock = balances(state);
+  const stock = balances(state, data.opening);
   const requiredLines = order?.lines ?? [{ product: item.product, quantity: order?.quantity ?? 0 }];
   const sufficient = requiredLines.every((line) => stock[line.product] >= line.quantity);
   const available = stock[item.product];
@@ -115,7 +120,7 @@ export function DisbursementDetail({
           <form
             className="db-form"
             noValidate
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               if (!confirmed) {
                 setError('Confirm the physical check before continuing.');
@@ -125,7 +130,7 @@ export function DisbursementDetail({
                 setError('Enter the actual received quantity in whole units.');
                 return;
               }
-              const result = onSave(
+              const result = await onSave(
                 transfer
                   ? { kind: 'accept', id, quantity: Number(quantity), note }
                   : { kind: 'fulfill', id }
@@ -133,67 +138,69 @@ export function DisbursementDetail({
               setError(result ?? '');
             }}
           >
-            {transfer ? (
-              <>
-                <label>
-                  Actual received (units)
-                  <input
-                    inputMode="numeric"
-                    value={quantity}
-                    onChange={(e) => {
-                      setQuantity(e.target.value);
-                      setConfirmed(false);
-                    }}
-                  />
-                </label>
-                <p className="sw-muted">
-                  Enter your own count. Submitted output is not available stock until accepted.
+            <fieldset disabled={busy} className="sw-form-fields">
+              {transfer ? (
+                <>
+                  <label>
+                    Actual received (units)
+                    <input
+                      inputMode="numeric"
+                      value={quantity}
+                      onChange={(e) => {
+                        setQuantity(e.target.value);
+                        setConfirmed(false);
+                      }}
+                    />
+                  </label>
+                  <p className="sw-muted">
+                    Enter your own count. Submitted output is not available stock until accepted.
+                  </p>
+                  <label>
+                    Difference explanation
+                    <textarea
+                      maxLength={500}
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder="Required when received and submitted quantities differ"
+                    />
+                  </label>
+                </>
+              ) : (
+                <p className="sw-callout">
+                  Check all {expected} units against {order!.reference}. Confirmation deducts the
+                  full quantity from available stock; partial fulfillment is not supported.
                 </p>
-                <label>
-                  Difference explanation
-                  <textarea
-                    maxLength={500}
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    placeholder="Required when received and submitted quantities differ"
-                  />
-                </label>
-              </>
-            ) : (
-              <p className="sw-callout">
-                Check all {expected} units against {order!.reference}. Confirmation deducts the full
-                quantity from available stock; partial fulfillment is not supported.
-              </p>
-            )}
-            <label className="db-check">
-              <input
-                type="checkbox"
-                checked={confirmed}
-                onChange={(e) => setConfirmed(e.target.checked)}
-              />
-              {transfer
-                ? 'I independently counted the received units.'
-                : 'I checked and handed over the full order.'}
-            </label>
-            {error && (
-              <p role="alert" className="sw-field-error">
-                {error}
-              </p>
-            )}
-            {!transfer && !sufficient && (
-              <p className="sw-callout">
-                Insufficient accepted stock. Review incoming transfers before fulfillment.
-              </p>
-            )}
-            <button
-              className="sw-primary"
-              disabled={
-                (!transfer && !sufficient) ||
-                !permissions.allowed(transfer ? 'transfer:accept' : 'orders:fulfill')
-              }
-            >
-              {transfer ? 'Confirm acceptance' : 'Confirm fulfillment'}
-            </button>
+              )}
+              <label className="db-check">
+                <input
+                  type="checkbox"
+                  checked={confirmed}
+                  onChange={(e) => setConfirmed(e.target.checked)}
+                />
+                {transfer
+                  ? 'I independently counted the received units.'
+                  : 'I checked and handed over the full order.'}
+              </label>
+              {error && (
+                <p role="alert" className="sw-field-error">
+                  {error}
+                </p>
+              )}
+              {!transfer && !sufficient && (
+                <p className="sw-callout">
+                  Insufficient accepted stock. Review incoming transfers before fulfillment.
+                </p>
+              )}
+              <button
+                className="sw-primary"
+                disabled={
+                  (!transfer && !sufficient) ||
+                  !permissions.allowed(transfer ? 'transfer:accept' : 'orders:fulfill')
+                }
+              >
+                {transfer ? 'Confirm acceptance' : 'Confirm fulfillment'}
+              </button>
+            </fieldset>
           </form>
         )}
       </section>

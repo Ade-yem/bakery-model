@@ -1,29 +1,10 @@
 import { createContext, useContext } from 'react';
-import type { DemoDepartment } from '../mock-auth/session';
+import type { Department } from '../integration/auth';
 import { canAccessStaffPage, type StaffAccess } from './access';
 export const AssignedAccess = createContext<StaffAccess | null>(null);
-const actions: Record<DemoDepartment, string[]> = {
-  production: ['production:create'],
-  reception: [
-    'orders:create',
-    'payments:create',
-    'orders:push',
-    'repayments:create',
-    'handover:submit',
-    'handover:sign',
-  ],
-  disbursement: [
-    'transfer:accept',
-    'orders:fulfill',
-    'stock:count',
-    'handover:submit',
-    'handover:sign',
-  ],
-  procurement: ['procurement:create'],
-};
 export function useStaffActions() {
   const access = useContext(AssignedAccess);
-  const allowed = (action: string) => !access || access.permissions.includes(action);
+  const allowed = (action: string) => Boolean(access?.permissions.includes(action));
   return {
     allowed,
     require: (action: string) => {
@@ -31,21 +12,8 @@ export function useStaffActions() {
     },
   };
 }
-export function departmentAccess(department: DemoDepartment): StaffAccess {
-  const module = department === 'reception' ? 'orders' : department;
-  return {
-    enabledModules: [module],
-    permissions: [
-      `${module}:view`,
-      'records:view',
-      'history:view',
-      'schedule:view',
-      ...actions[department],
-    ],
-  };
-}
 export function canOpenStaffPath(
-  department: DemoDepartment,
+  department: Department,
   page: string,
   access: StaffAccess
 ): boolean {
@@ -57,7 +25,7 @@ export function canOpenStaffPath(
   if (/^\/records(?:\/[^/]+)?$/.test(page)) return access.permissions.includes('records:view');
   if (['', '/tasks', '/history', '/schedule'].includes(page))
     return canAccessStaffPage(`/workspace${page}`, access);
-  const routes: Record<DemoDepartment, string[]> = {
+  const routes: Record<Department, string[]> = {
     production: [],
     reception: ['/orders/new', '/handover', '/customers', '/credits', '/repayments'],
     disbursement: ['/stock', '/handover'],
@@ -73,13 +41,13 @@ export function canOpenStaffPath(
   return routes[department].includes(page) && (!action || access.permissions.includes(action));
 }
 
-export function isKnownStaffPath(department: DemoDepartment, page: string): boolean {
+export function isKnownStaffPath(department: Department, page: string): boolean {
   if (
     ['', '/tasks', '/records', '/history', '/schedule', '/profile', '/sync'].includes(page) ||
     /^\/records\/[^/]+$/.test(page)
   )
     return true;
-  const extra: Record<DemoDepartment, string[]> = {
+  const extra: Record<Department, string[]> = {
     production: [],
     reception: ['/orders/new', '/handover', '/customers', '/credits', '/repayments'],
     disbursement: ['/stock', '/handover'],

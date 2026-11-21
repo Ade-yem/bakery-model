@@ -1,5 +1,10 @@
+import { suppliers, materials, sampleReceipts } from '../__tests__/fixtures/procurement';
+import type { ReceiptInput, Receipt } from './model';
+const createReceipt = (input: ReceiptInput, existing: Receipt[]) =>
+  create(input, existing, { suppliers, materials });
+const parseReceipts = (raw: string) => parse(raw, { suppliers, materials });
 import { describe, expect, it } from 'vitest';
-import { createReceipt, receiptTotal, parseReceipts, sampleReceipts } from './model';
+import { createReceipt as create, receiptTotal, parseReceipts as parse } from './model';
 const input = {
   id: 'REC-test',
   supplierId: 'mill',

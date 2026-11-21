@@ -1,3 +1,4 @@
+import { TestWorkspace } from '../../__tests__/fixtures/workspace';
 /** @file Reception rendering and privacy boundaries. */
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -19,7 +20,9 @@ for (const path of [
   it(`renders Reception ${path || '/'} with the approved shell and no forbidden operational controls`, () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={[`/workspace/reception${path}`]}>
-        <ReceptionWorkspace />
+        <TestWorkspace department="reception">
+          <ReceptionWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('Staff navigation');
@@ -38,7 +41,9 @@ describe('Reception views', () => {
   it('makes dispatch a separate Reception action and distinguishes credit from cash', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/workspace/reception/records/ORD-0246']}>
-        <ReceptionWorkspace />
+        <TestWorkspace department="reception">
+          <ReceptionWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('Push to Disbursement');
@@ -48,7 +53,9 @@ describe('Reception views', () => {
   it('shows an unknown order without leaking another department record', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/workspace/reception/records/BAT-0186']}>
-        <ReceptionWorkspace />
+        <TestWorkspace department="reception">
+          <ReceptionWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('Order not found');

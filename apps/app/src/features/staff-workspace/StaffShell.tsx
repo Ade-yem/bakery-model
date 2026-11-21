@@ -1,8 +1,8 @@
 import { AssignedAccess, canOpenStaffPath } from './policy';
-import type { DemoDepartment } from '../mock-auth/session';
+import { useAuth, type Department } from '../integration/auth';
 /** @file Shared staff shell; department pages supply only their own authorized UI. */
 import { useContext, useEffect, useState, type ReactNode } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -15,17 +15,12 @@ import {
   LogOut,
   ShieldCheck,
 } from 'lucide-react';
-import { DEMO_SESSION_KEY } from '../mock-auth/session';
 import { GlobalSyncStatus } from '../sync/SyncStatus';
 import { Logo } from '../../components/shared/Logo';
 import { getStaffNavigation, type StaffAccess } from './access';
 interface Props {
   base: string;
   department: string;
-  name: string;
-  initials: string;
-  role: string;
-  access: StaffAccess;
   children: ReactNode;
   dialog?: ReactNode;
   extraLinks?: { path: string; label: string }[];
@@ -47,17 +42,22 @@ const navigationIcons = {
 export function StaffShell({
   base,
   department,
-  name,
-  initials,
-  role,
-  access,
   children,
   dialog,
   extraLinks = [],
   navigationLabels = {},
 }: Props) {
+  const auth = useAuth();
+  const [logoutError, setLogoutError] = useState('');
   const assigned = useContext(AssignedAccess);
-  const effectiveAccess = assigned ?? access;
+  const effectiveAccess: StaffAccess = assigned ?? { enabledModules: [], permissions: [] };
+  const name = auth.session?.displayName ?? '';
+  const role = auth.session?.role ?? '';
+  const initials = name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('');
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
   useEffect(() => {
@@ -84,7 +84,7 @@ export function StaffShell({
           </span>
           <div>
             <strong>{department}</strong>
-            <p>Tally Artisan Bakery</p>
+            <p>{auth.session?.tenantName}</p>
           </div>
         </div>
         <p className="sw-nav-caption">My workspace</p>
@@ -94,7 +94,7 @@ export function StaffShell({
               (item) =>
                 !assigned ||
                 canOpenStaffPath(
-                  department.toLowerCase() as DemoDepartment,
+                  department.toLowerCase() as Department,
                   item.path.replace('/workspace', ''),
                   effectiveAccess
                 )
@@ -123,7 +123,7 @@ export function StaffShell({
               (item) =>
                 !assigned ||
                 canOpenStaffPath(
-                  department.toLowerCase() as DemoDepartment,
+                  department.toLowerCase() as Department,
                   item.path.slice(base.length),
                   effectiveAccess
                 )
@@ -147,22 +147,21 @@ export function StaffShell({
               <p>{role}</p>
             </div>
           </div>
-          <Link
+          <button
             className="sw-exit"
-            to="/login"
-            onClick={() => {
-              if (base.startsWith('/workspace/')) {
-                try {
-                  sessionStorage.removeItem(DEMO_SESSION_KEY);
-                } catch {
-                  /* Storage may be blocked after sign-in. */
-                }
+            onClick={async () => {
+              setLogoutError('');
+              try {
+                await auth.signOut();
+              } catch {
+                setLogoutError('Sign-out failed. Please retry.');
               }
             }}
           >
             <LogOut size={16} />
             Log out
-          </Link>
+          </button>
+          {logoutError && <p role="alert">{logoutError}</p>}
         </div>
       </aside>
       <div className="sw-main">
@@ -176,7 +175,7 @@ export function StaffShell({
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <span>Ikeja branch</span>
+            <span>{auth.session?.branchName}</span>
             <span className="sw-top-divider">/</span>
             <span className="sw-muted">Staff workspace</span>
           </div>

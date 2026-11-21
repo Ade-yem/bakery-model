@@ -1,14 +1,12 @@
 import { useStaffActions } from '../policy';
-import { commitRecord } from '../journal/store';
+import { useDepartmentData, useWorkspace } from '../../integration/workspace';
 import { RepaymentPage } from './RepaymentPage';
 /** @file Reception application pages using the current local data implementation. */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { StaffShell } from '../StaffShell';
-import { receptionAccess } from './data';
 import type { ReceptionOrder } from './orders';
-import { loadReceptionRecords, storageKey } from './storage';
 import { ReceptionHome } from './ReceptionHome';
 import {
   ReceptionHeading,
@@ -28,16 +26,9 @@ import './reception.css';
  */
 export function ReceptionWorkspace({ basePath }: { basePath?: string } = {}) {
   const permissions = useStaffActions();
-  const [snapshot, setSnapshot] = useState(loadReceptionRecords);
-  useEffect(() => {
-    const refresh = () => setSnapshot(loadReceptionRecords());
-    window.addEventListener('storage', refresh);
-    window.addEventListener('focus', refresh);
-    return () => {
-      window.removeEventListener('storage', refresh);
-      window.removeEventListener('focus', refresh);
-    };
-  }, []);
+  const data = useDepartmentData('reception');
+  const workspace = useWorkspace();
+  const snapshot = { orders: data.orders };
   const [ledgerVersion, setLedgerVersion] = useState(0);
   const [message, setMessage] = useState('');
   const location = useLocation();
@@ -49,69 +40,36 @@ export function ReceptionWorkspace({ basePath }: { basePath?: string } = {}) {
    * @param order Captured order or validated payment/dispatch transition.
    * @returns Error text on failure, otherwise null; does not contact any server.
    */
-  function save(order: ReceptionOrder): string | null {
-    if (snapshot.error) return snapshot.error;
-    if (
-      !snapshot.orders.some((item) => item.id === order.id) &&
-      !permissions.allowed('orders:create')
-    )
-      return 'Your permissions do not allow order entry.';
-    const current = loadReceptionRecords();
-    if (current.error) return current.error;
-    const previous = snapshot.orders.find((item) => item.id === order.id);
-    const latest = current.orders.find((item) => item.id === order.id);
-    if (JSON.stringify(previous) !== JSON.stringify(latest))
-      return 'This order changed on another page. Reload the record before posting; your input has been retained.';
-    if (previous && order.creditAuthorized !== previous.creditAuthorized)
-      return 'Credit approval must come from an authorized manager.';
-    if (
-      previous &&
-      order.status === 'PUSHED' &&
-      previous.status !== 'PUSHED' &&
-      !permissions.allowed('orders:push')
-    )
-      return 'Your permissions do not allow handoff to Disbursement.';
-    if (
-      previous &&
-      order.payments.length !== previous.payments.length &&
-      !permissions.allowed('payments:create')
-    )
-      return 'Your permissions do not allow payment entry.';
-    const next = latest
-      ? current.orders.map((item) => (item.id === order.id ? order : item))
-      : [order, ...current.orders];
+  async function save(order: ReceptionOrder): Promise<string | null> {
+    const previous = data.orders.find((item) => item.id === order.id);
     try {
-      commitRecord(storageKey, JSON.stringify(next));
-      setSnapshot({ orders: next, error: '' });
-      setMessage(
-        order.status === 'PUSHED'
-          ? 'Order marked for Disbursement.'
-          : 'Order saved. Push to Disbursement remains a separate action.'
-      );
+      if (!previous) {
+        permissions.require('orders:create');
+        if (order.creditAuthorized) return 'Credit approval must come from an authorized manager.';
+        await workspace.submit({ type: 'orders:create', order });
+      } else if (order.status === 'PUSHED' && previous.status !== 'PUSHED') {
+        permissions.require('orders:push');
+        await workspace.submit({ type: 'orders:push', orderId: order.id });
+      } else {
+        permissions.require('payments:create');
+        if (order.creditAuthorized !== previous.creditAuthorized)
+          return 'Credit approval must come from an authorized manager.';
+        await workspace.submit({
+          type: 'payments:create',
+          orderId: order.id,
+          payments: order.payments.slice(previous.payments.length),
+        });
+      }
+      setMessage('Change recorded. Review the record for its current status.');
       return null;
-    } catch {
-      return 'The browser could not save this change. Your input is still here; free storage or allow browser storage and try again.';
+    } catch (error) {
+      return error instanceof Error
+        ? error.message
+        : 'The change could not be saved. Your input is retained.';
     }
   }
   let content;
-  if (snapshot.error)
-    content = (
-      <>
-        <ReceptionHeading
-          title="Saved records need attention"
-          description="Your previous records have been preserved."
-        />
-        <div className="sw-panel sw-detail">
-          <p role="alert" className="sw-field-error">
-            {snapshot.error}
-          </p>
-          <button className="sw-quiet" onClick={() => setSnapshot(loadReceptionRecords())}>
-            Retry loading records
-          </button>
-        </div>
-      </>
-    );
-  else if (page === '')
+  if (page === '')
     content = <ReceptionHome key={ledgerVersion} orders={snapshot.orders} base={base} />;
   else if (page === '/repayments')
     content = (
@@ -124,8 +82,8 @@ export function ReceptionWorkspace({ basePath }: { basePath?: string } = {}) {
     content = (
       <OrderEntry
         base={base}
-        onSave={(order) => {
-          const error = save(order);
+        onSave={async (order) => {
+          const error = await save(order);
           if (!error) navigate(`${base}/records/${order.id}`);
           return error;
         }}
@@ -162,10 +120,7 @@ export function ReceptionWorkspace({ basePath }: { basePath?: string } = {}) {
     <StaffShell
       base={base}
       department="Reception"
-      name="Fatima Ahmed"
-      initials="FA"
-      role="Receptionist / Cashier"
-      access={receptionAccess}
+
       navigationLabels={{ '/workspace/records': 'Orders & payments' }}
       extraLinks={[
         { path: `${base}/handover`, label: 'Closing & handover' },

@@ -1,3 +1,4 @@
+import { TestWorkspace } from './fixtures/workspace';
 import { WorkspaceRoute } from '../WorkspaceRoute';
 /** @file Staff UI checks for role boundaries, routes and integration states. */
 import { describe, expect, it } from 'vitest';
@@ -29,7 +30,9 @@ describe('Production staff workspace', () => {
     it(`renders production workspace ${page || '/'} with no financial or customer information`, () => {
       const html = renderToStaticMarkup(
         <MemoryRouter initialEntries={[`/workspace/production${page}`]}>
-          <StaffWorkspace />
+          <TestWorkspace department="production">
+            <StaffWorkspace />
+          </TestWorkspace>
         </MemoryRouter>
       );
       expect(html).toContain('Staff navigation');
@@ -45,7 +48,9 @@ describe('Production staff workspace', () => {
   it('shows pending acceptance without counting submitted production as available stock', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/workspace/production/records/BAT-0186']}>
-        <StaffWorkspace />
+        <TestWorkspace department="production">
+          <StaffWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('Pending acceptance');
@@ -55,7 +60,9 @@ describe('Production staff workspace', () => {
   it('handles unrecognized workspace pages without falling back to privileged content', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/workspace/production/unknown']}>
-        <StaffWorkspace />
+        <TestWorkspace department="production">
+          <StaffWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('Page not found');

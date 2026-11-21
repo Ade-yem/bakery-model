@@ -1,9 +1,11 @@
+import { useStaffIdentity } from '../useStaffIdentity';
+import { useDepartmentData } from '../../integration/workspace';
 import { ShiftBadge } from '../ShiftBadge';
 import { Allowed } from '../Allowed';
 import { Link } from 'react-router-dom';
 import { ArrowRight, PackagePlus, Files, Truck } from 'lucide-react';
 import { StaffHeading } from '../StaffPages';
-import { suppliers, materials, type Receipt } from './model';
+import { type Receipt } from './model';
 export function ProcurementHome({
   receipts,
   base,
@@ -13,12 +15,14 @@ export function ProcurementHome({
   base: string;
   tasks?: boolean;
 }) {
+  const identity = useStaffIdentity();
+  const { suppliers, materials } = useDepartmentData('procurement');
   return (
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Ikeja branch · Receiving shift</p>
-          <h1>{tasks ? 'Department tasks' : 'Good morning, Bisi.'}</h1>
+          <p className="sw-eyebrow">{identity.branch} · Receiving shift</p>
+          <h1>{tasks ? 'Department tasks' : `Welcome, ${identity.name}.`}</h1>
           <p>Record every delivery with a clear receiving trail.</p>
         </div>
         <Allowed action="procurement:create">
@@ -29,7 +33,7 @@ export function ProcurementHome({
       </header>
       <section className="sw-shift-banner">
         <ShiftBadge department="procurement" />
-        <strong>Morning · 06:00–14:00</strong>
+        <strong>{identity.shiftLabel}</strong>
         <span>Procurement</span>
         <Link to={`${base}/schedule`}>
           My schedule <ArrowRight size={14} />
@@ -128,10 +132,17 @@ export function ProcurementHome({
   );
 }
 export function ProcurementSuppliers() {
+  const { suppliers } = useDepartmentData('procurement');
   return (
     <>
       <StaffHeading title="Supplier directory" description="Supplier contacts · Read-only" />
       <section className="sw-panel">
+        {!suppliers.length && (
+          <div className="sw-empty">
+            <h2>No suppliers available</h2>
+            <p>Your authorized supplier directory will appear here.</p>
+          </div>
+        )}
         <div className="sw-table-scroll">
           <table className="sw-table">
             <thead>
@@ -142,6 +153,7 @@ export function ProcurementSuppliers() {
               </tr>
             </thead>
             <tbody>
+              <option value="">Select supplier</option>
               {suppliers.map((s) => (
                 <tr key={s.id}>
                   <td>
@@ -163,6 +175,7 @@ export function ProcurementSuppliers() {
   );
 }
 export function ProcurementHistory({ receipts, base }: { receipts: Receipt[]; base: string }) {
+  const { materials } = useDepartmentData('procurement');
   return (
     <>
       <StaffHeading

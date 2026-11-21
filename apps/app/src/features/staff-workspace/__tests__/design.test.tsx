@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import { TestWorkspace } from './fixtures/workspace';
 /** @file Brand consistency contract with the existing landing/auth components. */
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -13,7 +14,9 @@ describe('Shared visual identity', () => {
   it('uses the existing loaf logo in the staff workspace rather than a second brand mark', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
-        <StaffWorkspace />
+        <TestWorkspace department="production">
+          <StaffWorkspace />
+        </TestWorkspace>
       </MemoryRouter>
     );
     expect(html).toContain('M4 15C4 10.5');
@@ -37,7 +40,7 @@ describe('Shared visual identity', () => {
   });
   it('matches the frontend branch Figtree typography', () => {
     expect(tokens).toContain("--font-family-base: 'Figtree'");
-    expect(globalStyles).toContain("--font-sans: 'Figtree'");
+    expect(globalStyles).toMatch(/--font-sans:\s*['"]Figtree['"]/);
     expect(tokens + globalStyles).not.toContain('Switzer');
   });
   it('keeps the frontend core palette in the global and component tokens', () => {
@@ -52,7 +55,7 @@ describe('Shared visual identity', () => {
     };
     for (const [name, value] of Object.entries(palette)) {
       for (const css of [tokens, globalStyles]) {
-        expect(css).toContain(`--color-${name}: ${value}`);
+        expect(css.toLowerCase()).toContain(`--color-${name}: ${value.toLowerCase()}`);
       }
     }
   });

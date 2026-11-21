@@ -1,11 +1,12 @@
+import { StaffPersonal } from './StaffPersonal';
+import { useDepartmentData } from '../integration/workspace';
 import { Allowed } from './Allowed';
 import { useProductionRecords } from './production-store';
 import { Button } from '../../components/shared/Button';
-/** @file Supporting staff pages; all records are synthetic production fixtures. */
+/** @file Supporting staff pages; records are supplied by the assigned workspace. */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowUpRight, Search } from 'lucide-react';
-import { productionTasks } from '../mock-auth/production-data';
 import { StaffTable } from './StaffTable';
 interface Props {
   base: string;
@@ -34,6 +35,7 @@ export function StaffHeading({ title, description }: { title: string; descriptio
  * @returns Assigned production task page.
  */
 export function StaffTasks({ base, onBatch }: Props) {
+  const productionTasks = useDepartmentData('production').tasks;
   return (
     <>
       <StaffHeading
@@ -41,10 +43,16 @@ export function StaffTasks({ base, onBatch }: Props) {
         description="The work assigned to you for this production shift."
       />
       <section className="sw-panel">
+        {!productionTasks.length && (
+          <div className="sw-empty">
+            <h2>No assigned tasks</h2>
+            <p>Assigned work will appear here.</p>
+          </div>
+        )}
         {productionTasks.map((task) => (
           <article className="sw-task-detail" key={task.id}>
             <div>
-              <span className="sw-eyebrow">{task.id} · Morning shift</span>
+              <span className="sw-eyebrow">{task.id}</span>
               <h2>{task.title}</h2>
               <p>{task.detail}</p>
               <p className="sw-muted">{task.note}</p>
@@ -57,7 +65,7 @@ export function StaffTasks({ base, onBatch }: Props) {
                 </Button>
               </Allowed>
             ) : (
-              <Link className="sw-quiet" to={`${base}/records/BAT-0184`}>
+              <Link className="sw-quiet" to={`${base}/records/${task.batchId}`}>
                 Review batch
                 <ArrowUpRight size={16} />
               </Link>
@@ -116,13 +124,7 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
       </>
     );
   const accepted =
-    record.accepted !== undefined
-      ? `${record.accepted} units`
-      : record.state === 'Pending acceptance'
-        ? 'Awaiting physical count'
-        : record.id === 'BAT-0184'
-          ? '238 units'
-          : '100 units';
+    record.accepted !== undefined ? `${record.accepted} units` : 'Receiving count unavailable';
   return (
     <>
       <Link className="sw-back" to={`${base}/records`}>
@@ -138,7 +140,7 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
         {record.note && <p className="sw-callout">{record.note}</p>}
         <dl>
           {[
-            ['Recorded by', 'Ada Okonkwo · Production'],
+            ['Recorded by', record.recordedBy ?? 'Not provided'],
             ['Submitted output', `${record.quantity} units`],
             ['Accepted output', accepted],
             ['Receiving state', record.state],
@@ -168,7 +170,7 @@ export function StaffRecordDetail({ base, recordId }: Pick<Props, 'base' | 'reco
   );
 }
 /**
- * @description Renders only the current staff member's sample production activity.
+ * @description Renders only the current staff member's recorded production activity.
  * @returns Personal activity timeline.
  */
 export function StaffHistory() {
@@ -181,6 +183,12 @@ export function StaffHistory() {
       />
       <section className="sw-panel sw-detail">
         <h2>Production activity</h2>
+        {!records.length && (
+          <div className="sw-empty">
+            <h3>No production activity yet</h3>
+            <p>Recorded batches will appear here.</p>
+          </div>
+        )}
         <ol className="sw-timeline">
           {records.map((record) => (
             <li key={record.id}>
@@ -203,95 +211,8 @@ export function StaffHistory() {
  * @returns Personal weekly schedule with explicit overnight end dates.
  */
 export function StaffSchedule() {
-  return (
-    <>
-      <StaffHeading
-        title="My schedule"
-        description="Your assigned shifts for 02–08 November 2026."
-      />
-      <section className="sw-panel">
-        <div className="sw-panel-heading">
-          <div>
-            <h2>This week</h2>
-            <p>Production · Ikeja branch · All times WAT</p>
-          </div>
-          <span className="sw-label">Group A</span>
-        </div>
-        <div className="sw-table-scroll">
-          <table className="sw-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Shift</th>
-                <th>Starts</th>
-                <th>Ends</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ['Mon 02 Nov', 'Morning', '06:00', '14:00'],
-                ['Tue 03 Nov', 'Morning', '06:00', '14:00'],
-                ['Wed 04 Nov', 'Morning', '06:00', '14:00'],
-                ['Thu 05 Nov', 'Evening', '14:00', '22:00'],
-                ['Fri 06 Nov', 'Evening', '14:00', '22:00'],
-                ['Sat 07 Nov', 'Night', '22:00', 'Sun 08 Nov · 06:00'],
-                ['Sun 08 Nov', 'Rest day', '—', '—'],
-              ].map((row) => (
-                <tr key={row[0]}>
-                  {row.map((value, index) => (
-                    <td key={`${row[0]}-${index}`}>{value}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="sw-panel-footer">
-          Schedule changes require an authorized manager. Staff cannot change their own assignment.
-        </div>
-      </section>
-    </>
-  );
+  return <StaffPersonal page="schedule" />;
 }
-/**
- * @description Shows staff identity and assignment as read-only until profile contracts are agreed.
- * @returns Own-profile page without role or department editing controls.
- */
 export function StaffProfile() {
-  return (
-    <>
-      <StaffHeading
-        title="My profile"
-        description="Your account and assigned production workspace."
-      />
-      <section className="sw-panel sw-detail">
-        <div className="sw-profile-heading">
-          <span className="sw-avatar">AO</span>
-          <div>
-            <h2>Ada Okonkwo</h2>
-            <p className="sw-muted">Production supervisor</p>
-          </div>
-        </div>
-        <dl>
-          {[
-            ['Business', 'Tally Artisan Bakery'],
-            ['Branch', 'Ikeja'],
-            ['Department', 'Production'],
-            ['Role', 'Production supervisor'],
-            ['Shift group', 'Group A'],
-            ['Account', 'ada.okonkwo'],
-          ].map(([label, value]) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="sw-callout">
-          Your manager maintains your department, role and shift assignments. Contact them if these
-          details need correcting.
-        </p>
-      </section>
-    </>
-  );
+  return <StaffPersonal page="profile" />;
 }

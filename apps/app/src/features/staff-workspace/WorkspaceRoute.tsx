@@ -1,6 +1,6 @@
 import { JournalPage } from './journal/JournalPage';
 import { StaffShell } from './StaffShell';
-import { AssignedAccess, departmentAccess, canOpenStaffPath, isKnownStaffPath } from './policy';
+import { AssignedAccess, canOpenStaffPath, isKnownStaffPath } from './policy';
 import { StaffState } from './StaffState';
 import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
@@ -8,34 +8,52 @@ import { StaffWorkspace } from './StaffWorkspace';
 import { ReceptionWorkspace } from './reception/ReceptionWorkspace';
 import { DisbursementWorkspace } from './disbursement/DisbursementWorkspace';
 import { ProcurementWorkspace } from './procurement/ProcurementWorkspace';
-import { DEMO_SESSION_KEY, readDemoSession, isExpiredSession } from '../mock-auth/session';
+import type { WorkspaceAdapter } from '../integration/workspace';
+import { WorkspaceProvider } from '../integration/WorkspaceProvider';
+import { useAuth } from '../integration/auth';
 
-/** Staff route boundary. Uses the explicitly requested mock session until server auth is integrated. */
-export function WorkspaceRoute() {
+/** Staff route boundary. Requires a verified session and explicit backend-resolved assignments. */
+export function WorkspaceRoute({ adapter }: { adapter?: WorkspaceAdapter } = {}) {
   const { pathname } = useLocation();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30000);
     return () => window.clearInterval(timer);
   }, []);
-  let raw: string | null = null;
-  let session = null;
-  try {
-    raw = sessionStorage.getItem(DEMO_SESSION_KEY);
-    session = readDemoSession(raw);
-  } catch {
-    /* Storage unavailable. */
-  }
-  if (!session) {
-    if (isExpiredSession(raw, now))
-      return (
-        <StaffState
-          title="Session expired"
-          description="Sign in again to continue. Saved drafts and unacknowledged records remain on this device."
-        />
-      );
-    return <Navigate to="/login" replace />;
-  }
+  const auth = useAuth();
+  const session = auth.session;
+  if (auth.status === 'loading')
+    return (
+      <StaffState
+        title="Checking your session"
+        description="Please wait while your access is verified."
+      />
+    );
+  if (auth.status === 'unavailable')
+    return (
+      <StaffState
+        title="Sign-in unavailable"
+        description="Sign-in is currently unavailable. Please try again later."
+      />
+    );
+  if (auth.status === 'error')
+    return (
+      <section className="sw-root sw-session">
+        <h1>Session unavailable</h1>
+        <p role="alert">{auth.error}</p>
+        <button className="sw-primary" onClick={() => void auth.refresh()}>
+          Retry
+        </button>
+      </section>
+    );
+  if (!session) return <Navigate to="/login" replace />;
+  if (session.expiresAt <= now)
+    return (
+      <StaffState
+        title="Session expired"
+        description="Sign in again to continue. Your saved work has been retained."
+      />
+    );
   if (session.accountStatus === 'SUSPENDED' || session.accountStatus === 'INACTIVE')
     return (
       <StaffState
@@ -62,11 +80,7 @@ export function WorkspaceRoute() {
       </div>
     );
   }
-  const fallback = departmentAccess(session.department);
-  const access = {
-    enabledModules: session.enabledModules ?? fallback.enabledModules,
-    permissions: session.permissions ?? fallback.permissions,
-  };
+  const access = { enabledModules: session.enabledModules, permissions: session.permissions };
   const page = pathname.slice(base.length).replace(/\/$/, '');
   if (!isKnownStaffPath(session.department, page))
     return (
@@ -100,25 +114,17 @@ export function WorkspaceRoute() {
         action="My profile"
       />
     );
-  const staff = {
-    production: { name: 'Ada Okonkwo', initials: 'AO', role: 'Production supervisor' },
-    reception: { name: 'Fatima Ahmed', initials: 'FA', role: 'Receptionist / Cashier' },
-    disbursement: { name: 'Chidi Nwosu', initials: 'CN', role: 'Disbursement officer' },
-    procurement: { name: 'Bisi Afolayan', initials: 'BA', role: 'Procurement officer' },
-  }[session.department];
   if (page === '/sync')
     return (
       <AssignedAccess.Provider value={access}>
-        <StaffShell
-          base={base}
-          department={session.department.charAt(0).toUpperCase() + session.department.slice(1)}
-          name={staff.name}
-          initials={staff.initials}
-          role={staff.role}
-          access={access}
-        >
-          <JournalPage department={session.department} />
-        </StaffShell>
+        <WorkspaceProvider adapter={adapter}>
+          <StaffShell
+            base={base}
+            department={session.department.charAt(0).toUpperCase() + session.department.slice(1)}
+          >
+            <JournalPage department={session.department} />
+          </StaffShell>
+        </WorkspaceProvider>
       </AssignedAccess.Provider>
     );
   const content =
@@ -131,5 +137,9 @@ export function WorkspaceRoute() {
     ) : (
       <ReceptionWorkspace basePath={base} />
     );
-  return <AssignedAccess.Provider value={access}>{content}</AssignedAccess.Provider>;
+  return (
+    <AssignedAccess.Provider value={access}>
+      <WorkspaceProvider adapter={adapter}>{content}</WorkspaceProvider>
+    </AssignedAccess.Provider>
+  );
 }

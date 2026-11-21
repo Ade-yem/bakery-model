@@ -1,4 +1,3 @@
-import { readRecord } from '../journal/store';
 import { parseMoney, type ReceptionOrder } from './orders';
 export interface Repayment {
   id: string;
@@ -38,35 +37,4 @@ export function makeRepayment(
     reference: input.reference.trim(),
     at: new Date().toISOString(),
   };
-}
-export function loadRepayments(orders: ReceptionOrder[]): { entries: Repayment[]; error: string } {
-  if (typeof window === 'undefined') return { entries: [], error: '' };
-  try {
-    const raw = readRecord(repaymentKey);
-    if (!raw) return { entries: [], error: '' };
-    const values = JSON.parse(raw);
-    if (!Array.isArray(values) || values.length > 10000) throw new Error();
-    const entries: Repayment[] = [];
-    for (const value of values) {
-      if (
-        !value ||
-        !Number.isSafeInteger(value.amount) ||
-        typeof value.at !== 'string' ||
-        !Number.isFinite(Date.parse(value.at))
-      )
-        throw new Error();
-      const canonical = makeRepayment(orders, entries, {
-        ...value,
-        amount: `${Math.floor(value.amount / 100)}.${String(value.amount % 100).padStart(2, '0')}`,
-      });
-      entries.push({ ...canonical, at: value.at });
-    }
-    return { entries, error: '' };
-  } catch {
-    return {
-      entries: [],
-      error:
-        'Saved repayment evidence is unavailable or invalid. It has not been overwritten. Restore valid storage and retry.',
-    };
-  }
 }

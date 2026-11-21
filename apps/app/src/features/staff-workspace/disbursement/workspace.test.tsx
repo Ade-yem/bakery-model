@@ -1,8 +1,15 @@
+import { dataFor } from '../__tests__/fixtures/data';
+import type { DisbursementData } from '../../integration/workspace';
+import type { State, Action } from './model';
+const source = dataFor('disbursement') as DisbursementData;
+const applyAction = (state: State, action: Action) => apply(state, action, source);
+const parseState = (raw: string) => parseLedger(raw, source);
+import { TestWorkspace } from '../__tests__/fixtures/workspace';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
 import { DisbursementWorkspace } from './DisbursementWorkspace';
-import { applyAction, initialState, loadState, parseState } from './model';
+import { applyAction as apply, initialState, parseState as parseLedger } from './model';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('quantity-only Disbursement workspace', () => {
@@ -21,7 +28,9 @@ describe('quantity-only Disbursement workspace', () => {
     it(`renders ${page || 'overview'} with no financial or procurement fields`, () => {
       const html = renderToStaticMarkup(
         <MemoryRouter initialEntries={[`/workspace/disbursement${page}`]}>
-          <DisbursementWorkspace />
+          <TestWorkspace department="disbursement">
+            <DisbursementWorkspace />
+          </TestWorkspace>
         </MemoryRouter>
       );
       expect(html).toContain('<h1');
@@ -35,27 +44,6 @@ describe('quantity-only Disbursement workspace', () => {
       expect(html).not.toContain('href="/app/');
     });
   }
-  it('preserves malformed storage and fails visibly instead of silently resetting', () => {
-    vi.stubGlobal('window', {});
-    vi.stubGlobal('localStorage', { getItem: () => '{broken' });
-    expect(loadState().error).toContain('not been overwritten');
-    const html = renderToStaticMarkup(
-      <MemoryRouter>
-        <DisbursementWorkspace />
-      </MemoryRouter>
-    );
-    expect(html).toContain('Saved records need attention');
-    expect(html).not.toContain('TRF-0186');
-  });
-  it('surfaces storage denial', () => {
-    vi.stubGlobal('window', {});
-    vi.stubGlobal('localStorage', {
-      getItem: () => {
-        throw new Error('denied');
-      },
-    });
-    expect(loadState().error).toContain('storage is unavailable');
-  });
   it('replays intake, fulfillment and counts without changing finalized evidence', () => {
     const accepted = applyAction(initialState, {
       kind: 'accept',

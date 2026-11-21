@@ -1,3 +1,4 @@
+import { useStaffIdentity } from './useStaffIdentity';
 import { ShiftBadge } from './ShiftBadge';
 import { Allowed } from './Allowed';
 import { useProductionRecords } from './production-store';
@@ -5,7 +6,7 @@ import { Button } from '../../components/shared/Button';
 /** @file Production staff home, with assigned work above routine history. */
 import { ArrowRight, ArrowUpRight, Clock3, ClipboardList, PackageCheck, Wheat } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { productionTasks } from '../mock-auth/production-data';
+import { useDepartmentData } from '../integration/workspace';
 import { StaffTable } from './StaffTable';
 interface Props {
   base: string;
@@ -17,13 +18,15 @@ interface Props {
  * @returns Production home without cross-department private data.
  */
 export function StaffHome({ base, onBatch }: Props) {
+  const identity = useStaffIdentity();
   const records = useProductionRecords();
+  const productionTasks = useDepartmentData('production').tasks;
   return (
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Wednesday, 04 November 2026</p>
-          <h1>Good morning, Ada.</h1>
+          <p className="sw-eyebrow">{identity.date}</p>
+          <h1>Welcome, {identity.name}.</h1>
           <p>Here’s what’s on your production floor today.</p>
         </div>
         <Allowed action="production:create">
@@ -34,8 +37,8 @@ export function StaffHome({ base, onBatch }: Props) {
       </header>
       <section className="sw-shift-banner" aria-label="Current shift">
         <ShiftBadge department="production" />
-        <strong>Morning · 06:00–14:00</strong>
-        <span>Production / Ikeja branch</span>
+        <strong>{identity.shiftLabel}</strong>
+        <span>Production / {identity.branch}</span>
         <Link to={`${base}/schedule`}>
           View my schedule <ArrowRight size={14} />
         </Link>
@@ -51,7 +54,7 @@ export function StaffHome({ base, onBatch }: Props) {
           {
             label: 'Units submitted',
             value: String(records.reduce((sum, r) => sum + r.quantity, 0)),
-            note: 'Across two product sizes',
+            note: 'Across recorded products',
             Icon: Wheat,
           },
           {
@@ -64,7 +67,12 @@ export function StaffHome({ base, onBatch }: Props) {
             note: 'Physical receiving still required',
             Icon: PackageCheck,
           },
-          { label: 'Scheduled shift', value: '8 hrs', note: 'Ends at 14:00', Icon: Clock3 },
+          {
+            label: 'Scheduled shift',
+            value: identity.shift?.label ?? 'Unassigned',
+            note: identity.shiftLabel,
+            Icon: Clock3,
+          },
         ].map(({ label, value, note, Icon }) => (
           <div key={label}>
             <div className="sw-stat-title">
@@ -87,6 +95,12 @@ export function StaffHome({ base, onBatch }: Props) {
               All tasks <ArrowRight size={14} />
             </Link>
           </div>
+          {!productionTasks.length && (
+            <div className="sw-empty">
+              <h3>No assigned tasks</h3>
+              <p>Assigned work will appear here.</p>
+            </div>
+          )}
           {productionTasks.map((task, i) => (
             <article className="sw-task-row" key={task.id}>
               <span className="sw-task-number">0{i + 1}</span>
@@ -101,7 +115,7 @@ export function StaffHome({ base, onBatch }: Props) {
                   <ArrowUpRight size={14} />
                 </button>
               ) : (
-                <Link className="sw-quiet" to={`${base}/records/BAT-0184`}>
+                <Link className="sw-quiet" to={`${base}/records/${task.batchId}`}>
                   {task.action}
                   <ArrowUpRight size={14} />
                 </Link>
@@ -119,8 +133,8 @@ export function StaffHome({ base, onBatch }: Props) {
             Your batch stays pending until Disbursement verifies the physical count. Only accepted
             units become available stock.
           </p>
-          <Link to={`${base}/records/BAT-0186`}>
-            Review pending transfer <ArrowRight size={14} />
+          <Link to={`${base}/records`}>
+            Review batch records <ArrowRight size={14} />
           </Link>
         </aside>
       </div>

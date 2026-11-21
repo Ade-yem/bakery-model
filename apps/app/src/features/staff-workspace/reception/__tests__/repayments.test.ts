@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { makeRepayment, outstanding } from '../repayments';
-import { receptionOrders } from '../data';
+import { receptionOrders } from '../../__tests__/fixtures/reception';
 describe('customer repayments', () => {
   const order = receptionOrders.find((o) => o.payments.some((p) => p.method === 'DEBT'))!;
   it('reduces debt through linked evidence without changing the original order', () => {

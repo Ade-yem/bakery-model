@@ -1,23 +1,20 @@
+import { useWorkspace as useFormWorkspace } from '../../integration/workspace';
+import { useDepartmentData, useDraftKey } from '../../integration/workspace';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { StaffHeading } from '../StaffPages';
-import {
-  draftKey,
-  parseDraft,
-  materials,
-  suppliers,
-  receiptTotal,
-  formatMoney,
-  type ReceiptInput,
-} from './model';
+import { parseDraft, receiptTotal, formatMoney, type ReceiptInput } from './model';
 
 export function ReceiptForm({
   base,
   onSave,
 }: {
   base: string;
-  onSave: (input: ReceiptInput) => string | null;
+  onSave: (input: ReceiptInput) => Promise<string | null>;
 }) {
+  const { busy } = useFormWorkspace();
+  const { suppliers, materials } = useDepartmentData('procurement');
+  const draftKey = useDraftKey('procurement');
   const [recovery] = useState(() => {
     try {
       const raw = localStorage.getItem(draftKey);
@@ -39,8 +36,8 @@ export function ReceiptForm({
     () =>
       recovery.draft ?? {
         id: `REC-${crypto.randomUUID()}`,
-        supplierId: 'mill',
-        materialId: 'flour',
+        supplierId: '',
+        materialId: '',
         quantity: '',
         unitCost: '',
         reference: '',
@@ -92,200 +89,205 @@ export function ReceiptForm({
           <form
             noValidate
             className="pc-form"
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
-              const result = onSave(values);
+              const result = await onSave(values);
               if (result) setError(result);
             }}
           >
-            <label>
-              Supplier
-              <select
-                value={values.supplierId}
-                onChange={(e) => update('supplierId', e.target.value)}
-              >
-                {suppliers.map((s) => (
-                  <option value={s.id} key={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Material
-              <select
-                value={values.materialId}
-                onChange={(e) => update('materialId', e.target.value)}
-              >
-                {materials.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} · {m.unit}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="pc-grid">
+            <fieldset disabled={busy} className="sw-form-fields">
               <label>
-                Quantity ({materials.find((m) => m.id === values.materialId)?.unit})
-                <input
-                  aria-label="Received quantity"
-                  inputMode="decimal"
-                  value={values.quantity}
-                  onChange={(e) => update('quantity', e.target.value)}
-                />
+                Supplier
+                <select
+                  value={values.supplierId}
+                  onChange={(e) => update('supplierId', e.target.value)}
+                >
+                  <option value="">Select supplier</option>
+                  {suppliers.map((s) => (
+                    <option value={s.id} key={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label>
-                Unit cost (₦)
-                <input
-                  inputMode="decimal"
-                  value={values.unitCost}
-                  onChange={(e) => update('unitCost', e.target.value)}
-                />
+                Material
+                <select
+                  value={values.materialId}
+                  onChange={(e) => update('materialId', e.target.value)}
+                >
+                  <option value="">Select material</option>
+                  {materials.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} · {m.unit}
+                    </option>
+                  ))}
+                </select>
               </label>
-            </div>
-            <p className="sw-callout">
-              Receipt total: <strong>{total}</strong> · Quantity supports three decimal places; cost
-              supports two. Totals round to the nearest kobo.
-            </p>
-            {(values.additionalLines ?? []).map((line, index) => (
-              <fieldset key={index} className="pc-form">
-                <legend>Material line {index + 2}</legend>
+              <div className="pc-grid">
                 <label>
-                  Additional material {index + 2}
-                  <select
-                    value={line.materialId}
-                    onChange={(event) =>
+                  Quantity ({materials.find((m) => m.id === values.materialId)?.unit})
+                  <input
+                    aria-label="Received quantity"
+                    inputMode="decimal"
+                    value={values.quantity}
+                    onChange={(e) => update('quantity', e.target.value)}
+                  />
+                </label>
+                <label>
+                  Unit cost (₦)
+                  <input
+                    inputMode="decimal"
+                    value={values.unitCost}
+                    onChange={(e) => update('unitCost', e.target.value)}
+                  />
+                </label>
+              </div>
+              <p className="sw-callout">
+                Receipt total: <strong>{total}</strong> · Quantity supports three decimal places;
+                cost supports two. Totals round to the nearest kobo.
+              </p>
+              {(values.additionalLines ?? []).map((line, index) => (
+                <fieldset key={index} className="pc-form">
+                  <legend>Material line {index + 2}</legend>
+                  <label>
+                    Additional material {index + 2}
+                    <select
+                      value={line.materialId}
+                      onChange={(event) =>
+                        setValues({
+                          ...values,
+                          additionalLines: values.additionalLines!.map((item, i) =>
+                            i === index ? { ...item, materialId: event.target.value } : item
+                          ),
+                        })
+                      }
+                    >
+                      <option value="">Select material</option>
+                      {materials.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name} · {m.unit}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="pc-grid">
+                    <label>
+                      Quantity line {index + 2}
+                      <input
+                        inputMode="decimal"
+                        value={line.quantity}
+                        onChange={(event) =>
+                          setValues({
+                            ...values,
+                            additionalLines: values.additionalLines!.map((item, i) =>
+                              i === index ? { ...item, quantity: event.target.value } : item
+                            ),
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Unit cost line {index + 2} (₦)
+                      <input
+                        inputMode="decimal"
+                        value={line.unitCost}
+                        onChange={(event) =>
+                          setValues({
+                            ...values,
+                            additionalLines: values.additionalLines!.map((item, i) =>
+                              i === index ? { ...item, unitCost: event.target.value } : item
+                            ),
+                          })
+                        }
+                      />
+                    </label>
+                  </div>
+                  <button
+                    className="sw-quiet"
+                    type="button"
+                    onClick={() =>
                       setValues({
                         ...values,
-                        additionalLines: values.additionalLines!.map((item, i) =>
-                          i === index ? { ...item, materialId: event.target.value } : item
-                        ),
+                        additionalLines: values.additionalLines!.filter((_, i) => i !== index),
                       })
                     }
                   >
-                    {materials.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.name} · {m.unit}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <div className="pc-grid">
-                  <label>
-                    Quantity line {index + 2}
-                    <input
-                      inputMode="decimal"
-                      value={line.quantity}
-                      onChange={(event) =>
-                        setValues({
-                          ...values,
-                          additionalLines: values.additionalLines!.map((item, i) =>
-                            i === index ? { ...item, quantity: event.target.value } : item
-                          ),
-                        })
-                      }
-                    />
-                  </label>
-                  <label>
-                    Unit cost line {index + 2} (₦)
-                    <input
-                      inputMode="decimal"
-                      value={line.unitCost}
-                      onChange={(event) =>
-                        setValues({
-                          ...values,
-                          additionalLines: values.additionalLines!.map((item, i) =>
-                            i === index ? { ...item, unitCost: event.target.value } : item
-                          ),
-                        })
-                      }
-                    />
-                  </label>
-                </div>
+                    Remove material line {index + 2}
+                  </button>
+                </fieldset>
+              ))}
+              <button
+                type="button"
+                className="sw-quiet"
+                disabled={(values.additionalLines?.length ?? 0) >= 49}
+                onClick={() =>
+                  setValues({
+                    ...values,
+                    additionalLines: [
+                      ...(values.additionalLines ?? []),
+                      { materialId: '', quantity: '', unitCost: '' },
+                    ],
+                  })
+                }
+              >
+                Add material line
+              </button>
+              <label>
+                Invoice / delivery reference
+                <input
+                  maxLength={80}
+                  value={values.reference}
+                  onChange={(e) => update('reference', e.target.value)}
+                />
+              </label>
+              <label>
+                Received date
+                <input
+                  type="date"
+                  value={values.receivedOn}
+                  onChange={(e) => update('receivedOn', e.target.value)}
+                />
+              </label>
+              <label>
+                Receiving note
+                <textarea
+                  maxLength={500}
+                  value={values.note}
+                  onChange={(e) => update('note', e.target.value)}
+                />
+              </label>
+              {error && (
+                <p role="alert" className="sw-field-error">
+                  {error}
+                </p>
+              )}
+              {notice && (
+                <p role="status" className="sw-callout">
+                  {notice}
+                </p>
+              )}
+              <div className="pc-actions">
+                <button className="sw-primary">Record receipt</button>
                 <button
                   className="sw-quiet"
                   type="button"
-                  onClick={() =>
-                    setValues({
-                      ...values,
-                      additionalLines: values.additionalLines!.filter((_, i) => i !== index),
-                    })
-                  }
+                  onClick={async () => {
+                    try {
+                      localStorage.setItem(draftKey, JSON.stringify(values));
+                      setNotice('Draft saved. The receipt has not been recorded.');
+                      setError('');
+                    } catch {
+                      setError(
+                        'Could not save draft. Your input is still here; allow storage and try again.'
+                      );
+                    }
+                  }}
                 >
-                  Remove material line {index + 2}
+                  Save draft
                 </button>
-              </fieldset>
-            ))}
-            <button
-              type="button"
-              className="sw-quiet"
-              disabled={(values.additionalLines?.length ?? 0) >= 49}
-              onClick={() =>
-                setValues({
-                  ...values,
-                  additionalLines: [
-                    ...(values.additionalLines ?? []),
-                    { materialId: 'sugar', quantity: '', unitCost: '' },
-                  ],
-                })
-              }
-            >
-              Add material line
-            </button>
-            <label>
-              Invoice / delivery reference
-              <input
-                maxLength={80}
-                value={values.reference}
-                onChange={(e) => update('reference', e.target.value)}
-              />
-            </label>
-            <label>
-              Received date
-              <input
-                type="date"
-                value={values.receivedOn}
-                onChange={(e) => update('receivedOn', e.target.value)}
-              />
-            </label>
-            <label>
-              Receiving note
-              <textarea
-                maxLength={500}
-                value={values.note}
-                onChange={(e) => update('note', e.target.value)}
-              />
-            </label>
-            {error && (
-              <p role="alert" className="sw-field-error">
-                {error}
-              </p>
-            )}
-            {notice && (
-              <p role="status" className="sw-callout">
-                {notice}
-              </p>
-            )}
-            <div className="pc-actions">
-              <button className="sw-primary">Record receipt</button>
-              <button
-                className="sw-quiet"
-                type="button"
-                onClick={() => {
-                  try {
-                    localStorage.setItem(draftKey, JSON.stringify(values));
-                    setNotice('Draft saved. The receipt has not been recorded.');
-                    setError('');
-                  } catch {
-                    setError(
-                      'Could not save draft. Your input is still here; allow storage and try again.'
-                    );
-                  }
-                }}
-              >
-                Save draft
-              </button>
-            </div>
+              </div>
+            </fieldset>
           </form>
         )}
       </section>

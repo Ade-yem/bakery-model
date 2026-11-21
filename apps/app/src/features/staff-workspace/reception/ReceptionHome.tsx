@@ -1,6 +1,7 @@
+import { useStaffIdentity } from '../useStaffIdentity';
+import { useDepartmentData } from '../../integration/workspace';
 import { ShiftBadge } from '../ShiftBadge';
 import { Allowed } from '../Allowed';
-import { loadRepayments } from './repayments';
 /** @file Shift-focused Reception overview, following the existing staff visual system. */
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Banknote, ClipboardList, Send, CreditCard } from 'lucide-react';
@@ -14,18 +15,12 @@ interface Props {
 }
 /**
  * @description Prioritizes orders awaiting manual dispatch and keeps cash distinct from transfers and debt.
- * @param props Reception-only sample records and workspace route base.
+ * @param props Reception-only records and workspace route base.
  * @returns Staff overview with source-linked order activity.
  */
 export function ReceptionHome({ orders, base }: Props) {
-  const ledger = loadRepayments(orders);
-  if (ledger.error)
-    return (
-      <section className="sw-panel sw-detail">
-        <h1>Repayment evidence needs attention</h1>
-        <p role="alert">{ledger.error}</p>
-      </section>
-    );
+  const identity = useStaffIdentity();
+  const ledger = { entries: useDepartmentData('reception').repayments };
   const cash =
     orders
       .flatMap((order) => order.payments)
@@ -45,8 +40,8 @@ export function ReceptionHome({ orders, base }: Props) {
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Wednesday, 04 November 2026</p>
-          <h1>Good morning, Fatima.</h1>
+          <p className="sw-eyebrow">{identity.date}</p>
+          <h1>Welcome, {identity.name}.</h1>
           <p>A clear record, from the counter to Disbursement.</p>
         </div>
         <Allowed action="orders:create">
@@ -57,8 +52,8 @@ export function ReceptionHome({ orders, base }: Props) {
       </header>
       <section className="sw-shift-banner" aria-label="Current shift">
         <ShiftBadge department="reception" />
-        <strong>Morning · 06:00–14:00</strong>
-        <span>Reception / Ikeja branch</span>
+        <strong>{identity.shiftLabel}</strong>
+        <span>Reception / {identity.branch}</span>
         <Link to={`${base}/schedule`}>
           My schedule <ArrowRight size={14} />
         </Link>

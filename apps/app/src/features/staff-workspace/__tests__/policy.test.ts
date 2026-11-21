@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { canOpenStaffPath, departmentAccess } from '../policy';
+import { canOpenStaffPath } from '../policy';
+import { accessFor as departmentAccess } from './fixtures/data';
 describe('staff route and module policy', () => {
   it('requires an enabled department module as well as permissions', () => {
     const access = departmentAccess('production');

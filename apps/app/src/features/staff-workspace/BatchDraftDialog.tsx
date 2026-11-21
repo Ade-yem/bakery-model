@@ -1,3 +1,5 @@
+import { useWorkspace as useFormWorkspace } from '../integration/workspace';
+import { useDepartmentData, useDraftKey } from '../integration/workspace';
 import { Button } from '../../components/shared/Button';
 /** @file A local UI workspace draft, deliberately separate from stock posting. */
 import { useEffect, useRef, useState } from 'react';
@@ -7,17 +9,20 @@ import type { BatchDraftValues } from './draft';
 interface Props {
   onClose: () => void;
   onSaved: () => void;
-  onSubmitBatch?: (values: BatchDraftValues) => string | null;
+  onSubmitBatch?: (values: BatchDraftValues) => Promise<string | null>;
 }
 /**
- * @description Captures a sample batch draft in browser storage; never submits stock or an authenticated mutation.
+ * @description Captures a batch draft in browser storage; never submits stock or an authenticated mutation.
  * @param props Close and saved callbacks owned by the workspace shell.
  * @returns Native modal with focus containment, input errors and storage-failure feedback.
  */
 export function BatchDraftDialog({ onClose, onSaved, onSubmitBatch }: Props) {
+  const { busy } = useFormWorkspace();
+  const draftKey = useDraftKey('production');
+  const products = useDepartmentData('production').products;
   const [recovered] = useState(() => {
     try {
-      return parseBatchDraft(localStorage.getItem('tallybakery:production-draft:v1'));
+      return parseBatchDraft(localStorage.getItem(draftKey));
     } catch {
       return null;
     }
@@ -33,8 +38,8 @@ export function BatchDraftDialog({ onClose, onSaved, onSubmitBatch }: Props) {
     label: string;
     value: string;
   }[] = [
-    { name: 'output', label: 'Finished output (units)', value: recovered?.output ?? '250' },
-    { name: 'flour', label: 'Flour consumed (bags)', value: recovered?.flour ?? '5' },
+    { name: 'output', label: 'Finished output (units)', value: recovered?.output ?? '' },
+    { name: 'flour', label: 'Flour consumed (bags)', value: recovered?.flour ?? '' },
     { name: 'sugar', label: 'Sugar consumed (kg)', value: recovered?.sugar ?? '0' },
     { name: 'yeast', label: 'Yeast consumed (kg)', value: recovered?.yeast ?? '0' },
     { name: 'waste', label: 'Scrap / waste (units)', value: recovered?.waste ?? '0' },
@@ -57,7 +62,7 @@ export function BatchDraftDialog({ onClose, onSaved, onSubmitBatch }: Props) {
       </p>
       <form
         noValidate
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
           const form = new FormData(event.currentTarget);
           const values = {
@@ -75,13 +80,13 @@ export function BatchDraftDialog({ onClose, onSaved, onSubmitBatch }: Props) {
           if (
             (event.nativeEvent as SubmitEvent).submitter?.getAttribute('value') === 'submit-batch'
           ) {
-            const failure = onSubmitBatch?.(values);
+            const failure = await onSubmitBatch?.(values);
             if (failure) setStorageError(failure);
             return;
           }
           try {
             localStorage.setItem(
-              'tallybakery:production-draft:v1',
+              draftKey,
               JSON.stringify({
                 ...values,
                 product: String(form.get('product')),
@@ -96,66 +101,70 @@ export function BatchDraftDialog({ onClose, onSaved, onSubmitBatch }: Props) {
           }
         }}
       >
-        <label>
-          Product
-          <select name="product" defaultValue={recovered?.product}>
-            <option>Family loaf · 500g</option>
-            <option>Sandwich bread · 1kg</option>
-          </select>
-        </label>
-        <div className="sw-form-grid">
-          {quantityFields.map(({ name, label, value }) => (
-            <label key={name}>
-              {label}
-              <input
-                name={name}
-                type="number"
-                step={['flour', 'sugar', 'yeast'].includes(name) ? '0.001' : '1'}
-                defaultValue={value}
-                aria-invalid={Boolean(errors[name])}
-                aria-describedby={errors[name] ? `${name}-error` : undefined}
-              />
-              {errors[name] && (
-                <span className="sw-field-error" id={`${name}-error`}>
-                  {errors[name]}
-                </span>
-              )}
-            </label>
-          ))}
-        </div>
-        <label>
-          Production notes
-          <textarea
-            name="note"
-            aria-invalid={Boolean(errors.note)}
-            aria-describedby={errors.note ? 'note-error' : undefined}
-            defaultValue={recovered?.note}
-            placeholder="Record material, output or waste observations."
-          />
-        </label>
-        {errors.note && (
-          <p id="note-error" role="alert" className="sw-field-error">
-            {errors.note}
-          </p>
-        )}
-        {storageError && (
-          <p role="alert" className="sw-field-error">
-            {storageError}
-          </p>
-        )}
-        <div className="sw-dialog-actions">
-          <button type="button" className="sw-quiet" onClick={onClose}>
-            Cancel
-          </button>
-          <Button type="submit" className="sw-primary">
-            Save draft
-          </Button>
-          {onSubmitBatch && (
-            <button type="submit" className="sw-primary" value="submit-batch">
-              Submit batch
-            </button>
+        <fieldset disabled={busy} className="sw-form-fields">
+          <label>
+            Product
+            <select name="product" defaultValue={recovered?.product ?? ''}>
+              <option value="">Select product</option>
+              {products.map((product) => (
+                <option key={product}>{product}</option>
+              ))}
+            </select>
+          </label>
+          <div className="sw-form-grid">
+            {quantityFields.map(({ name, label, value }) => (
+              <label key={name}>
+                {label}
+                <input
+                  name={name}
+                  type="number"
+                  step={['flour', 'sugar', 'yeast'].includes(name) ? '0.001' : '1'}
+                  defaultValue={value}
+                  aria-invalid={Boolean(errors[name])}
+                  aria-describedby={errors[name] ? `${name}-error` : undefined}
+                />
+                {errors[name] && (
+                  <span className="sw-field-error" id={`${name}-error`}>
+                    {errors[name]}
+                  </span>
+                )}
+              </label>
+            ))}
+          </div>
+          <label>
+            Production notes
+            <textarea
+              name="note"
+              aria-invalid={Boolean(errors.note)}
+              aria-describedby={errors.note ? 'note-error' : undefined}
+              defaultValue={recovered?.note}
+              placeholder="Record material, output or waste observations."
+            />
+          </label>
+          {errors.note && (
+            <p id="note-error" role="alert" className="sw-field-error">
+              {errors.note}
+            </p>
           )}
-        </div>
+          {storageError && (
+            <p role="alert" className="sw-field-error">
+              {storageError}
+            </p>
+          )}
+          <div className="sw-dialog-actions">
+            <button type="button" className="sw-quiet" onClick={onClose}>
+              Cancel
+            </button>
+            <Button type="submit" className="sw-primary">
+              Save draft
+            </Button>
+            {onSubmitBatch && (
+              <button type="submit" className="sw-primary" value="submit-batch">
+                Submit batch
+              </button>
+            )}
+          </div>
+        </fieldset>
       </form>
     </dialog>
   );

@@ -1,4 +1,5 @@
-/** @file Additional payment evidence capture for an unsettled sample order. */
+import { useWorkspace as useFormWorkspace } from '../../integration/workspace';
+/** @file Additional payment evidence capture for an unsettled order. */
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '../../../components/shared/Button';
@@ -14,7 +15,7 @@ import { TenderFields } from './TenderFields';
 interface Props {
   order: ReceptionOrder;
   onClose: () => void;
-  onSave: (order: ReceptionOrder) => string | null;
+  onSave: (order: ReceptionOrder) => Promise<string | null>;
 }
 /**
  * @description Validates additional tender components while preserving prior payment entries.
@@ -22,6 +23,7 @@ interface Props {
  * @returns Keyboard-contained payment dialog; errors keep entered values intact.
  */
 export function PaymentDialog({ order, onClose, onSave }: Props) {
+  const { busy } = useFormWorkspace();
   const ref = useRef<HTMLDialogElement>(null);
   const [value, setValue] = useState<TenderInput>({
     cash: '0',
@@ -55,12 +57,12 @@ export function PaymentDialog({ order, onClose, onSave }: Props) {
       </p>
       <form
         noValidate
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
           try {
             const additions = captureTenders(value);
             if (!additions.length) throw new Error('Enter at least one payment amount.');
-            const failure = onSave(recordPayment(order, additions));
+            const failure = await onSave(recordPayment(order, additions));
             if (failure) setError(failure);
             else onClose();
           } catch (failure) {
@@ -68,18 +70,20 @@ export function PaymentDialog({ order, onClose, onSave }: Props) {
           }
         }}
       >
-        <TenderFields value={value} onChange={setValue} />
-        {error && (
-          <p role="alert" className="sw-field-error">
-            {error}
-          </p>
-        )}
-        <div className="sw-dialog-actions">
-          <button className="sw-quiet" type="button" onClick={onClose}>
-            Cancel
-          </button>
-          <Button type="submit">Save payment</Button>
-        </div>
+        <fieldset disabled={busy} className="sw-form-fields">
+          <TenderFields value={value} onChange={setValue} />
+          {error && (
+            <p role="alert" className="sw-field-error">
+              {error}
+            </p>
+          )}
+          <div className="sw-dialog-actions">
+            <button className="sw-quiet" type="button" onClick={onClose}>
+              Cancel
+            </button>
+            <Button type="submit">Save payment</Button>
+          </div>
+        </fieldset>
       </form>
     </dialog>
   );

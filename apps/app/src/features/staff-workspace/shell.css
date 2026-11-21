@@ -186,3 +186,11 @@
   padding: 32px 36px 24px;
   outline: none;
 }
+
+.sw-form-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: contents;
+}

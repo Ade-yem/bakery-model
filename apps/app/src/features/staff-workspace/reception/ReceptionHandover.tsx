@@ -1,46 +1,27 @@
-import { loadRepayments } from './repayments';
+import { useDepartmentData } from '../../integration/workspace';
+import { useAuth } from '../../integration/auth';
 import { ReceptionHeading } from './ReceptionPages';
-import { loadReceptionRecords } from './storage';
 import { HandoverPage } from '../handover/HandoverPage';
 import { cashSummary } from './handover';
 import type { ReceptionOrder } from './orders';
 export function ReceptionHandover({ orders }: { orders: ReceptionOrder[] }) {
-  const ledger = loadRepayments(orders);
-  if (ledger.error)
+  const data = useDepartmentData('reception');
+  const { session } = useAuth();
+  if (data.openingCash === null || data.approvedExpenses === null)
     return (
-      <ReceptionHeading title="Repayment evidence needs attention" description={ledger.error} />
+      <ReceptionHeading
+        title="Cash reconciliation unavailable"
+        description="Verified opening cash and approved expenses are required before handover."
+      />
     );
-  const received = ledger.entries
-    .filter((e) => e.method === 'CASH')
-    .reduce((sum, e) => sum + e.amount, 0);
-  const summary = cashSummary(orders, 1000000, 150000, received);
+  const received = data.repayments
+    .filter((entry) => entry.method === 'CASH')
+    .reduce((sum, entry) => sum + entry.amount, 0);
+  const summary = cashSummary(orders, data.openingCash, data.approvedExpenses, received);
   return (
     <HandoverPage
       department="reception"
-      actor="reception@demo.tallybakery.test"
-      currentLines={() => {
-        const current = loadReceptionRecords();
-        if (current.error) throw new Error(current.error);
-        return [
-          {
-            id: 'cash',
-            label: 'Cash drawer',
-            expected: (() => {
-              const repayments = loadRepayments(current.orders);
-              if (repayments.error) throw new Error(repayments.error);
-              return cashSummary(
-                current.orders,
-                1000000,
-                150000,
-                repayments.entries
-                  .filter((e) => e.method === 'CASH')
-                  .reduce((sum, e) => sum + e.amount, 0)
-              ).expected;
-            })(),
-            scale: 100,
-          },
-        ];
-      }}
+      actor={session!.userId}
       lines={[{ id: 'cash', label: 'Cash drawer', expected: summary.expected, scale: 100 }]}
     />
   );

@@ -1,5 +1,4 @@
 import { useStaffActions } from '../policy';
-import { fulfilledQuantity } from '../receiving';
 /** @file Reception order detail, payment evidence and explicit manual dispatch. */
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,7 +10,7 @@ import { PaymentDialog } from './PaymentDialog';
 interface Props {
   order?: ReceptionOrder;
   base: string;
-  onSave: (order: ReceptionOrder) => string | null;
+  onSave: (order: ReceptionOrder) => Promise<string | null>;
 }
 /**
  * @description Separates recorded money, customer debt and explicit dispatch, without fulfillment controls.
@@ -33,12 +32,7 @@ export function OrderDetail({ order, base, onSave }: Props) {
         </Link>
       </>
     );
-  let fulfilled: number | null = null;
-  try {
-    fulfilled = fulfilledQuantity(order.id);
-  } catch {
-    /* Order evidence remains readable; receiving status is unavailable. */
-  }
+  const fulfilled = order.fulfilledQuantity ?? null;
   const total = orderTotal(order.lines);
   const debt = order.payments
     .filter((p) => p.method === 'DEBT')
@@ -199,9 +193,9 @@ export function OrderDetail({ order, base, onSave }: Props) {
             Cancel
           </button>
           <Button
-            onClick={() => {
+            onClick={async () => {
               try {
-                const failure = onSave(pushOrder(order));
+                const failure = await onSave(pushOrder(order));
                 if (failure) setError(failure);
                 confirm.current?.close();
               } catch (failure) {

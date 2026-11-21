@@ -1,10 +1,12 @@
+import { useDepartmentData } from '../../integration/workspace';
 import { Allowed } from '../Allowed';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ArrowUpRight } from 'lucide-react';
 import { StaffHeading } from '../StaffPages';
-import { suppliers, materials, formatMoney, receiptTotal, type Receipt } from './model';
+import { formatMoney, receiptTotal, type Receipt } from './model';
 export function ReceiptRecords({ receipts, base }: { receipts: Receipt[]; base: string }) {
+  const { suppliers, materials } = useDepartmentData('procurement');
   const [query, setQuery] = useState('');
   const [supplier, setSupplier] = useState('all');
   const rows = receipts.filter(
@@ -34,6 +36,7 @@ export function ReceiptRecords({ receipts, base }: { receipts: Receipt[]; base: 
           Supplier
           <select value={supplier} onChange={(e) => setSupplier(e.target.value)}>
             <option value="all">All suppliers</option>
+            <option value="">Select supplier</option>
             {suppliers.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -109,6 +112,7 @@ export function ReceiptRecords({ receipts, base }: { receipts: Receipt[]; base: 
   );
 }
 export function ReceiptDetail({ receipt, base }: { receipt?: Receipt; base: string }) {
+  const { suppliers, materials } = useDepartmentData('procurement');
   if (!receipt)
     return (
       <>
@@ -119,7 +123,7 @@ export function ReceiptDetail({ receipt, base }: { receipt?: Receipt; base: stri
         <Link to={`${base}/records`}>Back to receipts</Link>
       </>
     );
-  const material = materials.find((m) => m.id === receipt.materialId)!;
+  const material = materials.find((m) => m.id === receipt.materialId);
   return (
     <>
       <StaffHeading title={receipt.id} description="Received-material evidence · Read-only" />
@@ -130,7 +134,7 @@ export function ReceiptDetail({ receipt, base }: { receipt?: Receipt; base: stri
         <h2>
           {receipt.additionalLines?.length
             ? `Material receipt · ${receipt.additionalLines.length + 1} lines`
-            : material.name}
+            : (material?.name ?? 'Material unavailable')}
         </h2>
         {receipt.additionalLines?.length ? (
           <div className="sw-table-scroll">
@@ -167,19 +171,22 @@ export function ReceiptDetail({ receipt, base }: { receipt?: Receipt; base: stri
         ) : null}
         <dl>
           {[
-            ['Supplier', suppliers.find((s) => s.id === receipt.supplierId)!.name],
+            [
+              'Supplier',
+              suppliers.find((s) => s.id === receipt.supplierId)?.name ?? 'Supplier unavailable',
+            ],
             ['Invoice / delivery reference', receipt.reference],
             ['Received', receipt.receivedOn],
             [
               receipt.additionalLines?.length ? 'First-line quantity' : 'Quantity',
-              `${receipt.quantity} ${material.unit}`,
+              `${receipt.quantity} ${material?.unit ?? 'Unknown unit'}`,
             ],
             [
               receipt.additionalLines?.length ? 'First-line unit cost' : 'Unit cost',
               formatMoney(receiptTotal('1', receipt.unitCost)),
             ],
             ['Total', formatMoney(receipt.total)],
-            ['Receiver', 'Bisi Afolayan'],
+            ['Receiver', receipt.recordedBy ?? 'Not provided'],
             [
               'Recorded',
               new Date(receipt.recordedAt).toLocaleString('en-GB', { timeZone: 'Africa/Lagos' }) +

@@ -1,20 +1,25 @@
+import { useWorkspace as useFormWorkspace } from '../../integration/workspace';
+import { useDepartmentData } from '../../integration/workspace';
 import { Allowed } from '../Allowed';
 import { useState } from 'react';
 import { StaffHeading } from '../StaffPages';
-import { balances, products, type Product, type State, type Action } from './model';
+import { balances, type Product, type State, type Action } from './model';
 
 export function DisbursementStock({
   state,
   onSave,
 }: {
   state: State;
-  onSave: (action: Action) => string | null;
+  onSave: (action: Action) => Promise<string | null>;
 }) {
-  const [product, setProduct] = useState<Product>('loaf');
+  const { busy } = useFormWorkspace();
+  const data = useDepartmentData('disbursement');
+  const products = data.products;
+  const [product, setProduct] = useState<Product>('');
   const [quantity, setQuantity] = useState('');
   const [note, setNote] = useState('');
   const [error, setError] = useState('');
-  const stock = balances(state);
+  const stock = balances(state, data.opening);
   const count = state.events.filter((e) => e.kind === 'count' && e.product === product).at(-1);
   return (
     <>
@@ -36,7 +41,7 @@ export function DisbursementStock({
               {(Object.keys(products) as Product[]).map((key) => (
                 <tr key={key}>
                   <td>{products[key]}</td>
-                  <td>{key === 'loaf' ? 80 : 40}</td>
+                  <td>{data.opening[key] ?? 'Unavailable'}</td>
                   <td>{stock[key]}</td>
                 </tr>
               ))}
@@ -52,13 +57,18 @@ export function DisbursementStock({
         <form
           className="db-form"
           noValidate
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             if (!/^\d+$/.test(quantity)) {
               setError('Enter a whole-unit physical count.');
               return;
             }
-            const result = onSave({ kind: 'count', id: product, quantity: Number(quantity), note });
+            const result = await onSave({
+              kind: 'count',
+              id: product,
+              quantity: Number(quantity),
+              note,
+            });
             setError(result ?? '');
             if (!result) {
               setQuantity('');
@@ -66,49 +76,52 @@ export function DisbursementStock({
             }
           }}
         >
-          <label>
-            Product
-            <select
-              value={product}
-              onChange={(e) => {
-                setProduct(e.target.value as Product);
-                setQuantity('');
-                setNote('');
-                setError('');
-              }}
-            >
-              {(Object.keys(products) as Product[]).map((key) => (
-                <option key={key} value={key}>
-                  {products[key]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Physical count (units)
-            <input
-              inputMode="numeric"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-          </label>
-          <label>
-            Variance explanation
-            <textarea
-              value={note}
-              maxLength={500}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Required when physical and expected counts differ"
-            />
-          </label>
-          {error && (
-            <p role="alert" className="sw-field-error">
-              {error}
-            </p>
-          )}
-          <Allowed action="stock:count">
-            <button className="sw-primary">Save physical count</button>
-          </Allowed>
+          <fieldset disabled={busy} className="sw-form-fields">
+            <label>
+              Product
+              <select
+                value={product}
+                onChange={(e) => {
+                  setProduct(e.target.value as Product);
+                  setQuantity('');
+                  setNote('');
+                  setError('');
+                }}
+              >
+                <option value="">Select product</option>
+                {(Object.keys(products) as Product[]).map((key) => (
+                  <option key={key} value={key}>
+                    {products[key]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Physical count (units)
+              <input
+                inputMode="numeric"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </label>
+            <label>
+              Variance explanation
+              <textarea
+                value={note}
+                maxLength={500}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Required when physical and expected counts differ"
+              />
+            </label>
+            {error && (
+              <p role="alert" className="sw-field-error">
+                {error}
+              </p>
+            )}
+            <Allowed action="stock:count">
+              <button className="sw-primary">Save physical count</button>
+            </Allowed>
+          </fieldset>
         </form>
         {count && (
           <p className="sw-callout">
