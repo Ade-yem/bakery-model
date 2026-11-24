@@ -2,13 +2,15 @@
  * @file Platform Admin directory page for inspecting and managing all client business subscriptions.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { SubscriptionsOverviewCards } from './components/SubscriptionsOverviewCards';
 import { SubscriptionsFiltersBar } from './components/SubscriptionsFiltersBar';
 import { SubscriptionMobileFilters } from './components/SubscriptionMobileFilters';
 import { SubscriptionsTable } from './components/SubscriptionsTable';
 import { SubscriptionMobileCard } from './components/SubscriptionMobileCard';
 import { SubscriptionActionModals } from './components/SubscriptionActionModals';
+import { EmptyState, Pagination } from '../../../components/shared';
+import { usePagination, paginateArray } from '../../../hooks/usePagination';
 import { MOCK_PLATFORM_SUBSCRIPTIONS } from '../mock-subscriptions';
 import { MOCK_SUBSCRIPTION_PLANS } from '../mock-plans';
 import { hasPlatformPermission, PLATFORM_PERMISSIONS } from '../permissions';
@@ -83,6 +85,19 @@ export function SubscriptionsDirectoryPage({
       return true;
     });
   }, [subsList, filters]);
+
+  const pagination = usePagination({
+    totalRecords: filteredSubs.length,
+    initialPageSize: 10,
+  });
+
+  useEffect(() => {
+    pagination.goToPage(1);
+  }, [filters]);
+
+  const paginatedSubs = useMemo(() => {
+    return paginateArray(filteredSubs, pagination.currentPage, pagination.pageSize).data;
+  }, [filteredSubs, pagination.currentPage, pagination.pageSize]);
 
   const handleChangePlan = (sub: PlatformSubscription, newPlanId: string) => {
     const plan = MOCK_SUBSCRIPTION_PLANS.find((p) => p.id === newPlanId);
@@ -167,16 +182,16 @@ export function SubscriptionsDirectoryPage({
 
       {/* Directory Records: Desktop Table & Mobile Cards */}
       {filteredSubs.length === 0 ? (
-        <div className="p-8 text-center rounded-xl border border-[#D9D3C0] bg-white">
-          <p className="text-sm font-semibold text-[#10201F]/70">
-            No subscriptions found matching your query.
-          </p>
-        </div>
+        <EmptyState
+          variant="no-search-results"
+          title="No subscriptions found"
+          description="No subscriptions match your search and filter criteria. Try adjusting your query or resetting filters."
+        />
       ) : (
         <>
           <div className="hidden md:block">
             <SubscriptionsTable
-              subscriptions={filteredSubs}
+              subscriptions={paginatedSubs}
               canManage={canManage}
               canExtend={canExtend}
               canCancel={canCancel}
@@ -187,7 +202,7 @@ export function SubscriptionsDirectoryPage({
           </div>
 
           <div className="md:hidden space-y-3">
-            {filteredSubs.map((sub) => (
+            {paginatedSubs.map((sub) => (
               <SubscriptionMobileCard
                 key={sub.id}
                 subscription={sub}
@@ -198,6 +213,15 @@ export function SubscriptionsDirectoryPage({
               />
             ))}
           </div>
+
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalRecords={pagination.totalRecords}
+            pageSize={pagination.pageSize}
+            onPageChange={pagination.goToPage}
+            onPageSizeChange={pagination.setPageSize}
+          />
         </>
       )}
 

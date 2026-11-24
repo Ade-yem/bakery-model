@@ -2,12 +2,14 @@
  * @file Businesses Management master page for Cadence Platform Admin.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AdminPageHeader } from '../AdminPageHeader';
 import { BusinessOverviewCards } from './components/BusinessOverviewCards';
 import { BusinessFiltersBar } from './components/BusinessFiltersBar';
 import { BusinessTable } from './components/BusinessTable';
 import { BusinessStatusModal } from './components/BusinessStatusModal';
+import { Pagination } from '../../../components/shared';
+import { usePagination, paginateArray } from '../../../hooks/usePagination';
 import { MOCK_PLATFORM_BUSINESSES } from '../mock-businesses';
 import { PLATFORM_PERMISSIONS, hasPlatformPermission } from '../permissions';
 import type { AuthenticatedActor } from '../../../components/layout/types';
@@ -87,6 +89,21 @@ export function BusinessesManagementPage({
     });
   }, [businesses, filters]);
 
+  // Server-side pagination simulation
+  const pagination = usePagination({
+    totalRecords: filteredBusinesses.length,
+    initialPageSize: 10,
+  });
+
+  // Reset page when filters change
+  useEffect(() => {
+    pagination.goToPage(1);
+  }, [filters]);
+
+  const paginatedBusinesses = useMemo(() => {
+    return paginateArray(filteredBusinesses, pagination.currentPage, pagination.pageSize).data;
+  }, [filteredBusinesses, pagination.currentPage, pagination.pageSize]);
+
   const handleOpenStatusModal = (
     business: PlatformBusiness,
     targetStatus: 'active' | 'suspended'
@@ -126,9 +143,19 @@ export function BusinessesManagementPage({
 
       {/* Table */}
       <BusinessTable
-        businesses={filteredBusinesses}
+        businesses={paginatedBusinesses}
         canManage={canManage}
         onRequestStatusChange={handleOpenStatusModal}
+      />
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={pagination.currentPage}
+        totalPages={pagination.totalPages}
+        totalRecords={pagination.totalRecords}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.goToPage}
+        onPageSizeChange={pagination.setPageSize}
       />
 
       {/* Confirmation Modal */}

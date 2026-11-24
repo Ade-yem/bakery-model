@@ -2,12 +2,14 @@
  * @file Master page for Client Admin Accounts directory in Cadence Platform Admin.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { AdminPageHeader } from '../AdminPageHeader';
 import { ClientAdminOverviewCards } from './components/ClientAdminOverviewCards';
 import { ClientAdminFiltersBar } from './components/ClientAdminFiltersBar';
 import { ClientAdminTable } from './components/ClientAdminTable';
 import { ClientAdminDetailsModal } from './components/ClientAdminDetailsModal';
+import { Pagination } from '../../../components/shared';
+import { usePagination, paginateArray } from '../../../hooks/usePagination';
 import { MOCK_CLIENT_ADMINS } from '../mock-businesses';
 import { PLATFORM_PERMISSIONS, hasPlatformPermission } from '../permissions';
 import type { AuthenticatedActor } from '../../../components/layout/types';
@@ -79,6 +81,19 @@ export function ClientAdminsPage({ actor }: ClientAdminsPageProps): React.ReactE
     });
   }, [admins, filters]);
 
+  const pagination = usePagination({
+    totalRecords: filteredAdmins.length,
+    initialPageSize: 10,
+  });
+
+  useEffect(() => {
+    pagination.goToPage(1);
+  }, [filters]);
+
+  const paginatedAdmins = useMemo(() => {
+    return paginateArray(filteredAdmins, pagination.currentPage, pagination.pageSize).data;
+  }, [filteredAdmins, pagination.currentPage, pagination.pageSize]);
+
   const handleSelectAdmin = (admin: PlatformClientAdmin) => {
     setSelectedAdmin(admin);
     setIsModalOpen(true);
@@ -113,10 +128,20 @@ export function ClientAdminsPage({ actor }: ClientAdminsPageProps): React.ReactE
 
       {/* Table */}
       <ClientAdminTable
-        admins={filteredAdmins}
+        admins={paginatedAdmins}
         canManage={canManage}
         onSelectAdmin={handleSelectAdmin}
         onToggleStatus={handleToggleStatus}
+      />
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={pagination.currentPage}
+        totalPages={pagination.totalPages}
+        totalRecords={pagination.totalRecords}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.goToPage}
+        onPageSizeChange={pagination.setPageSize}
       />
 
       {/* Profile Details Modal */}

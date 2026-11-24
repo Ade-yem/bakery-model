@@ -2,7 +2,7 @@
  * @file Main directory and overview page for Cadence Platform Admin Subscription Plans.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { PlansOverviewCards } from './components/PlansOverviewCards';
@@ -11,6 +11,8 @@ import { PlanMobileFilters } from './components/PlanMobileFilters';
 import { PlansTable } from './components/PlansTable';
 import { PlanMobileCard } from './components/PlanMobileCard';
 import { PlanStatusModal } from './components/PlanStatusModal';
+import { EmptyState, Pagination } from '../../../components/shared';
+import { usePagination, paginateArray } from '../../../hooks/usePagination';
 import { MOCK_SUBSCRIPTION_PLANS } from '../mock-plans';
 import { hasPlatformPermission, PLATFORM_PERMISSIONS } from '../permissions';
 import type { AuthenticatedActor } from '../../../components/layout/types';
@@ -65,6 +67,19 @@ export function PlansOverviewPage({
       return true;
     });
   }, [plansList, filters]);
+
+  const pagination = usePagination({
+    totalRecords: filteredPlans.length,
+    initialPageSize: 10,
+  });
+
+  useEffect(() => {
+    pagination.goToPage(1);
+  }, [filters]);
+
+  const paginatedPlans = useMemo(() => {
+    return paginateArray(filteredPlans, pagination.currentPage, pagination.pageSize).data;
+  }, [filteredPlans, pagination.currentPage, pagination.pageSize]);
 
   const handleConfirmStatus = (
     plan: PlatformSubscriptionPlan,
@@ -122,23 +137,23 @@ export function PlansOverviewPage({
 
       {/* Directory Records: Desktop Table & Mobile Stacked Cards */}
       {filteredPlans.length === 0 ? (
-        <div className="p-8 text-center rounded-xl border border-[#D9D3C0] bg-white">
-          <p className="text-sm font-semibold text-[#10201F]/70">
-            No subscription plans found matching your criteria.
-          </p>
-        </div>
+        <EmptyState
+          variant="no-search-results"
+          title="No subscription plans found"
+          description="No subscription plans match your search and filter criteria. Try adjusting your query or resetting filters."
+        />
       ) : (
         <>
           <div className="hidden md:block">
             <PlansTable
-              plans={filteredPlans}
+              plans={paginatedPlans}
               canManage={canManage}
               onToggleStatus={setSelectedPlanForStatus}
             />
           </div>
 
           <div className="md:hidden space-y-3">
-            {filteredPlans.map((plan) => (
+            {paginatedPlans.map((plan) => (
               <PlanMobileCard
                 key={plan.id}
                 plan={plan}
@@ -147,6 +162,15 @@ export function PlansOverviewPage({
               />
             ))}
           </div>
+
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalRecords={pagination.totalRecords}
+            pageSize={pagination.pageSize}
+            onPageChange={pagination.goToPage}
+            onPageSizeChange={pagination.setPageSize}
+          />
         </>
       )}
 

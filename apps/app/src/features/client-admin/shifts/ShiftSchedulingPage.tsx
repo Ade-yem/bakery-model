@@ -11,6 +11,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { ShiftModal } from './components/ShiftModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
 import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
+import { EmptyState } from '../../../components/shared';
 
 const DAYS_HEADER = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -124,7 +125,13 @@ export function ShiftSchedulingPage(): React.ReactElement {
       </SearchFilterBar>
 
       {/* 3. Calendar Grid View or Table View */}
-      {viewMode === 'calendar' ? (
+      {filteredShifts.length === 0 ? (
+        <EmptyState
+          variant="no-search-results"
+          title="No shifts found"
+          description="No scheduled shifts match your search and department filter. Try adjusting your query or resetting filters."
+        />
+      ) : viewMode === 'calendar' ? (
         <div className="bg-white rounded-2xl border border-[#D9D3C0] shadow-xs p-5 space-y-4">
           <div className="grid grid-cols-7 gap-2 border-b border-[#D9D3C0]/60 pb-3 text-center">
             {DAYS_HEADER.map((d) => (

@@ -13,6 +13,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DepartmentModal } from './components/DepartmentModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
 import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
+import { EmptyState } from '../../../components/shared';
 
 export function DepartmentBuilderPage(): React.ReactElement {
   const {
@@ -137,13 +138,15 @@ export function DepartmentBuilderPage(): React.ReactElement {
       </SearchFilterBar>
 
       {/* 3. Grid of Department Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {filteredDepartments.length === 0 ? (
-          <div className="col-span-full py-16 text-center bg-white rounded-2xl border border-rule text-oven-black/50">
-            No departments found matching your search query.
-          </div>
-        ) : (
-          filteredDepartments.map((dept) => (
+      {filteredDepartments.length === 0 ? (
+        <EmptyState
+          variant="no-search-results"
+          title="No departments found"
+          description="No departments match your current search and filter criteria. Try adjusting your query or resetting filters."
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredDepartments.map((dept) => (
             <div
               key={dept.id}
               className="bg-white rounded-2xl border border-rule p-5 shadow-2xs hover:border-[#C8C2AD] hover:shadow-xs transition-all flex flex-col justify-between space-y-4"
@@ -220,9 +223,9 @@ export function DepartmentBuilderPage(): React.ReactElement {
                 </div>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Modals */}
       <DepartmentModal

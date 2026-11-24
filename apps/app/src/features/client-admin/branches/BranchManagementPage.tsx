@@ -2,8 +2,8 @@
  * @file Branch Management page adopting Platform Admin directory and table standards.
  */
 
-import React, { useState, useMemo } from 'react';
-import { Plus, Edit2, Power, MapPin, Mail, Phone, Building2 } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Plus, Edit2, Power, MapPin, Mail, Phone } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import type { ClientBranch } from '../types';
 import { SubscriptionGate } from '../components/SubscriptionGate';
@@ -12,6 +12,8 @@ import { StatusBadge } from '../components/StatusBadge';
 import { BranchModal } from './components/BranchModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
 import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
+import { EmptyState, Pagination } from '../../../components/shared';
+import { usePagination, paginateArray } from '../../../hooks/usePagination';
 
 export function BranchManagementPage(): React.ReactElement {
   const { branches, subscription, actor, createBranch, updateBranch, toggleBranchStatus } = useTenant();
@@ -47,6 +49,21 @@ export function BranchManagementPage(): React.ReactElement {
       return true;
     });
   }, [branches, search, statusFilter]);
+
+  const pagination = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
+    totalRecords: filteredBranches.length,
+  });
+
+  // Reset pagination to page 1 whenever search or status filter changes
+  useEffect(() => {
+    pagination.resetPage();
+  }, [search, statusFilter]);
+
+  const paginatedBranches = useMemo(() => {
+    return paginateArray(filteredBranches, pagination.currentPage, pagination.pageSize).data;
+  }, [filteredBranches, pagination.currentPage, pagination.pageSize]);
 
   const handleOpenCreate = () => {
     setEditingBranch(null);
@@ -103,20 +120,23 @@ export function BranchManagementPage(): React.ReactElement {
       {/* 3. Table matching Platform Admin BusinessTable */}
       <div className="bg-white border border-[#D9D3C0] rounded-2xl shadow-xs overflow-hidden">
         {filteredBranches.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center mx-auto mb-3">
-              <Building2 className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-[#10201F]">No branches found</h3>
-            <p className="text-xs text-[#10201F]/60 mt-1 max-w-sm mx-auto">
-              No branch locations match your current search and filter criteria. Try adjusting your query or resetting filters.
-            </p>
-          </div>
+          <EmptyState
+            variant="no-search-results"
+            title="No branches found"
+            description="No branch locations match your current search and filter criteria. Try adjusting your query or resetting filters."
+            action={{
+              label: 'Reset Filters',
+              onClick: () => {
+                setSearch('');
+                setStatusFilter('all');
+              },
+            }}
+          />
         ) : (
           <>
             {/* Mobile Card Layout */}
             <div className="md:hidden divide-y divide-[#E5E0D0]">
-              {filteredBranches.map((b) => (
+              {paginatedBranches.map((b) => (
                 <div key={`mobile-${b.id}`} className="p-4 space-y-3 text-xs">
                   <div className="flex items-center justify-between">
                     <div>
@@ -177,7 +197,7 @@ export function BranchManagementPage(): React.ReactElement {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5E0D0] text-sm">
-                  {filteredBranches.map((b) => (
+                  {paginatedBranches.map((b) => (
                     <tr key={b.id} className="hover:bg-[#F9F7F1]/60 transition-colors group">
                       <td className="py-3.5 px-4 sm:px-6">
                         <div className="font-bold text-[#10201F] flex items-center gap-2">
@@ -244,6 +264,18 @@ export function BranchManagementPage(): React.ReactElement {
           </>
         )}
       </div>
+
+      {/* 4. Standardized Pagination */}
+      {filteredBranches.length > 0 && (
+        <Pagination
+          currentPage={pagination.currentPage}
+          pageSize={pagination.pageSize}
+          totalRecords={filteredBranches.length}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.setPage}
+          onPageSizeChange={pagination.setPageSize}
+        />
+      )}
 
       {/* Modal */}
       <BranchModal

@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { Eye } from 'lucide-react';
 import type { PlatformAuditRecord } from '../../types';
+import { EmptyState } from '../../../../components/shared';
 
 export interface AuditTableProps {
   /** Filtered audit log entries. */
@@ -35,6 +36,18 @@ export function AuditTable({
   onViewDetails,
 }: AuditTableProps): React.ReactElement {
   const [visibleCount, setVisibleCount] = useState<number>(10);
+
+  if (records.length === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-[#D9D3C0] shadow-xs">
+        <EmptyState
+          variant="no-activity"
+          title="No audit records found"
+          description="No activity matches your current search or filter parameters."
+        />
+      </div>
+    );
+  }
 
   const displayedRecords = records.slice(0, visibleCount);
   const hasMore = records.length > visibleCount;

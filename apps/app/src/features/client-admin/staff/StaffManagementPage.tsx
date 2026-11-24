@@ -2,8 +2,8 @@
  * @file Staff Management directory adopting Platform Admin table and filter patterns.
  */
 
-import React, { useState, useMemo } from 'react';
-import { Users, UserPlus, Edit2, Power } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { UserPlus, Edit2, Power } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import type { ClientStaffMember } from '../types';
 import { SearchFilterBar } from '../components/SearchFilterBar';
@@ -11,6 +11,8 @@ import { StatusBadge } from '../components/StatusBadge';
 import { StaffModal } from './components/StaffModal';
 import { CLIENT_PERMISSIONS, hasClientPermission } from '../permissions';
 import { AdminPageHeader } from '../../platform-admin/AdminPageHeader';
+import { EmptyState, Pagination } from '../../../components/shared';
+import { usePagination, paginateArray } from '../../../hooks/usePagination';
 
 export function StaffManagementPage(): React.ReactElement {
   const { staff, departments, subscription, actor, createStaff, updateStaff, toggleStaffStatus } = useTenant();
@@ -38,6 +40,21 @@ export function StaffManagementPage(): React.ReactElement {
       return true;
     });
   }, [staff, search, deptFilter, statusFilter]);
+
+  const pagination = usePagination({
+    initialPage: 1,
+    initialPageSize: 10,
+    totalRecords: filteredStaff.length,
+  });
+
+  // Reset pagination when search, department or status filter changes
+  useEffect(() => {
+    pagination.resetPage();
+  }, [search, deptFilter, statusFilter]);
+
+  const paginatedStaff = useMemo(() => {
+    return paginateArray(filteredStaff, pagination.currentPage, pagination.pageSize).data;
+  }, [filteredStaff, pagination.currentPage, pagination.pageSize]);
 
   const handleOpenCreate = () => {
     setEditingStaff(null);
@@ -107,20 +124,24 @@ export function StaffManagementPage(): React.ReactElement {
       {/* 3. Data Table matching Platform Admin BusinessTable */}
       <div className="bg-white border border-[#D9D3C0] rounded-2xl shadow-xs overflow-hidden">
         {filteredStaff.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center mx-auto mb-3">
-              <Users className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-[#10201F]">No staff accounts found</h3>
-            <p className="text-xs text-[#10201F]/60 mt-1 max-w-sm mx-auto">
-              No employees match your search and filter criteria. Adjust your query or clear filters.
-            </p>
-          </div>
+          <EmptyState
+            variant="no-search-results"
+            title="No staff accounts found"
+            description="No employees match your search and filter criteria. Adjust your query or clear filters."
+            action={{
+              label: 'Reset Filters',
+              onClick: () => {
+                setSearch('');
+                setDeptFilter('all');
+                setStatusFilter('all');
+              },
+            }}
+          />
         ) : (
           <>
             {/* Mobile Cards */}
             <div className="md:hidden divide-y divide-[#E5E0D0]">
-              {filteredStaff.map((s) => (
+              {paginatedStaff.map((s) => (
                 <div key={`mobile-${s.id}`} className="p-4 space-y-3 text-xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
@@ -186,7 +207,7 @@ export function StaffManagementPage(): React.ReactElement {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5E0D0] text-sm">
-                  {filteredStaff.map((s) => (
+                  {paginatedStaff.map((s) => (
                     <tr key={s.id} className="hover:bg-[#F9F7F1]/60 transition-colors group">
                       <td className="py-3.5 px-4 sm:px-6">
                         <div className="flex items-center gap-3">
@@ -256,6 +277,18 @@ export function StaffManagementPage(): React.ReactElement {
           </>
         )}
       </div>
+
+      {/* 4. Standardized Pagination */}
+      {filteredStaff.length > 0 && (
+        <Pagination
+          currentPage={pagination.currentPage}
+          pageSize={pagination.pageSize}
+          totalRecords={filteredStaff.length}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.setPage}
+          onPageSizeChange={pagination.setPageSize}
+        />
+      )}
 
       {/* Staff Modal */}
       <StaffModal

@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 export interface ButtonProps {
   children: React.ReactNode;
@@ -14,6 +15,8 @@ export interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
+  loading?: boolean;
+  loadingText?: string;
   fullWidth?: boolean;
   className?: string;
   icon?: React.ReactNode;
@@ -22,7 +25,7 @@ export interface ButtonProps {
 }
 
 /**
- * @description Renders a styled accessible button or navigation link following brand design tokens.
+ * @description Renders a styled accessible button or navigation link following brand design tokens, with loading state support.
  * @param {ButtonProps} props - Button configuration.
  * @returns {React.ReactElement} Action element.
  */
@@ -35,12 +38,16 @@ export function Button({
   type = 'button',
   onClick,
   disabled = false,
+  loading = false,
+  loadingText,
   fullWidth = false,
   className = '',
   icon,
   iconPosition = 'right',
   'aria-label': ariaLabel,
 }: ButtonProps): React.ReactElement {
+  const isActionDisabled = disabled || loading;
+
   const baseStyles =
     'inline-flex items-center justify-center font-medium font-sans transition-all duration-150 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none cursor-pointer';
 
@@ -66,7 +73,12 @@ export function Button({
   const widthStyle = fullWidth ? 'w-full' : '';
   const combinedClasses = `${baseStyles} ${sizeStyles} ${variantStyles} ${widthStyle} ${className}`;
 
-  const content = (
+  const content = loading ? (
+    <>
+      <Loader2 className="w-4 h-4 animate-spin shrink-0" aria-hidden="true" />
+      <span>{loadingText || children}</span>
+    </>
+  ) : (
     <>
       {icon && iconPosition === 'left' && <span className="shrink-0">{icon}</span>}
       <span>{children}</span>
@@ -74,7 +86,7 @@ export function Button({
     </>
   );
 
-  if (to) {
+  if (to && !loading) {
     return (
       <Link to={to} className={combinedClasses} aria-label={ariaLabel}>
         {content}
@@ -82,7 +94,7 @@ export function Button({
     );
   }
 
-  if (href) {
+  if (href && !loading) {
     return (
       <a href={href} className={combinedClasses} aria-label={ariaLabel} target="_blank" rel="noopener noreferrer">
         {content}
@@ -95,7 +107,8 @@ export function Button({
       type={type}
       className={combinedClasses}
       onClick={onClick}
-      disabled={disabled}
+      disabled={isActionDisabled}
+      aria-busy={loading ? 'true' : undefined}
       aria-label={ariaLabel}
     >
       {content}

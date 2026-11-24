@@ -2,7 +2,7 @@
  * @file Main page for inspecting platform audit logs, security events, and configuration diffs.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ShieldAlert } from 'lucide-react';
 import { AuditOverviewCards } from './components/AuditOverviewCards';
 import { AuditFiltersBar } from './components/AuditFiltersBar';
@@ -10,6 +10,8 @@ import { AuditMobileFilters } from './components/AuditMobileFilters';
 import { AuditTable } from './components/AuditTable';
 import { AuditMobileCard } from './components/AuditMobileCard';
 import { AuditDetailsModal } from './components/AuditDetailsModal';
+import { EmptyState, Pagination } from '../../../components/shared';
+import { usePagination, paginateArray } from '../../../hooks/usePagination';
 import { MOCK_AUDIT_RECORDS } from '../mock-audit';
 import { hasPlatformPermission, PLATFORM_PERMISSIONS } from '../permissions';
 import type { AuthenticatedActor } from '../../../components/layout/types';
@@ -70,6 +72,19 @@ export function AuditOverviewPage({
     });
   }, [recordsList, filters]);
 
+  const pagination = usePagination({
+    totalRecords: filteredRecords.length,
+    initialPageSize: 10,
+  });
+
+  useEffect(() => {
+    pagination.goToPage(1);
+  }, [filters]);
+
+  const paginatedRecords = useMemo(() => {
+    return paginateArray(filteredRecords, pagination.currentPage, pagination.pageSize).data;
+  }, [filteredRecords, pagination.currentPage, pagination.pageSize]);
+
   if (!hasAccess) {
     return (
       <div className="p-8 text-center rounded-xl border border-[#D9D3C0] bg-white font-sans max-w-xl mx-auto space-y-3">
@@ -127,22 +142,22 @@ export function AuditOverviewPage({
 
       {/* Table & Mobile Views */}
       {filteredRecords.length === 0 ? (
-        <div className="p-8 text-center rounded-xl border border-[#D9D3C0] bg-white">
-          <p className="text-sm font-semibold text-[#10201F]/70">
-            No audit records found matching your filters.
-          </p>
-        </div>
+        <EmptyState
+          variant="no-search-results"
+          title="No audit records found"
+          description="No audit logs match your search and filter criteria. Try adjusting your query or resetting filters."
+        />
       ) : (
         <>
           <div className="hidden lg:block">
             <AuditTable
-              records={filteredRecords}
+              records={paginatedRecords}
               onViewDetails={setSelectedRecord}
             />
           </div>
 
           <div className="lg:hidden space-y-3">
-            {filteredRecords.map((log) => (
+            {paginatedRecords.map((log) => (
               <AuditMobileCard
                 key={log.id}
                 record={log}
@@ -150,6 +165,15 @@ export function AuditOverviewPage({
               />
             ))}
           </div>
+
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalRecords={pagination.totalRecords}
+            pageSize={pagination.pageSize}
+            onPageChange={pagination.goToPage}
+            onPageSizeChange={pagination.setPageSize}
+          />
         </>
       )}
 

@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Eye, UserCheck, Users } from 'lucide-react';
 import { ClientAdminMobileCard } from './ClientAdminMobileCard';
 import type { PlatformClientAdmin } from '../../types';
+import { EmptyState } from '../../../../components/shared';
 
 export interface ClientAdminTableProps {
   /** Array of administrators to display. */
@@ -36,15 +37,12 @@ export function ClientAdminTable({
 }: ClientAdminTableProps): React.ReactElement {
   if (admins.length === 0) {
     return (
-      <div className="bg-white border border-[#D9D3C0] rounded-2xl p-12 text-center shadow-xs">
-        <div className="w-12 h-12 rounded-2xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center mx-auto mb-3">
-          <Users className="w-6 h-6" />
-        </div>
-        <h3 className="text-base font-bold text-[#10201F]">No administrators found</h3>
-        <p className="text-xs text-[#10201F]/60 mt-1 max-w-sm mx-auto">
-          No primary client administrators match your current search and filter criteria. Try resetting your filters.
-        </p>
-      </div>
+      <EmptyState
+        variant="no-search-results"
+        icon={<Users className="w-8 h-8" />}
+        title="No administrators found"
+        description="No primary client administrators match your current search and filter criteria. Try resetting your filters."
+      />
     );
   }
 

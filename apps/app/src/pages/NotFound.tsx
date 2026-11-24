@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Home } from 'lucide-react';
+import { ArrowLeft, Home, Compass } from 'lucide-react';
 
 export interface NotFoundProps {
   /** Optional destination path for the primary home button (defaults to root '/'). */
@@ -56,6 +56,12 @@ export function NotFound({
           />
         </div>
 
+
+        {/* Subtle decorative brand badge */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-verdigris/10 text-verdigris border border-verdigris/20 mb-2.5">
+          <Compass className="w-3.5 h-3.5" aria-hidden="true" />
+          <span>Error 404</span>
+        </div>
 
         {/* Heading */}
         <h1

@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Eye, CheckCircle2, AlertOctagon, Building2 } from 'lucide-react';
 import { BusinessMobileCard } from './BusinessMobileCard';
 import type { PlatformBusiness } from '../../types';
+import { EmptyState } from '../../../../components/shared';
 
 export interface BusinessTableProps {
   /** Filtered businesses to display. */
@@ -33,15 +34,12 @@ export function BusinessTable({
 }: BusinessTableProps): React.ReactElement {
   if (businesses.length === 0) {
     return (
-      <div className="bg-white border border-[#D9D3C0] rounded-2xl p-12 text-center shadow-xs">
-        <div className="w-12 h-12 rounded-2xl bg-[#0B5C63]/10 text-[#0B5C63] flex items-center justify-center mx-auto mb-3">
-          <Building2 className="w-6 h-6" />
-        </div>
-        <h3 className="text-base font-bold text-[#10201F]">No businesses found</h3>
-        <p className="text-xs text-[#10201F]/60 mt-1 max-w-sm mx-auto">
-          No registered bakery businesses match your current search and filter criteria. Try adjusting your query or resetting filters.
-        </p>
-      </div>
+      <EmptyState
+        variant="no-search-results"
+        icon={<Building2 className="w-8 h-8" />}
+        title="No businesses found"
+        description="No registered bakery businesses match your current search and filter criteria. Try adjusting your query or resetting filters."
+      />
     );
   }
 
