@@ -27,21 +27,21 @@ export function AuthenticatedTopbar({
   profilePath,
 }: AuthenticatedTopbarProps): React.ReactElement {
   return (
-    <header className="sticky top-0 z-20 h-16 bg-white/95 backdrop-blur-xs border-b border-[#D9D3C0] px-4 sm:px-6 flex items-center justify-between font-sans">
+    <header className="sticky top-0 z-20 h-14 bg-white/95 backdrop-blur-xs border-b border-[#D9D3C0] px-4 sm:px-6 flex items-center justify-between font-sans">
       {/* Left: Mobile trigger & Page Title / Breadcrumbs */}
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onToggleMobileSidebar}
           aria-label="Open sidebar menu"
-          className="md:hidden p-2 rounded-md text-[#10201F]/70 hover:text-[#10201F] hover:bg-[#F6F3EA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0B5C63]"
+          className="md:hidden p-1.5 rounded-md text-[#10201F]/70 hover:text-[#10201F] hover:bg-[#F6F3EA] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0B5C63]"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         <div>
           {title && (
-            <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[#10201F] tracking-tight">
+            <h1 className="text-base sm:text-lg font-bold text-[#10201F] tracking-tight">
               {title}
             </h1>
           )}

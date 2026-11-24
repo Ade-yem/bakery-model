@@ -30,6 +30,7 @@ import {
   Sparkles,
   Shield,
   Lock,
+  ShieldAlert,
 } from 'lucide-react';
 import { filterNavGroupsByPermissions } from './permission-filter';
 import type { AuthenticatedSidebarProps, LayoutNavItem } from './types';
@@ -57,6 +58,7 @@ const ICON_REGISTRY: Record<string, React.ReactElement> = {
   Clock: <Clock className="w-5 h-5 shrink-0" />,
   Sparkles: <Sparkles className="w-5 h-5 shrink-0" />,
   Shield: <Shield className="w-5 h-5 shrink-0" />,
+  ShieldAlert: <ShieldAlert className="w-5 h-5 shrink-0" />,
   Lock: <Lock className="w-5 h-5 shrink-0" />,
 };
 
@@ -112,13 +114,11 @@ function SidebarBody({
         isMobile
           ? 'w-full rounded-none'
           : 'rounded-t-2xl md:rounded-tr-2xl md:rounded-br-2xl transition-all duration-200'
-      } overflow-hidden ${
-        isFloatingHover ? 'shadow-2xl ring-1 ring-[#10201F]/10' : 'shadow-xs'
-      }`}
+      } overflow-hidden ${isFloatingHover ? 'shadow-2xl ring-1 ring-[#10201F]/10' : 'shadow-xs'}`}
     >
       {/* Brand Header */}
       <div
-        className={`h-16 flex items-center ${
+        className={`h-14 flex items-center ${
           !isExpanded ? 'justify-center' : 'justify-between px-4'
         } border-b border-[#E5E0D0] shrink-0`}
       >
@@ -151,8 +151,8 @@ function SidebarBody({
             <div className="flex flex-col leading-none">
               <div className="flex items-center tracking-tight font-extrabold text-sm uppercase">
                 <span className="sr-only">{brandTitle}</span>
-                <span className="text-[#0B5C63]">TALLY</span>
-                <span className="text-[#A9501A] ml-1">BAKERY</span>
+                <span className="text-[#0B5C63]">CADENCE</span>
+                 <span className="text-[#A9501A] ml-1">PLATFORM</span>
               </div>
               {brandSubtitle && (
                 <span className="text-[9px] font-bold tracking-wider uppercase text-[#0B5C63] bg-[#0B5C63]/10 px-1.5 py-0.5 rounded mt-0.5 inline-block w-fit">
@@ -229,7 +229,9 @@ function SidebarBody({
                     }}
                     className={({ isActive }) =>
                       `flex items-center ${
-                        !isExpanded ? 'justify-center w-11 h-11 mx-auto' : 'justify-between px-3.5 py-2.5'
+                        !isExpanded
+                          ? 'justify-center w-11 h-11 mx-auto'
+                          : 'justify-between px-3.5 py-2.5'
                       } rounded-xl text-[15px] transition-all ${
                         isActive
                           ? 'bg-[#EFEBDB] text-[#10201F] font-semibold shadow-2xs'
@@ -276,7 +278,7 @@ export function AuthenticatedSidebar({
   onToggleCollapse,
   mobileOpen = false,
   onCloseMobile,
-  brandTitle = 'TALLYBAKERY',
+  brandTitle = 'CADENCE',
   brandSubtitle,
   brandHomeHref = '/',
   footerSlot,

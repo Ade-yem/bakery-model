@@ -74,6 +74,10 @@ export interface UserAccountDropdownProps {
   profilePath?: string;
   /** Controlled open state for testing or external overrides. */
   isOpen?: boolean;
+  /** Whether to display actor email below the name in the trigger. Defaults to false. */
+  showEmail?: boolean;
+  /** Whether to render the dropdown chevron icon in the trigger. Defaults to true. */
+  showChevron?: boolean;
 }
 
 /**

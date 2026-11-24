@@ -16,6 +16,7 @@ import {
   PLATFORM_ADMIN_NAV_GROUPS,
   BUSINESS_OWNER_NAV_GROUPS,
 } from '../role-nav-configs';
+import { PLATFORM_PERMISSIONS } from '../../../features/platform-admin/permissions';
 import {
   PlatformAdminLayout,
   BusinessOwnerLayout,
@@ -32,18 +33,7 @@ describe('Shared Authenticated Application Layout System', () => {
     designation: 'Platform Super Admin',
     roleBadge: 'Super Admin',
     initials: 'AO',
-    permissions: [
-      'admin:dashboard:view',
-      'admin:businesses:view',
-      'admin:users:view',
-      'admin:plans:view',
-      'admin:subscriptions:view',
-      'admin:transactions:view',
-      'admin:support:view',
-      'admin:notifications:view',
-      'admin:analytics:view',
-      'admin:settings:view',
-    ],
+    permissions: Object.values(PLATFORM_PERMISSIONS),
   };
 
   const mockOwner: AuthenticatedActor = {

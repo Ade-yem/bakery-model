@@ -1,20 +1,16 @@
-import { StaffState } from './features/staff-workspace/StaffState';
 /**
  * @file Application router root for Cadence app & authentication portal.
  */
 
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import type { ApiClient } from './features/api/http';
 import type { WorkspaceAdapter } from './features/integration/workspace';
 import type { AuthClient } from './features/integration/auth';
 import { AuthProvider } from './features/integration/AuthProvider';
 import { SyncProvider } from './features/sync/SyncProvider';
 import type { SyncAdapter } from './features/sync/types';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { WorkspaceRoute } from './features/staff-workspace/WorkspaceRoute';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { ForgotPassword } from './pages/ForgotPassword';
+import { AppRoutes } from './AppRoutes';
 
 /**
  * @description Main app router hosting authentication and authenticated portal.
@@ -37,27 +33,7 @@ export function App({
         <BrowserRouter>
           <div className="min-h-screen flex flex-col bg-flour text-oven-black selection:bg-verdigris selection:text-flour font-sans antialiased">
             <main className="flex-1">
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route
-                  path="/workspace/*"
-                  element={<WorkspaceRoute adapter={workspaceAdapter} api={api} />}
-                />
-                <Route path="/" element={<Navigate to="/login" replace />} />
-                <Route
-                  path="*"
-                  element={
-                    <StaffState
-                      title="Page not found"
-                      description="The requested page is unavailable."
-                      to="/workspace"
-                      action="Return to my workspace"
-                    />
-                  }
-                />
-              </Routes>
+              <AppRoutes workspaceAdapter={workspaceAdapter} api={api} />
             </main>
           </div>
         </BrowserRouter>

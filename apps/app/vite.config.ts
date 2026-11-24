@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
   };
   return {
     plugins: [react(), tailwindcss(), offlineShell()],
+    resolve: {
+      dedupe: ['react', 'react-dom'],
+    },
     server: { proxy },
     preview: { proxy },
   };
