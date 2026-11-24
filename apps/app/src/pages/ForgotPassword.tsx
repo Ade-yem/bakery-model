@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Logo } from '@repo/shared/component/Logo';
+import { Logo } from '@repo/ui/component/Logo';
 import { ForgotPasswordForm } from '../components/auth/ForgotPasswordForm';
 
 /**

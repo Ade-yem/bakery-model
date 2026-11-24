@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Logo } from '@repo/shared/component/Logo';
+import { Logo } from '@repo/ui/component/Logo';
 import { RegisterForm } from '../components/auth/RegisterForm';
 
 /**
@@ -17,7 +17,6 @@ export function Register(): React.ReactElement {
 
   return (
     <div className="relative min-h-screen flex flex-col justify-between items-center py-10 px-4 sm:px-6 overflow-hidden font-sans">
-
       {/* Spacer to push card towards optical center */}
       <div className="w-full h-2 z-10" />
 

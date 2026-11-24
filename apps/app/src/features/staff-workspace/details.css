@@ -193,23 +193,6 @@
   color: var(--sw-muted);
   margin: 0;
 }
-.sw-profile-heading {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-.sw-profile-heading h2 {
-  margin: 0 0 6px;
-}
-.sw-profile-heading p {
-  margin: 0;
-}
-.sw-profile-heading .sw-avatar {
-  width: 48px;
-  height: 48px;
-  font-size: 14px;
-}
 .sw-dialog {
   font-family: var(--font-family-base);
   width: min(560px, calc(100% - 32px));

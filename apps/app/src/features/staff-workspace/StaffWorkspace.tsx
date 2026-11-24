@@ -1,9 +1,10 @@
-/** @file Production staff preview and live session integration boundary. */
+import { useStaffActions } from './policy';
+import { useDepartmentData, useWorkspace, useDraftKey } from '../integration/workspace';
+/** @file Production staff pages; the router owns session enforcement. */
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X } from 'lucide-react';
 import { StaffShell } from './StaffShell';
-import { previewAccess } from './preview-data';
 import { StaffHome } from './StaffHome';
 import {
   StaffHeading,
@@ -17,36 +18,32 @@ import {
 import { BatchDraftDialog } from './BatchDraftDialog';
 import './workspace.css';
 interface Props {
-  preview?: boolean;
+  basePath?: string;
 }
 /**
- * @description Provides an isolated production staff UI preview; real workspace routes require backend session integration.
- * @param props Whether the explicitly labeled preview route is being rendered.
- * @returns Responsive staff shell or the unauthenticated integration boundary.
+ * @description Renders the Production workspace behind the shared staff route boundary.
+ * @param props Canonical route base for Production pages.
+ * @returns Responsive Production staff pages.
  */
-export function StaffWorkspace({ preview = false }: Props) {
+export function StaffWorkspace({ basePath }: Props) {
+  const permissions = useStaffActions();
+  const data = useDepartmentData('production');
+  const workspace = useWorkspace();
+  const draftKey = useDraftKey('production');
   const location = useLocation();
+  const [batchId, setBatchId] = useState('');
   const [batchOpen, setBatchOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const base = '/workspace-preview';
+  const base = basePath ?? '/workspace/production';
   const page = location.pathname.slice(base.length).replace(/\/$/, '');
-  if (!preview)
-    return (
-      <div className="sw-root sw-session">
-        <ShieldCheck size={32} />
-        <p className="sw-eyebrow">Staff workspace</p>
-        <h1>Sign in to your workspace</h1>
-        <p>
-          Your session, assigned department and permissions must be verified before your workspace
-          can open.
-        </p>
-        <Link className="sw-primary" to="/login">
-          Go to login <ArrowRight size={16} />
-        </Link>
-        <p className="sw-muted">Workspace session integration is not connected yet.</p>
-      </div>
-    );
-  const openBatch = () => setBatchOpen(true);
+  const openBatch = () => {
+    if (!permissions.allowed('production:create')) {
+      setMessage('Your permissions do not allow batch entry.');
+      return;
+    }
+    setBatchId(`BAT-${crypto.randomUUID()}`);
+    setBatchOpen(true);
+  };
   let content;
   if (page === '') content = <StaffHome base={base} onBatch={openBatch} />;
   else if (page === '/tasks') content = <StaffTasks base={base} onBatch={openBatch} />;
@@ -72,19 +69,36 @@ export function StaffWorkspace({ preview = false }: Props) {
     <StaffShell
       base={base}
       department="Production"
-      name="Ada Okonkwo"
-      initials="AO"
-      role="Production supervisor"
-      access={previewAccess}
+
       dialog={
         batchOpen ? (
           <BatchDraftDialog
+            onSubmitBatch={async (values) => {
+              try {
+                permissions.require('production:create');
+                if (!data.products.includes(values.product ?? ''))
+                  return 'Choose a listed product.';
+                await workspace.submit({ type: 'production:create', id: batchId, values });
+                try {
+                  localStorage.removeItem(draftKey);
+                } catch {
+                  /* The recorded submission remains available. */
+                }
+                setBatchOpen(false);
+                setMessage(
+                  'Batch submission recorded. Review its receiving and synchronization status in records.'
+                );
+                return null;
+              } catch (error) {
+                return error instanceof Error
+                  ? error.message
+                  : 'Batch could not be saved. Your input is retained.';
+              }
+            }}
             onClose={() => setBatchOpen(false)}
             onSaved={() => {
               setBatchOpen(false);
-              setMessage(
-                'Preview draft saved on this browser. It has not been submitted to Production.'
-              );
+              setMessage('Draft saved.');
             }}
           />
         ) : undefined

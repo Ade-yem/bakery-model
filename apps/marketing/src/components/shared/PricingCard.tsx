@@ -84,7 +84,7 @@ export function PricingCard({
       </div>
 
       <Button
-        to={`/register?plan=${plan.id}`}
+        to={`${import.meta.env.VITE_PUBLIC_APP_URL}/register?plan=${plan.id}`}
         variant={isPopular ? 'primary' : 'secondary'}
         fullWidth
         size="md"

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Logo } from '@repo/shared/component/Logo';
+import { Logo } from '@repo/ui/component/Logo';
 import { LoginForm } from '../components/auth/LoginForm';
 
 /**

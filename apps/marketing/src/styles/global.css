@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@repo/shared/styles/variables.css";
+@import "@repo/ui/styles/variables.css";
 
 @theme {
   --font-sans: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

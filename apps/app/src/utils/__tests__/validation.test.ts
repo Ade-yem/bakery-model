@@ -119,7 +119,7 @@ describe('Validation Utilities', () => {
       expect(res.errors.businessName).toBeDefined();
       expect(res.errors.fullName).toBeDefined();
       expect(res.errors.email).toBeDefined();
-      expect(res.errors.username).toBeDefined();
+      expect(res.errors.username).toBeUndefined();
       expect(res.errors.password).toBeDefined();
       expect(res.errors.confirmPassword).toBeDefined();
       expect(res.errors.agreeToTerms).toBeDefined();

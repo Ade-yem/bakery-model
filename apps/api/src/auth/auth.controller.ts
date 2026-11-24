@@ -11,7 +11,7 @@ export class AuthController {
     this.nodeHandler = toNodeHandler(this.authService.auth);
   }
 
-  @All('*')
+  @All('{*path}')
   async handleAuth(@Req() req: Request, @Res() res: Response) {
     return this.nodeHandler(req, res);
   }
