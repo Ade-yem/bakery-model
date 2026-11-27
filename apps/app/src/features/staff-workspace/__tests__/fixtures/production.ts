@@ -1,5 +1,5 @@
 /** @file Synthetic production-only fixtures, isolated from authenticated workspace data. */
-export const previewAccess = {
+export const productionAccess = {
   enabledModules: ['production'],
   permissions: ['production:view', 'records:view', 'history:view', 'schedule:view'],
 };
@@ -35,7 +35,7 @@ export const productionRecords = [
     waste: 3,
   },
 ];
-export const previewTasks = [
+export const productionTasks = [
   {
     id: 'TASK-041',
     title: 'Record the next production batch',

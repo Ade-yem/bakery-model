@@ -3,12 +3,14 @@ export interface BatchDraftValues {
   product?: string;
   output: string;
   flour: string;
+  sugar?: string;
+  yeast?: string;
   waste: string;
   note: string;
 }
 /**
  * @description Validates basic quantity shape without inventing production yield constraints.
- * @param values Unposted sample production input with explicit field units.
+ * @param values Unposted production input with explicit field units.
  * @returns Field-specific errors; an empty object indicates a well-formed local draft.
  */
 export function validateBatchDraft(
@@ -29,12 +31,26 @@ export function validateBatchDraft(
     Number(values.waste) < 0
   )
     errors.waste = 'Enter a whole number of units, including zero.';
+  for (const field of ['sugar', 'yeast'] as const) {
+    if (values[field] !== undefined && typeof values[field] !== 'string') {
+      errors[field] = 'Enter a valid kilogram quantity.';
+      continue;
+    }
+    if (
+      values[field] !== undefined &&
+      (typeof values[field] !== 'string' ||
+        !/^\d{1,7}(\.\d{1,3})?$/.test(values[field]!) ||
+        !Number.isFinite(Number(values[field])))
+    )
+      errors[field] = 'Enter a nonnegative kilogram quantity with up to three decimal places.';
+  }
+  if (values.note.length > 500) errors.note = 'Keep production notes within 500 characters.';
   if (!errors.waste && Number(values.waste) > 0 && !values.note.trim())
     errors.note = 'Explain the recorded scrap or waste.';
   return errors;
 }
 /**
- * @description Recovers only known string fields from an untrusted preview draft.
+ * @description Recovers only known string fields from an untrusted workspace draft.
  * @param raw Browser-stored JSON or no prior entry.
  * @returns Recoverable draft fields, or null for missing/corrupt data.
  */
@@ -66,9 +82,19 @@ export function parseBatchDraft(raw: string | null): BatchDraftValues | null {
     };
     if (
       'product' in value &&
-      (value.product === 'Family loaf · 500g' || value.product === 'Sandwich bread · 1kg')
+      typeof value.product === 'string' &&
+      value.product.trim().length > 0 &&
+      value.product.length <= 200
     )
       draft.product = value.product;
+    if ('sugar' in value) {
+      if (typeof value.sugar !== 'string') return null;
+      draft.sugar = value.sugar;
+    }
+    if ('yeast' in value) {
+      if (typeof value.yeast !== 'string') return null;
+      draft.yeast = value.yeast;
+    }
     return draft;
   } catch {
     return null;

@@ -1,0 +1,39 @@
+.api-setup {
+  width: min(100%, 34rem);
+  text-align: left;
+}
+.api-form {
+  display: grid;
+  gap: 1rem;
+}
+.api-form label {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+.api-form input,
+.api-form select {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid var(--sw-border, #d9d3c0);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--sw-paper, #fff);
+  color: inherit;
+}
+.api-actions,
+.api-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.api-refresh {
+  margin-top: 1rem;
+}
+.api-form input:focus-visible,
+.api-form select:focus-visible {
+  outline: 2px solid #0b5c63;
+  outline-offset: 2px;
+}

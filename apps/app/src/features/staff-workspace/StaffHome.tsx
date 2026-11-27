@@ -1,8 +1,12 @@
+import { useStaffIdentity } from './useStaffIdentity';
+import { ShiftBadge } from './ShiftBadge';
+import { Allowed } from './Allowed';
+import { useProductionRecords } from './production-store';
 import { Button } from '../../components/shared/Button';
 /** @file Production staff home, with assigned work above routine history. */
 import { ArrowRight, ArrowUpRight, Clock3, ClipboardList, PackageCheck, Wheat } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { previewTasks } from './preview-data';
+import { useDepartmentData } from '../integration/workspace';
 import { StaffTable } from './StaffTable';
 interface Props {
   base: string;
@@ -10,26 +14,31 @@ interface Props {
 }
 /**
  * @description Prioritizes production staff's current shift, pending work and own batch history.
- * @param props Preview route base and batch draft action.
+ * @param props Workspace route base and batch draft action.
  * @returns Production home without cross-department private data.
  */
 export function StaffHome({ base, onBatch }: Props) {
+  const identity = useStaffIdentity();
+  const records = useProductionRecords();
+  const productionTasks = useDepartmentData('production').tasks;
   return (
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Wednesday, 04 November 2026 · Sample shift</p>
-          <h1>Good morning, Ada.</h1>
+          <p className="sw-eyebrow">{identity.date}</p>
+          <h1>Welcome, {identity.name}.</h1>
           <p>Here’s what’s on your production floor today.</p>
         </div>
-        <Button className="sw-primary" onClick={onBatch}>
-          Record a batch <ArrowUpRight size={16} />
-        </Button>
+        <Allowed action="production:create">
+          <Button className="sw-primary" onClick={onBatch}>
+            Record a batch <ArrowUpRight size={16} />
+          </Button>
+        </Allowed>
       </header>
       <section className="sw-shift-banner" aria-label="Current shift">
-        <span className="sw-state sw-open">Open shift</span>
-        <strong>Morning · 06:00–14:00</strong>
-        <span>Production / Ikeja branch</span>
+        <ShiftBadge department="production" />
+        <strong>{identity.shiftLabel}</strong>
+        <span>Production / {identity.branch}</span>
         <Link to={`${base}/schedule`}>
           View my schedule <ArrowRight size={14} />
         </Link>
@@ -38,18 +47,32 @@ export function StaffHome({ base, onBatch }: Props) {
         {[
           {
             label: 'Batches recorded',
-            value: '3',
+            value: String(records.length),
             note: 'In your current shift',
             Icon: ClipboardList,
           },
-          { label: 'Units submitted', value: '590', note: 'Across two product sizes', Icon: Wheat },
+          {
+            label: 'Units submitted',
+            value: String(records.reduce((sum, r) => sum + r.quantity, 0)),
+            note: 'Across recorded products',
+            Icon: Wheat,
+          },
           {
             label: 'Awaiting acceptance',
-            value: '250',
+            value: String(
+              records
+                .filter((r) => r.state === 'Pending acceptance')
+                .reduce((sum, r) => sum + r.quantity, 0)
+            ),
             note: 'Physical receiving still required',
             Icon: PackageCheck,
           },
-          { label: 'Scheduled shift', value: '8 hrs', note: 'Ends at 14:00', Icon: Clock3 },
+          {
+            label: 'Scheduled shift',
+            value: identity.shift?.label ?? 'Unassigned',
+            note: identity.shiftLabel,
+            Icon: Clock3,
+          },
         ].map(({ label, value, note, Icon }) => (
           <div key={label}>
             <div className="sw-stat-title">
@@ -72,7 +95,13 @@ export function StaffHome({ base, onBatch }: Props) {
               All tasks <ArrowRight size={14} />
             </Link>
           </div>
-          {previewTasks.map((task, i) => (
+          {!productionTasks.length && (
+            <div className="sw-empty">
+              <h3>No assigned tasks</h3>
+              <p>Assigned work will appear here.</p>
+            </div>
+          )}
+          {productionTasks.map((task, i) => (
             <article className="sw-task-row" key={task.id}>
               <span className="sw-task-number">0{i + 1}</span>
               <div>
@@ -86,7 +115,7 @@ export function StaffHome({ base, onBatch }: Props) {
                   <ArrowUpRight size={14} />
                 </button>
               ) : (
-                <Link className="sw-quiet" to={`${base}/records/BAT-0184`}>
+                <Link className="sw-quiet" to={`${base}/records/${task.batchId}`}>
                   {task.action}
                   <ArrowUpRight size={14} />
                 </Link>
@@ -104,8 +133,8 @@ export function StaffHome({ base, onBatch }: Props) {
             Your batch stays pending until Disbursement verifies the physical count. Only accepted
             units become available stock.
           </p>
-          <Link to={`${base}/records/BAT-0186`}>
-            Review pending transfer <ArrowRight size={14} />
+          <Link to={`${base}/records`}>
+            Review batch records <ArrowRight size={14} />
           </Link>
         </aside>
       </div>
@@ -121,7 +150,7 @@ export function StaffHome({ base, onBatch }: Props) {
         </div>
         <StaffTable base={base} />
         <div className="sw-panel-footer">
-          Production records only · Values shown are sample data.
+          Production records · Receiving counts are recorded independently.
         </div>
       </section>
     </>

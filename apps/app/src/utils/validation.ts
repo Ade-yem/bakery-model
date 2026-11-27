@@ -92,7 +92,7 @@ export function validatePasswordMatch(password: string, confirm: string): FieldV
 export function validateLoginForm(values: LoginFormValues): FormValidationResult<LoginFormValues> {
   const errors: Partial<Record<keyof LoginFormValues, string>> = {};
 
-  const idCheck = validateRequired(values.identifier, 'Email or username');
+  const idCheck = validateEmail(values.identifier);
   if (!idCheck.isValid && idCheck.error) errors.identifier = idCheck.error;
 
   const pwCheck = validateRequired(values.password, 'Password');
@@ -128,7 +128,9 @@ export function validateForgotPasswordForm(
  * @param {RegisterFormValues} values - Registration form inputs.
  * @returns {FormValidationResult<RegisterFormValues>} Validation status with keyed errors.
  */
-export function validateRegisterForm(values: RegisterFormValues): FormValidationResult<RegisterFormValues> {
+export function validateRegisterForm(
+  values: RegisterFormValues
+): FormValidationResult<RegisterFormValues> {
   const errors: Partial<Record<keyof RegisterFormValues, string>> = {};
 
   const bizCheck = validateRequired(values.businessName, 'Bakery business name');
@@ -139,9 +141,6 @@ export function validateRegisterForm(values: RegisterFormValues): FormValidation
 
   const emailCheck = validateEmail(values.email);
   if (!emailCheck.isValid && emailCheck.error) errors.email = emailCheck.error;
-
-  const userCheck = validateRequired(values.username, 'Username');
-  if (!userCheck.isValid && userCheck.error) errors.username = userCheck.error;
 
   const pwCheck = validatePassword(values.password);
   if (!pwCheck.isValid && pwCheck.error) errors.password = pwCheck.error;

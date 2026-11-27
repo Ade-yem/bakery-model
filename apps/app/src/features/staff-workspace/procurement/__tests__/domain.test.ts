@@ -12,7 +12,7 @@ import {
   receivePurchaseOrder,
   recordDirectReceipt,
 } from '../domain';
-import { initialProcurementSnapshot } from '../data';
+import { initialProcurementSnapshot } from './fixtures/data';
 
 describe('Procurement domain logic', () => {
   it('TEST-PROC-001: parses currency into integer kobo and computes line totals safely', () => {
@@ -57,7 +57,7 @@ describe('Procurement domain logic', () => {
         supplierId: 'SUP-002',
         expectedDate: '2026-11-22',
         lines: [],
-      }),
+      })
     ).toThrow(/line/i);
 
     const next = createPurchaseOrder(initialProcurementSnapshot, {
@@ -121,7 +121,7 @@ describe('Procurement domain logic', () => {
         poId: 'PO-0102',
         reference: 'DUP-001',
         receivedBy: 'Kemi Adeyemi',
-      }),
+      })
     ).toThrow();
   });
 
@@ -158,7 +158,7 @@ describe('Procurement domain logic', () => {
         phone: '0800',
         email: 'a@b.com',
         leadTimeDays: 2,
-      }),
+      })
     ).toThrow(/name/i);
 
     const withSupplier = addSupplier(initialProcurementSnapshot, {

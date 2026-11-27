@@ -1,3 +1,6 @@
+import { useDepartmentData } from '../../integration/workspace';
+import { StaffPersonal } from '../StaffPersonal';
+import { outstanding } from './repayments';
 /** @file Reception lists, customers, credit and personal pages. */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,7 +14,7 @@ interface Props {
 }
 /**
  * @description Presents Reception order totals and dispatch state without stock/fulfillment controls.
- * @param props Orders already scoped to this sample Reception workspace.
+ * @param props Orders already scoped to this Reception workspace.
  * @returns Order table or a useful empty state.
  */
 export function OrderTable({ orders, base }: Props) {
@@ -77,7 +80,7 @@ export function ReceptionHeading({ title, description }: { title: string; descri
 }
 /**
  * @description Filters Reception records without changing or concealing canonical order state.
- * @param props Current local preview orders and route base.
+ * @param props Current local orders and route base.
  * @returns Search, status filter and order list.
  */
 export function ReceptionOrders({ orders, base }: Props) {
@@ -158,7 +161,7 @@ export function ReceptionTasks({ orders, base }: Props) {
 }
 /**
  * @description Displays customer contacts or debt grouped from recorded Reception tender entries.
- * @param props Current Reception sample orders, route base and whether to show only debtor accounts.
+ * @param props Current Reception orders, route base and whether to show only debtor accounts.
  * @returns Named customer accounts and source-linked credit entries; no invented credit approvals.
  */
 export function ReceptionCustomers({
@@ -166,6 +169,7 @@ export function ReceptionCustomers({
   base,
   credits = false,
 }: Props & { credits?: boolean }) {
+  const ledger = { entries: useDepartmentData('reception').repayments };
   const customers = [
     ...new Set(
       orders.filter((order) => order.customer !== 'Walk-in customer').map((order) => order.customer)
@@ -182,8 +186,7 @@ export function ReceptionCustomers({
         }
       />
       <section className="sw-panel">
-        {((credits &&
-          !orders.some((order) => order.payments.some((payment) => payment.method === 'DEBT'))) ||
+        {((credits && orders.every((order) => outstanding(order, ledger.entries) === 0)) ||
           (!credits && !customers.length)) && (
           <div className="sw-empty">
             <h2>{credits ? 'No customer credit recorded' : 'No named customers yet'}</h2>
@@ -206,10 +209,14 @@ export function ReceptionCustomers({
                 const debtOrders = source.filter((order) =>
                   order.payments.some((p) => p.method === 'DEBT')
                 );
-                const debt = debtOrders
-                  .flatMap((order) => order.payments)
-                  .filter((payment) => payment.method === 'DEBT')
-                  .reduce((sum, payment) => sum + payment.amount, 0);
+                const debt =
+                  debtOrders
+                    .flatMap((order) => order.payments)
+                    .filter((payment) => payment.method === 'DEBT')
+                    .reduce((sum, payment) => sum + payment.amount, 0) -
+                  ledger.entries
+                    .filter((entry) => source.some((order) => order.id === entry.orderId))
+                    .reduce((sum, entry) => sum + entry.amount, 0);
                 if (credits && debt === 0) return null;
                 return (
                   <tr key={name}>
@@ -234,8 +241,8 @@ export function ReceptionCustomers({
         </div>
         <div className="sw-panel-footer">
           {credits
-            ? 'Credit approval and repayment posting require the agreed backend policy. No debt write-off or self-approval is offered here.'
-            : 'Sample contacts only. Customer management APIs are not connected.'}
+            ? 'Credit approval and repayments require an authorized manager. Reception cannot approve its own credit.'
+            : 'Customer details are read-only. Contact an authorized manager for changes.'}
         </div>
       </section>
     </>
@@ -247,86 +254,20 @@ export function ReceptionCustomers({
  * @returns Read-only personal records without admin editing controls.
  */
 export function ReceptionPersonal({ page, orders }: { page: string; orders: ReceptionOrder[] }) {
-  if (page === 'profile')
-    return (
-      <>
-        <ReceptionHeading
-          title="My profile"
-          description="Your Reception identity and assigned workspace."
-        />
-        <section className="sw-panel sw-detail">
-          <div className="sw-profile-heading">
-            <span className="sw-avatar">FA</span>
-            <div>
-              <h2>Fatima Ahmed</h2>
-              <p className="sw-muted">Receptionist · Sample profile</p>
-            </div>
-          </div>
-          <dl>
-            {[
-              ['Business', 'Tally Artisan Bakery'],
-              ['Branch', 'Ikeja'],
-              ['Department', 'Reception'],
-              ['Role', 'Receptionist / Cashier'],
-              ['Shift group', 'Group B'],
-            ].map(([label, value]) => (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="sw-callout">
-            Your manager maintains your assignments. Reception cannot change its own role or
-            department.
-          </p>
-        </section>
-      </>
-    );
-  if (page === 'schedule')
-    return (
-      <>
-        <ReceptionHeading
-          title="My schedule"
-          description="Your assigned Reception shifts · 02–08 November 2026 · Sample data."
-        />
-        <section className="sw-panel">
-          <div className="sw-panel-heading">
-            <h2>This week · All times WAT</h2>
-            <span className="sw-label">Group B</span>
-          </div>
-          <div className="sw-table-scroll">
-            <table className="sw-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Shift</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {['Mon 02', 'Tue 03', 'Wed 04', 'Thu 05', 'Fri 06', 'Sat 07', 'Sun 08'].map(
-                  (day, index) => (
-                    <tr key={day}>
-                      <td>{day} Nov</td>
-                      <td>{index === 6 ? 'Rest day' : index < 3 ? 'Morning' : 'Evening'}</td>
-                      <td>{index === 6 ? '—' : index < 3 ? '06:00–14:00' : '14:00–22:00'}</td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </>
-    );
+  if (page === 'profile' || page === 'schedule') return <StaffPersonal page={page} />;
   return (
     <>
       <ReceptionHeading
         title="Activity history"
-        description="Your sample orders and their current handoff state. No fabricated audit trail."
+        description="Your orders and their current handoff state."
       />
       <section className="sw-panel sw-detail">
+        {!orders.length && (
+          <div className="sw-empty">
+            <h2>No order activity yet</h2>
+            <p>Recorded orders will appear here.</p>
+          </div>
+        )}
         <ol className="sw-timeline">
           {orders.map((order) => (
             <li key={order.id}>
@@ -346,7 +287,9 @@ export function ReceptionPersonal({ page, orders }: { page: string; orders: Rece
             </li>
           ))}
         </ol>
-        <p className="sw-muted">This is a preview activity summary, not a server audit log.</p>
+        <p className="sw-muted">
+          Order activity is shown here. Finalized audit history is read-only.
+        </p>
       </section>
     </>
   );

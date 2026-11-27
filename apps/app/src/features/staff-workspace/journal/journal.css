@@ -1,0 +1,15 @@
+.jo-filter {
+  display: grid;
+  gap: 8px;
+  max-width: 280px;
+  margin-top: 16px;
+  font-size: 13px;
+}
+.jo-filter select {
+  background: var(--color-flour);
+  border: 1px solid var(--sw-rule);
+  color: var(--sw-ink);
+  padding: 12px;
+  border-radius: 4px;
+  font: inherit;
+}

@@ -1,15 +1,10 @@
-/** @file Synthetic hospital procurement fixtures for the interactive client preview. */
-import type { StaffAccess } from '../access';
-import type { ProcurementSnapshot } from './types';
+/** @file Synthetic bakery procurement fixtures for the interactive client preview. */
+import type { StaffAccess } from '../../../access';
+import type { ProcurementSnapshot } from '../../types';
 
 export const procurementAccess: StaffAccess = {
   enabledModules: ['procurement', 'inventory', 'suppliers'],
-  permissions: [
-    'procurement:view',
-    'inventory:view',
-    'suppliers:view',
-    'records:view',
-  ],
+  permissions: ['procurement:view', 'inventory:view', 'suppliers:view', 'records:view'],
 };
 
 export const initialProcurementSnapshot: ProcurementSnapshot = {
