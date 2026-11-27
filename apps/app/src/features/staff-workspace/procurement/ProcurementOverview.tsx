@@ -1,5 +1,5 @@
 /** @file Executive procurement overview with state-derived operational signals. */
-import { AlertTriangle, ClipboardList, PackageCheck, ReceiptText } from 'lucide-react';
+import { AlertTriangle, ClipboardList, PackageCheck, ReceiptText, RotateCcw } from 'lucide-react';
 import { Button } from '../../../components/shared/Button';
 import { deriveProcurementKpis, formatMoney, getStockStatus } from './domain';
 import type { ProcurementSnapshot, RawMaterial } from './types';
@@ -8,14 +8,15 @@ interface Props {
   snapshot: ProcurementSnapshot;
   onReorder: (material: RawMaterial) => void;
   branchName?: string;
+  onReset?: () => void;
 }
 
 /**
  * @description Gives procurement managers a concise view of commitments, spend, receipts, and materials needing action.
- * @param props Current snapshot and callbacks for the two recoverable overview actions.
+ * @param props Current snapshot and callbacks for overview actions.
  * @returns A state-derived overview with low-stock quick reorder and recent receipt context.
  */
-export function ProcurementOverview({ snapshot, onReorder, branchName }: Props) {
+export function ProcurementOverview({ snapshot, onReorder, branchName, onReset }: Props) {
   const kpis = deriveProcurementKpis(snapshot);
   const lowStock = snapshot.materials.filter(
     (material) => getStockStatus(material.currentStock, material.minThreshold) !== 'OK'
@@ -40,6 +41,11 @@ export function ProcurementOverview({ snapshot, onReorder, branchName }: Props) 
           <h1>Procurement overview</h1>
           <p>Monitor vendor commitments, medical spend, and critical ward supply risk in one place.</p>
         </div>
+        {onReset && (
+          <Button variant="secondary" icon={<RotateCcw size={16} />} onClick={onReset}>
+            Reset demo data
+          </Button>
+        )}
       </header>
 
       <section className="sw-stats pr-stats" aria-label="Procurement summary">

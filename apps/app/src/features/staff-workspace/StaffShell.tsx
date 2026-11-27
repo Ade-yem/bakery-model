@@ -26,6 +26,7 @@ interface Props {
   extraLinks?: { path: string; label: string }[];
   navigationLabels?: Record<string, string>;
   navigationLinks?: { path: string; label: string }[];
+  showSyncStatus?: boolean;
 }
 const navigationIcons = {
   '/workspace': LayoutDashboard,
@@ -48,6 +49,7 @@ export function StaffShell({
   extraLinks = [],
   navigationLabels = {},
   navigationLinks,
+  showSyncStatus = true,
 }: Props) {
   const auth = useAuth();
   const [logoutError, setLogoutError] = useState('');
@@ -190,7 +192,7 @@ export function StaffShell({
           </div>
           <span className="sw-muted">{department}</span>
         </header>
-        <GlobalSyncStatus />
+        {showSyncStatus && <GlobalSyncStatus />}
         <div className="sw-content" id="staff-content" tabIndex={-1}>
           {children}
           <footer className="sw-footer">

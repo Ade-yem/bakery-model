@@ -12,6 +12,7 @@ import { SyncProvider } from './features/sync/SyncProvider';
 import type { SyncAdapter } from './features/sync/types';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { WorkspaceRoute } from './features/staff-workspace/WorkspaceRoute';
+import { ProcurementPreviewWorkspace } from './features/staff-workspace/procurement/ProcurementPreviewWorkspace';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { ForgotPassword } from './pages/ForgotPassword';
@@ -41,6 +42,10 @@ export function App({
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                  path="/workspace-preview/procurement/*"
+                  element={<ProcurementPreviewWorkspace />}
+                />
                 <Route
                   path="/workspace/*"
                   element={<WorkspaceRoute adapter={workspaceAdapter} api={api} />}

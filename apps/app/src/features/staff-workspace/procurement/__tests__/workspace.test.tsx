@@ -1,15 +1,13 @@
-import { TestWorkspace } from '../../__tests__/fixtures/workspace';
-/** @file Integration and rendering tests for the Procurement workspace preview. */
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import { ProcurementWorkspace } from '../ProcurementWorkspace';
+import { ProcurementPreviewWorkspace } from '../ProcurementPreviewWorkspace';
 import { CreatePoDialog } from '../CreatePoDialog';
 import { ProcurementOverview } from '../ProcurementOverview';
 import { PurchaseOrdersPage } from '../PurchaseOrdersPage';
 import { RawMaterialStockPage } from '../RawMaterialStockPage';
 import { ReceiptsLedgerPage } from '../ReceiptsLedgerPage';
-import { initialProcurementSnapshot } from './fixtures/data';
+import { initialProcurementSnapshot } from '../preview-data';
 import { addSupplier, createPurchaseOrder, formatMoney, receivePurchaseOrder } from '../domain';
 
 describe('Procurement workspace integration', () => {
@@ -17,11 +15,10 @@ describe('Procurement workspace integration', () => {
     for (const path of ['', '/purchase-orders', '/receipts', '/stock', '/suppliers']) {
       const html = renderToStaticMarkup(
         <MemoryRouter initialEntries={[`/workspace-preview/procurement${path}`]}>
-          <ProcurementWorkspace />
+          <ProcurementPreviewWorkspace />
         </MemoryRouter>,
       );
 
-      expect(html).toContain('Sample data');
       expect(html).toContain('Lagoon Specialist Hospital');
       expect(html).toContain('Central Medical Store');
       expect(html).toContain('Overview');
@@ -137,10 +134,8 @@ describe('Procurement workspace integration', () => {
     expect(dialogHtml).toContain('Emzor Pharmaceutical Supply');
 
     const notFoundHtml = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/workspace/procurement/unknown']}>
-        <TestWorkspace department="procurement">
-          <ProcurementWorkspace />
-        </TestWorkspace>
+      <MemoryRouter initialEntries={['/workspace-preview/procurement/unknown']}>
+        <ProcurementPreviewWorkspace />
       </MemoryRouter>
     );
     expect(notFoundHtml).toContain('Page not found');

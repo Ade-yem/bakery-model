@@ -1,0 +1,165 @@
+/** @file Synthetic hospital procurement fixtures for the interactive client preview. */
+import type { StaffAccess } from '../access';
+import type { ProcurementSnapshot } from './types';
+
+export const procurementAccess: StaffAccess = {
+  enabledModules: ['procurement', 'inventory', 'suppliers'],
+  permissions: ['procurement:view', 'inventory:view', 'suppliers:view', 'records:view'],
+};
+
+export const initialProcurementSnapshot: ProcurementSnapshot = {
+  suppliers: [
+    {
+      id: 'SUP-001',
+      name: 'Fidson Healthcare Supply',
+      category: 'Pharmaceuticals & IV Fluids',
+      contactName: 'Dr. Tunde Bakare',
+      phone: '+234 803 412 8890',
+      email: 'orders@fidson-sample.ng',
+      leadTimeDays: 2,
+    },
+    {
+      id: 'SUP-002',
+      name: 'Medline Surgical & Diagnostics',
+      category: 'Surgical & Sterile Consumables',
+      contactName: 'Ngozi Eze',
+      phone: '+234 809 771 2045',
+      email: 'dispatch@medlinesurgical-sample.ng',
+      leadTimeDays: 1,
+    },
+    {
+      id: 'SUP-003',
+      name: 'Biomed Lab Reagents Ltd.',
+      category: 'Lab Reagents & Kits',
+      contactName: 'Chidi Okafor',
+      phone: '+234 805 330 9112',
+      email: 'sales@biomedlab-sample.ng',
+      leadTimeDays: 3,
+    },
+  ],
+  materials: [
+    {
+      id: 'RM-001',
+      sku: 'MED-GLV-100',
+      name: 'Sterile Nitrile Gloves · Box of 100',
+      unit: 'box',
+      currentStock: 6,
+      minThreshold: 12,
+      lastUnitCostKobo: 1850000,
+      preferredSupplierId: 'SUP-002',
+    },
+    {
+      id: 'RM-002',
+      sku: 'MED-NSL-500',
+      name: '0.9% Normal Saline IV · 500ml Case (24)',
+      unit: 'case',
+      currentStock: 0,
+      minThreshold: 4,
+      lastUnitCostKobo: 4200000,
+      preferredSupplierId: 'SUP-001',
+    },
+    {
+      id: 'RM-003',
+      sku: 'MED-SYR-5ML',
+      name: '5ml Disposable Syringes · Box of 100',
+      unit: 'box',
+      currentStock: 14,
+      minThreshold: 5,
+      lastUnitCostKobo: 950000,
+      preferredSupplierId: 'SUP-002',
+    },
+    {
+      id: 'RM-004',
+      sku: 'MED-AMX-500',
+      name: 'Amoxicillin 500mg · Pack of 100',
+      unit: 'pack',
+      currentStock: 10,
+      minThreshold: 8,
+      lastUnitCostKobo: 2400000,
+      preferredSupplierId: 'SUP-001',
+    },
+    {
+      id: 'RM-005',
+      sku: 'LAB-TST-50',
+      name: 'Rapid Malaria Test Kits · 50 Pack',
+      unit: 'pack',
+      currentStock: 3,
+      minThreshold: 5,
+      lastUnitCostKobo: 3250000,
+      preferredSupplierId: 'SUP-003',
+    },
+  ],
+  purchaseOrders: [
+    {
+      id: 'PO-0102',
+      poNumber: 'PO-0102',
+      supplierId: 'SUP-001',
+      status: 'OPEN',
+      createdAt: '2026-11-20T07:15:00Z',
+      expectedDate: '2026-11-21',
+      lines: [
+        {
+          materialId: 'RM-002',
+          materialName: '0.9% Normal Saline IV · 500ml Case (24)',
+          unit: 'case',
+          quantity: 6,
+          unitCostKobo: 4200000,
+        },
+      ],
+      totalAmountKobo: 25200000,
+      notes: 'Urgent Emergency & Ward IV fluid restock',
+    },
+    {
+      id: 'PO-0101',
+      poNumber: 'PO-0101',
+      supplierId: 'SUP-002',
+      status: 'RECEIVED',
+      createdAt: '2026-11-19T14:30:00Z',
+      expectedDate: '2026-11-20',
+      lines: [
+        {
+          materialId: 'RM-003',
+          materialName: '5ml Disposable Syringes · Box of 100',
+          unit: 'box',
+          quantity: 5,
+          unitCostKobo: 950000,
+        },
+      ],
+      totalAmountKobo: 4750000,
+      notes: 'Weekly central store syringe replenishment',
+    },
+  ],
+  receipts: [
+    {
+      id: 'REC-0201',
+      receiptNumber: 'REC-0201',
+      poId: 'PO-0101',
+      supplierId: 'SUP-002',
+      reference: 'MDL-INV-4410',
+      receivedAt: '2026-11-20T06:45:00Z',
+      receivedBy: 'Kemi Adeyemi',
+      lines: [
+        {
+          materialId: 'RM-003',
+          materialName: '5ml Disposable Syringes · Box of 100',
+          unit: 'box',
+          quantity: 5,
+          unitCostKobo: 950000,
+        },
+      ],
+      totalAmountKobo: 4750000,
+      notes: 'Verified at Central Medical Store receiving bay',
+    },
+  ],
+  movements: [
+    {
+      id: 'MOV-0301',
+      materialId: 'RM-003',
+      type: 'INBOUND_PROCUREMENT',
+      quantityDelta: 5,
+      receiptId: 'REC-0201',
+      createdAt: '2026-11-20T06:45:00Z',
+      actor: 'Kemi Adeyemi',
+    },
+  ],
+};
