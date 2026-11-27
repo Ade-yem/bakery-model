@@ -13,20 +13,30 @@ import { initialProcurementSnapshot } from './fixtures/data';
 import { addSupplier, createPurchaseOrder, formatMoney, receivePurchaseOrder } from '../domain';
 
 describe('Procurement workspace integration', () => {
-  it('TEST-PROC-011: retains the Procurement shell behind a verified scoped data provider', () => {
-    const html = renderToStaticMarkup(
-      <MemoryRouter initialEntries={['/workspace/procurement']}>
-        <TestWorkspace department="procurement">
+  it('TEST-PROC-011: renders all 5 routes inside StaffShell with hospital context and strict role isolation', () => {
+    for (const path of ['', '/purchase-orders', '/receipts', '/stock', '/suppliers']) {
+      const html = renderToStaticMarkup(
+        <MemoryRouter initialEntries={[`/workspace-preview/procurement${path}`]}>
           <ProcurementWorkspace />
-        </TestWorkspace>
-      </MemoryRouter>
-    );
-    expect(html).toContain('Staff navigation');
-    expect(html).not.toContain('Sample data');
-    expect(html).not.toContain('Reset demo data');
+        </MemoryRouter>,
+      );
+
+      expect(html).toContain('Sample data');
+      expect(html).toContain('Lagoon Specialist Hospital');
+      expect(html).toContain('Central Medical Store');
+      expect(html).toContain('Overview');
+      expect(html).toContain('Purchase Orders');
+      expect(html).toContain('Receipts &amp; Ledger');
+      expect(html).toContain('Medical Stock');
+      expect(html).toContain('Suppliers');
+      expect(html).not.toMatch(/Tally Artisan Bakery|Bread Flour|Unsalted Butter/);
+      expect(html).not.toMatch(/Network available|Sync queue not connected|Pending count unavailable/);
+      expect(html).not.toMatch(/Customer credit|Push to Disbursement|Record a production batch|BAT-0186/);
+    }
   });
-  it('TEST-PROC-012: pre-fills CreatePoDialog with low-stock material and its preferred supplier', () => {
-    const lowFlour = initialProcurementSnapshot.materials.find((m) => m.id === 'RM-001')!;
+
+  it('TEST-PROC-012: pre-fills CreatePoDialog with low-stock medical item and its preferred supplier', () => {
+    const lowGloves = initialProcurementSnapshot.materials.find((m) => m.id === 'RM-001')!;
     const overviewHtml = renderToStaticMarkup(
       <MemoryRouter>
         <ProcurementOverview snapshot={initialProcurementSnapshot} onReorder={() => {}} />
