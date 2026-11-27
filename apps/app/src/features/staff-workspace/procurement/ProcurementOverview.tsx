@@ -36,9 +36,9 @@ export function ProcurementOverview({ snapshot, onReorder, onReset }: Props) {
     <>
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Ikeja branch · Procurement control</p>
+          <p className="sw-eyebrow">Central Medical Store · Procurement control</p>
           <h1>Procurement overview</h1>
-          <p>See supplier commitments, received spend, and replenishment risk in one place.</p>
+          <p>Monitor vendor commitments, medical spend, and critical ward supply risk in one place.</p>
         </div>
         <Button variant="secondary" icon={<RotateCcw size={16} />} onClick={onReset}>
           Reset demo data
@@ -98,8 +98,8 @@ export function ProcurementOverview({ snapshot, onReorder, onReset }: Props) {
             })}
             {lowStock.length === 0 && (
               <div className="sw-empty">
-                <h3>All stock levels healthy</h3>
-                <p>Every tracked raw material is above its minimum reorder threshold.</p>
+                <h3>All supply levels healthy</h3>
+                <p>Every tracked medical supply item is above its minimum reorder threshold.</p>
               </div>
             )}
           </div>

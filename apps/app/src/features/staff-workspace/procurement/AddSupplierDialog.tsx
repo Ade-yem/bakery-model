@@ -16,7 +16,7 @@ interface Props {
 export function AddSupplierDialog({ onClose, onSave }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('Flour & Grains');
+  const [category, setCategory] = useState('Pharmaceuticals & IV Fluids');
   const [contactName, setContactName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -69,7 +69,7 @@ export function AddSupplierDialog({ onClose, onSave }: Props) {
           <input
             type="text"
             required
-            placeholder="e.g. Olam Grains Nigeria"
+            placeholder="e.g. Emzor Pharmaceutical Supply"
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
@@ -78,10 +78,10 @@ export function AddSupplierDialog({ onClose, onSave }: Props) {
         <label>
           Category
           <select value={category} onChange={(event) => setCategory(event.target.value)}>
-            <option value="Flour & Grains">Flour &amp; Grains</option>
-            <option value="Dairy & Shortening">Dairy &amp; Shortening</option>
-            <option value="Packaging & Wraps">Packaging &amp; Wraps</option>
-            <option value="Sweeteners & Yeast">Sweeteners &amp; Yeast</option>
+            <option value="Pharmaceuticals & IV Fluids">Pharmaceuticals &amp; IV Fluids</option>
+            <option value="Surgical & Sterile Consumables">Surgical &amp; Sterile Consumables</option>
+            <option value="Lab Reagents & Kits">Lab Reagents &amp; Kits</option>
+            <option value="Medical Equipment & PPE">Medical Equipment &amp; PPE</option>
           </select>
         </label>
 

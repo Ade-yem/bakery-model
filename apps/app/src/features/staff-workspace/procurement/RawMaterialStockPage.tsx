@@ -33,9 +33,9 @@ export function RawMaterialStockPage({ materials, suppliers, onReorder }: Props)
     <section aria-labelledby="stock-heading">
       <header className="sw-page-header">
         <div>
-          <p className="sw-eyebrow">Store inventory</p>
-          <h1 id="stock-heading">Raw Material Stock</h1>
-          <p>Stock levels increment automatically when procurement deliveries are posted.</p>
+          <p className="sw-eyebrow">Central medical store</p>
+          <h1 id="stock-heading">Medical Supply Stock</h1>
+          <p>Stock levels increment automatically when verified supplier deliveries are posted.</p>
         </div>
         <span className="pr-count">{needsRestock} needing restock</span>
       </header>
@@ -46,19 +46,19 @@ export function RawMaterialStockPage({ materials, suppliers, onReorder }: Props)
             <Search size={16} />
             <input
               type="search"
-              placeholder="Search SKU, ingredient, or status"
+              placeholder="Search SKU, medical supply, or status"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
           </label>
-          <span className="pr-count">{filtered.length} tracked materials</span>
+          <span className="pr-count">{filtered.length} tracked supplies</span>
         </div>
 
         <div className="sw-table-scroll">
           <table className="sw-table pr-table">
             <thead>
               <tr>
-                <th scope="col">SKU / Material</th>
+                <th scope="col">SKU / Medical supply</th>
                 <th scope="col">Current stock</th>
                 <th scope="col">Min threshold</th>
                 <th scope="col">Last unit cost</th>

@@ -214,9 +214,11 @@ export function ProcurementWorkspace() {
     <StaffShell
       base={base}
       department="Procurement"
+      organizationName="Lagoon Specialist Hospital"
+      branchName="Central Medical Store"
       name="Kemi Adeyemi"
       initials="KA"
-      role="Procurement Officer"
+      role="Hospital Procurement Officer"
       access={procurementAccess}
       hiddenNavigationPaths={['/workspace/profile']}
       navigationLabels={{
@@ -228,7 +230,7 @@ export function ProcurementWorkspace() {
         '/workspace/records': `${base}/receipts`,
       }}
       extraLinks={[
-        { path: `${base}/stock`, label: 'Raw Material Stock' },
+        { path: `${base}/stock`, label: 'Medical Stock' },
         { path: `${base}/suppliers`, label: 'Suppliers' },
       ]}
       showSyncStatus={false}

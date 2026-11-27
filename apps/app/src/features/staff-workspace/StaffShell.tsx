@@ -30,6 +30,8 @@ interface Props {
   hiddenNavigationPaths?: string[];
   navigationPathOverrides?: Record<string, string>;
   showSyncStatus?: boolean;
+  organizationName?: string;
+  branchName?: string;
 }
 const navigationIcons = [LayoutDashboard, ClipboardList, Files, History, CalendarDays, UserRound];
 /**
@@ -51,6 +53,8 @@ export function StaffShell({
   hiddenNavigationPaths = [],
   navigationPathOverrides = {},
   showSyncStatus = true,
+  organizationName = 'Tally Artisan Bakery',
+  branchName = 'Ikeja branch',
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
@@ -78,7 +82,7 @@ export function StaffShell({
           </span>
           <div>
             <strong>{department}</strong>
-            <p>Tally Artisan Bakery</p>
+            <p>{organizationName}</p>
           </div>
         </div>
         <p className="sw-nav-caption">My workspace</p>
@@ -134,7 +138,7 @@ export function StaffShell({
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <span>Ikeja branch</span>
+            <span>{branchName}</span>
             <span className="sw-top-divider">/</span>
             <span className="sw-muted">Staff workspace</span>
           </div>

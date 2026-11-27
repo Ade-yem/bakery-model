@@ -147,7 +147,7 @@ export function ReceivePoDialog({
               </label>
               <div className="pr-form-grid">
                 <label>
-                  Material
+                  Supply item
                   <select
                     value={materialId}
                     onChange={(event) => changeDirectMaterial(event.target.value)}
@@ -223,7 +223,7 @@ export function ReceivePoDialog({
             <textarea
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
-              placeholder="Optional condition or delivery notes"
+              placeholder="Optional batch, expiry, or cold-chain condition notes"
             />
           </label>
           <p className="pr-atomic-note">

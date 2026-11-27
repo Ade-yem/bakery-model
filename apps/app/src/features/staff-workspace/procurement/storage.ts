@@ -2,7 +2,7 @@
 import { initialProcurementSnapshot } from './data';
 import type { ProcurementSnapshot } from './types';
 
-export const storageKey = 'cadence:procurement-preview:v1';
+export const storageKey = 'cadence:procurement-preview:v2';
 
 export interface ProcurementLoadResult {
   snapshot: ProcurementSnapshot;

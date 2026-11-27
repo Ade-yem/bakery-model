@@ -1,4 +1,4 @@
-/** @file Integration and rendering tests for the Procurement workspace preview. */
+/** @file Integration and rendering tests for the hospital Procurement workspace preview. */
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
@@ -17,7 +17,7 @@ import {
 } from '../domain';
 
 describe('Procurement workspace integration', () => {
-  it('TEST-PROC-011: renders all 5 routes inside StaffShell with strict role isolation', () => {
+  it('TEST-PROC-011: renders all 5 routes inside StaffShell with hospital context and strict role isolation', () => {
     for (const path of ['', '/purchase-orders', '/receipts', '/stock', '/suppliers']) {
       const html = renderToStaticMarkup(
         <MemoryRouter initialEntries={[`/workspace-preview/procurement${path}`]}>
@@ -26,19 +26,21 @@ describe('Procurement workspace integration', () => {
       );
 
       expect(html).toContain('Sample data');
-      expect(html).toContain('Procurement');
+      expect(html).toContain('Lagoon Specialist Hospital');
+      expect(html).toContain('Central Medical Store');
       expect(html).toContain('Overview');
       expect(html).toContain('Purchase Orders');
       expect(html).toContain('Receipts &amp; Ledger');
-      expect(html).toContain('Raw Material Stock');
+      expect(html).toContain('Medical Stock');
       expect(html).toContain('Suppliers');
+      expect(html).not.toMatch(/Tally Artisan Bakery|Bread Flour|Unsalted Butter/);
       expect(html).not.toMatch(/Network available|Sync queue not connected|Pending count unavailable/);
       expect(html).not.toMatch(/Customer credit|Push to Disbursement|Record a production batch|BAT-0186/);
     }
   });
 
-  it('TEST-PROC-012: pre-fills CreatePoDialog with low-stock material and its preferred supplier', () => {
-    const lowFlour = initialProcurementSnapshot.materials.find((m) => m.id === 'RM-001')!;
+  it('TEST-PROC-012: pre-fills CreatePoDialog with low-stock medical item and its preferred supplier', () => {
+    const lowGloves = initialProcurementSnapshot.materials.find((m) => m.id === 'RM-001')!;
     const overviewHtml = renderToStaticMarkup(
       <MemoryRouter>
         <ProcurementOverview
@@ -48,28 +50,28 @@ describe('Procurement workspace integration', () => {
         />
       </MemoryRouter>,
     );
-    expect(overviewHtml).toContain('Bread Flour');
+    expect(overviewHtml).toContain('Sterile Nitrile Gloves');
     expect(overviewHtml).toContain('Reorder');
 
     const dialogHtml = renderToStaticMarkup(
       <CreatePoDialog
         snapshot={initialProcurementSnapshot}
-        prefilledMaterial={lowFlour}
+        prefilledMaterial={lowGloves}
         onClose={() => {}}
         onSubmit={() => null}
       />,
     );
-    expect(dialogHtml).toContain('Golden Penny Flour Mills');
-    expect(dialogHtml).toContain('Bread Flour · 50kg bag');
-    expect(dialogHtml).toContain('54500');
+    expect(dialogHtml).toContain('Medline Surgical &amp; Diagnostics');
+    expect(dialogHtml).toContain('Sterile Nitrile Gloves · Box of 100');
+    expect(dialogHtml).toContain('18500');
   });
 
   it('TEST-PROC-013: reflects the complete PO -> Receive Delivery -> Stock & Ledger loop in UI views', () => {
     const afterPo = createPurchaseOrder(initialProcurementSnapshot, {
-      supplierId: 'SUP-001',
+      supplierId: 'SUP-002',
       expectedDate: '2026-11-22',
-      notes: 'Demo flour restock',
-      lines: [{ materialId: 'RM-001', quantity: 10, unitCostKobo: 5450000 }],
+      notes: 'Demo surgical gloves restock',
+      lines: [{ materialId: 'RM-001', quantity: 10, unitCostKobo: 1850000 }],
     });
     const newPo = afterPo.purchaseOrders[0];
     expect(newPo.poNumber).toBe('PO-0103');
@@ -104,7 +106,7 @@ describe('Procurement workspace integration', () => {
         onReorder={() => {}}
       />,
     );
-    expect(stockHtml).toContain('<strong>16</strong> 50kg bag');
+    expect(stockHtml).toContain('<strong>16</strong> box');
 
     const ledgerHtml = renderToStaticMarkup(
       <ReceiptsLedgerPage
@@ -115,7 +117,7 @@ describe('Procurement workspace integration', () => {
       />,
     );
     expect(ledgerHtml).toContain('INV-9981');
-    expect(ledgerHtml).toContain(formatMoney(54500000));
+    expect(ledgerHtml).toContain(formatMoney(18500000));
 
     const overviewHtml = renderToStaticMarkup(
       <ProcurementOverview
@@ -124,16 +126,16 @@ describe('Procurement workspace integration', () => {
         onReset={() => {}}
       />,
     );
-    expect(overviewHtml).toContain(formatMoney(54500000));
+    expect(overviewHtml).toContain(formatMoney(18500000));
   });
 
   it('TEST-PROC-014: makes newly added suppliers selectable and renders fallback for unknown routes', () => {
     const withNewSupplier = addSupplier(initialProcurementSnapshot, {
-      name: 'Olam Grains Nigeria',
-      category: 'Flour & Grains',
+      name: 'Emzor Pharmaceutical Supply',
+      category: 'Pharmaceuticals & IV Fluids',
       contactName: 'Seyi Balogun',
       phone: '+234 802 111 2233',
-      email: 'supply@olam-sample.ng',
+      email: 'supply@emzor-sample.ng',
       leadTimeDays: 2,
     });
     const dialogHtml = renderToStaticMarkup(
@@ -144,7 +146,7 @@ describe('Procurement workspace integration', () => {
         onSubmit={() => null}
       />,
     );
-    expect(dialogHtml).toContain('Olam Grains Nigeria');
+    expect(dialogHtml).toContain('Emzor Pharmaceutical Supply');
 
     const notFoundHtml = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/workspace-preview/procurement/unknown']}>
@@ -155,4 +157,3 @@ describe('Procurement workspace integration', () => {
     expect(notFoundHtml).toContain('Return to overview');
   });
 });
-

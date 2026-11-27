@@ -29,7 +29,7 @@ export function SuppliersPage({ suppliers, onOpenAddSupplier }: Props) {
         <div>
           <p className="sw-eyebrow">Vendor directory</p>
           <h1 id="suppliers-heading">Suppliers</h1>
-          <p>Approved raw-material and packaging vendors available for purchase orders.</p>
+          <p>Approved pharmaceutical, surgical, and laboratory vendors available for purchase orders.</p>
         </div>
         <Button icon={<Building2 size={16} />} onClick={onOpenAddSupplier}>
           Add supplier

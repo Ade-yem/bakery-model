@@ -149,11 +149,11 @@ export function CreatePoDialog({ snapshot, prefilledMaterial, onClose, onSubmit 
             </label>
           </div>
           <fieldset className="pr-lines">
-            <legend>Raw materials</legend>
+            <legend>Medical supplies</legend>
             {lines.map((line, index) => (
               <div className="pr-line" key={index}>
                 <label>
-                  Material
+                  Supply item
                   <select
                     value={line.materialId}
                     onChange={(event) => selectMaterial(index, event.target.value)}
